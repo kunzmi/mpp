@@ -11,93 +11,93 @@ extern "C"
     /// Duplicates a one channel image to all channels in a multi-channel image
     /// </summary>
     MPPErrorCode mppciDup_32fc_C1C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Duplicates a one channel image to all channels in a multi-channel image
     /// </summary>
     MPPErrorCode mppciDup_32fc_C1C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Duplicates a one channel image to all channels in a multi-channel image
     /// </summary>
     MPPErrorCode mppciDup_32fc_C1C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy single channel image to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C1C2C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                      Mpp32s aDstChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      Mpp32s aDstChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy single channel image to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C1C3C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                      Mpp32s aDstChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      Mpp32s aDstChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy single channel image to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C1C4C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                      Mpp32s aDstChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      Mpp32s aDstChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to single channel image aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C2C1C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C2C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel, DevPtrMpp32fc aDst,
                                     size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C2C3C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C2C4C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to single channel image aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C3C1C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C3C2C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C3C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel, DevPtrMpp32fc aDst,
                                     size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C3C4C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Swap channels<para/>
@@ -108,7 +108,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciSwapChannel_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                           size_t aDstStep, const Mpp32s aDstChannels[3], MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Swap channels (3-channel to 4-channel with additional value).<para/>
@@ -121,35 +121,35 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciSwapChannel_32fc_C3C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                             size_t aDstStep, const Mpp32s aDstChannels[3], Mpp32fc aValue,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to single channel image aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C4C1C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C4C2C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C4C3C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel,
                                       DevPtrMpp32fc aDst, size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy channel aSrcChannel to channel aDstChannel of aDst.
     /// </summary>
     MPPErrorCode mppciCopy_32fc_C4C(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32s aSrcChannel, DevPtrMpp32fc aDst,
                                     size_t aDstStep, Mpp32s aDstChannel, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
     /// <summary>
     /// Swap channels<para/>
     /// aDstChannels describes how channel values are permutated. The n-th entry
@@ -159,7 +159,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciSwapChannel_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                           size_t aDstStep, const Mpp32s aDstChannels[4], MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Swap channels<para/>
@@ -170,7 +170,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciSwapChannel_32fc_C4C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                             size_t aDstStep, const Mpp32s aDstChannels[3], MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
 #ifdef __cplusplus
 }

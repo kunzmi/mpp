@@ -735,7 +735,7 @@ extern "C"
     /// </summary>
     /// <param name="aStreamCtx">MPP stream context.</param>
     /// <returns>MPP C-API error code</returns>
-    MPPErrorCode mppcGetStreamContext(MppStreamCtx *aStreamCtx);
+    MPPErrorCode mppcGetStreamContext(MppCudaStreamCtx *aStreamCtx);
 
     /// <summary>
     /// Sets the default stream to use in case no stream context (nullptr) is passed to a MPP funtion.

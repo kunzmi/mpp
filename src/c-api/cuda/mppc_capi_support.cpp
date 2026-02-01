@@ -749,13 +749,13 @@ extern "C"
         return ErrorMessageSingleton::GetLastErrorMessage().c_str();
     }
 
-    MPPErrorCode DLLEXPORT mppcGetStreamContext(MppStreamCtx *aStreamCtx)
+    MPPErrorCode DLLEXPORT mppcGetStreamContext(MppCudaStreamCtx *aStreamCtx)
     {
         try
         {
             checkNullptr(aStreamCtx);
 
-            memcpy(aStreamCtx, &mpp::cuda::StreamCtxSingleton::Get(), sizeof(MppStreamCtx));
+            memcpy(aStreamCtx, &mpp::cuda::StreamCtxSingleton::Get(), sizeof(MppCudaStreamCtx));
         }
         CATCH_AND_RETURN_ERRORCODE;
     }

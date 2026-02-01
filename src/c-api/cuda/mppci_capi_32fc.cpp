@@ -30,7 +30,7 @@ using namespace mpp::image::cuda;
 extern "C"
 {
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -47,7 +47,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                               size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -67,7 +67,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopyBorder_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                    size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                                    MPPBorderType aBorder, MppiSize aSizeROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -87,7 +87,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopyBorder_32fc_C1Cb(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                      size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                                      Mpp32fc aConstant, MPPBorderType aBorder, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -108,7 +108,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopySubpix_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                    size_t aDstStep, const Mpp32f aDelta[2],
                                                    MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -126,7 +126,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -141,7 +141,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -157,7 +157,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -175,7 +175,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -192,7 +192,8 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciTranspose_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                                  size_t aDstStep, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aDstStep, MppiSize aSizeROISrc,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -210,7 +211,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -229,7 +230,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -247,7 +248,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -264,7 +265,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -280,7 +281,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -295,7 +296,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -312,7 +313,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -333,7 +334,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -353,7 +354,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -373,7 +374,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -392,7 +393,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -410,7 +411,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -428,7 +429,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -447,7 +448,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -465,7 +466,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -482,7 +483,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -498,7 +499,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -513,7 +514,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -528,7 +529,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubInv_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -544,7 +545,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubInvC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -560,7 +561,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvDevC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                     ConstDevPtrMpp32fc aConst, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -577,7 +578,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciSub_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -598,7 +599,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -618,7 +619,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -638,7 +639,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -657,7 +658,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -675,7 +676,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -693,7 +694,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInv_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -712,7 +713,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -730,7 +731,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvDevC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      ConstDevPtrMpp32fc aConst, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -748,7 +750,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -767,7 +769,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -785,7 +787,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -802,7 +804,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -818,7 +820,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -833,7 +835,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -850,7 +852,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMul_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -871,7 +873,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -891,7 +893,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -911,7 +913,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -930,7 +932,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -948,7 +950,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -966,7 +968,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -985,7 +987,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1003,7 +1005,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1020,7 +1022,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1036,7 +1038,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1051,7 +1053,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1066,7 +1068,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivInv_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1082,7 +1084,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivInvC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1098,7 +1100,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvDevC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                     ConstDevPtrMpp32fc aConst, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1115,7 +1117,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1136,7 +1138,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1156,7 +1158,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1176,7 +1178,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1195,7 +1197,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1213,7 +1215,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1231,7 +1233,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInv_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1250,7 +1252,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1268,7 +1270,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvDevC_32fc_C1IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      ConstDevPtrMpp32fc aConst, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1285,7 +1288,8 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddSquare_32fc_C1I(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
-                                                   size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   size_t aSrcDstStep, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1302,7 +1306,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddSquare_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                    size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1321,7 +1325,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddProduct_32fc_C1I(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aSrcDst,
-                                                    size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    size_t aSrcDstStep, MppiSize aSizeROI,
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1341,7 +1346,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddProduct_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aSrcDst,
                                                     size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1363,7 +1368,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aDst,
                                                     size_t aDstStep, Mpp32fc aAlpha, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1383,7 +1388,8 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                      ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aDst,
                                                      size_t aDstStep, Mpp32fc aAlpha, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1404,7 +1410,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C1I(DevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                      size_t aSrcDstStep, Mpp32fc aAlpha, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1420,7 +1426,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C1IM(DevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                       size_t aSrcDstStep, Mpp32fc aAlpha, ConstDevPtrMpp8u aMask,
-                                                      size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                      size_t aMaskStep, MppiSize aSizeROI,
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1437,7 +1444,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciExp_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1453,7 +1460,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciExp_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1467,7 +1474,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciLn_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1483,7 +1490,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciLn_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1497,7 +1504,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqr_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1513,7 +1520,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqr_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1527,7 +1534,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqrt_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1543,7 +1550,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqrt_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx)
+                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1558,7 +1565,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciConjMul_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1576,7 +1583,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConjMul_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                 size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1592,7 +1599,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConj_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1608,7 +1615,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConj_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx)
+                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1621,40 +1628,62 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciMagnitude_32fc32f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciMagnitude_32fc32f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                     DevPtrMpp32f aDst, size_t aDstStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
             const StreamCtx *_StreamCtx =
                 aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
             const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
             const ImageView<Pixel32fcC1> _Src1(reinterpret_cast<Pixel32fcC1 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
-                                               {_SizeROI, aSrc1Step});
+                                               {_SizeSrc1, aSrc1Step});
             ImageView<Pixel32fC1> _Dst(reinterpret_cast<Pixel32fC1 *>(aDst), {_SizeROI, aDstStep});
             _Src1.Magnitude(_Dst, *_StreamCtx);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciMagnitudeSqr_32fc32f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                        size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciMagnitudeSqr_32fc32f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                        DevPtrMpp32f aDst, size_t aDstStep, MppiSize aSizeROI,
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
             const StreamCtx *_StreamCtx =
                 aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
             const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
             const ImageView<Pixel32fcC1> _Src1(reinterpret_cast<Pixel32fcC1 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
-                                               {_SizeROI, aSrc1Step});
+                                               {_SizeSrc1, aSrc1Step});
             ImageView<Pixel32fC1> _Dst(reinterpret_cast<Pixel32fC1 *>(aDst), {_SizeROI, aDstStep});
             _Src1.MagnitudeSqr(_Dst, *_StreamCtx);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
+    MPPErrorCode DLLEXPORT mppciMagnitudeLog_32fc32f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                        DevPtrMpp32f aDst, size_t aDstStep, Mpp32f aOffset,
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
+    {
+        try
+        {
+            const StreamCtx *_StreamCtx =
+                aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
+            const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
+            const ImageView<Pixel32fcC1> _Src1(reinterpret_cast<Pixel32fcC1 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
+                                               {_SizeSrc1, aSrc1Step});
+            ImageView<Pixel32fC1> _Dst(reinterpret_cast<Pixel32fC1 *>(aDst), {_SizeROI, aDstStep});
+            _Src1.MagnitudeLog(_Dst, aOffset, *_StreamCtx);
+        }
+        CATCH_AND_RETURN_ERRORCODE;
+    }
+
     MPPErrorCode DLLEXPORT mppciAngle_32fc32f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                 size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1670,7 +1699,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciReal_32fc32f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1686,7 +1715,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciImag_32fc32f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1705,7 +1734,7 @@ extern "C"
                                                        MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                        MppiSize aDstSize, MPPFixedFilter aFilter, MPPMaskSize aMaskSize,
                                                        Mpp32fc aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1730,7 +1759,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, MPPFixedFilter aFilter, MPPMaskSize aMaskSize,
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1755,7 +1784,7 @@ extern "C"
                                                            MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                            Mpp32s aFilterSize, Mpp32s aFilterCenter, Mpp32fc aConstant,
                                                            MPPBorderType aBorder, MppiRect aSrcROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1781,7 +1810,7 @@ extern "C"
                                                          MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                          Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                          MPPBorderType aBorder, MppiRect aSrcROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1806,7 +1835,7 @@ extern "C"
                                                         MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                         Mpp32s aFilterSize, Mpp32s aFilterCenter, Mpp32fc aConstant,
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1831,7 +1860,7 @@ extern "C"
                                                       MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                       MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                       Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1856,7 +1885,7 @@ extern "C"
                                                            MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                            Mpp32s aFilterCenter, Mpp32fc aConstant,
                                                            MPPBorderType aBorder, MppiRect aSrcROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1879,7 +1908,7 @@ extern "C"
                                                          MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                          MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                          Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1901,7 +1930,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                      Mpp32s aFilterCenter, Mpp32fc aConstant, MPPBorderType aBorder,
-                                                     MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                     MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1926,7 +1955,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                    MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                    Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1950,7 +1979,7 @@ extern "C"
                                                         MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                         MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                         Mpp32s aFilterCenter, Mpp32fc aConstant, MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1973,7 +2002,7 @@ extern "C"
                                                       MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                       MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                       Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -1995,7 +2024,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, MppiFilterArea aFilterArea, Mpp32fc aConstant,
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2019,7 +2048,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciBoxFilter_32fc_C1R(ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step,
                                                    MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                    MppiSize aDstSize, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2043,7 +2072,7 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                   MppiFilterArea aFilterArea, Mpp32fc aConstant, MPPBorderType aBorder,
-                                                  MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                  MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2071,7 +2100,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                 MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                 MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2099,7 +2128,7 @@ extern "C"
                                                       MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                       MPPInterpolationMode aInterpolation, Mpp32fc aConstant,
                                                       MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2124,7 +2153,7 @@ extern "C"
                                                     MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                     MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                     MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                    MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2149,7 +2178,7 @@ extern "C"
                                                           MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                           MPPInterpolationMode aInterpolation, Mpp32fc aConstant,
                                                           MPPBorderType aBorder, MppiRect aSrcROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2174,7 +2203,7 @@ extern "C"
                                                         MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                         MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                         MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2199,7 +2228,7 @@ extern "C"
                                                            MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                            MPPInterpolationMode aInterpolation, Mpp32fc aConstant,
                                                            MPPBorderType aBorder, MppiRect aSrcROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2224,7 +2253,7 @@ extern "C"
                                                          MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                          MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                          MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2247,7 +2276,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciWarpPerspectiveBack_32fc_C1RCb(
         ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
         MppiSize aDstSize, const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, Mpp32fc aConstant,
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2272,7 +2301,7 @@ extern "C"
                                                              MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                              MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                              MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                             MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                             MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2296,7 +2325,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                   MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                   MPPInterpolationMode aInterpolation, Mpp32fc aConstant,
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2321,7 +2351,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                 MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2343,7 +2373,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciResize_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                size_t aDstStep, MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2364,7 +2394,7 @@ extern "C"
                                                           MppiSize aDstSize, const Mpp64f aScale[2],
                                                           const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                                           Mpp32fc aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2391,7 +2421,7 @@ extern "C"
                                                         MppiSize aDstSize, const Mpp64f aScale[2],
                                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2414,7 +2444,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMirror_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                size_t aDstStep, MPPMirrorAxis aAxis, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2431,7 +2461,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMirror_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2450,7 +2480,7 @@ extern "C"
                                                    MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
                                                    size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
                                                    Mpp32fc aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2477,7 +2507,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                  MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
                                                  size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2505,7 +2536,7 @@ extern "C"
                                                  size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
                                                  size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation,
                                                  Mpp32fc aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2536,7 +2567,7 @@ extern "C"
                                                ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                                ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                                MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                               MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                               MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2562,7 +2593,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageErrorBufferSize_32fc_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx)
+                                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2576,7 +2607,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageErrorBufferSize_32fc_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2592,7 +2623,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAverageError_32fc64f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2614,7 +2645,7 @@ extern "C"
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
                                                          size_t aBufferSize, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2635,7 +2666,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageRelativeErrorBufferSize_32fc_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                       CPtrMppStreamCtx aStreamCtx)
+                                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2649,7 +2680,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageRelativeErrorBufferSize_32fc_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                        CPtrMppStreamCtx aStreamCtx)
+                                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2666,7 +2697,7 @@ extern "C"
                                                                 ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step,
                                                                 DevPtrMpp64f aDst, DevPtrMpp8u aBuffer,
                                                                 size_t aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2689,7 +2720,7 @@ extern "C"
                                                                  DevPtrMpp64f aDst, ConstDevPtrMpp8u aMask,
                                                                  size_t aMaskStep, DevPtrMpp8u aBuffer,
                                                                  size_t aBufferSize, MppiSize aSizeROI,
-                                                                 CPtrMppStreamCtx aStreamCtx)
+                                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2710,7 +2741,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDotProductBufferSize_32fc_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx)
+                                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2724,7 +2755,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDotProductBufferSize_32fc_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx)
+                                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2740,7 +2771,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciDotProduct_32fc64fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64fc aDst,
                                                        DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2762,7 +2793,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64fc aDst,
                                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
                                                         size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2783,7 +2814,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMSEBufferSize_32fc_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2797,7 +2828,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMSEBufferSize_32fc_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2812,7 +2843,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMSE_32fc64fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp64fc aDst, DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2833,7 +2864,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMSE_32fc64fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, DevPtrMpp64fc aDst, ConstDevPtrMpp8u aMask,
                                                  size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2854,7 +2885,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumErrorBufferSize_32fc_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx)
+                                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2868,7 +2899,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumErrorBufferSize_32fc_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2884,7 +2915,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMaximumError_32fc64f_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2906,7 +2937,7 @@ extern "C"
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
                                                          size_t aBufferSize, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2927,7 +2958,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumRelativeErrorBufferSize_32fc_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                       CPtrMppStreamCtx aStreamCtx)
+                                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2941,7 +2972,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumRelativeErrorBufferSize_32fc_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                        CPtrMppStreamCtx aStreamCtx)
+                                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2958,7 +2989,7 @@ extern "C"
                                                                 ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step,
                                                                 DevPtrMpp64f aDst, DevPtrMpp8u aBuffer,
                                                                 size_t aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -2981,7 +3012,7 @@ extern "C"
                                                                  DevPtrMpp64f aDst, ConstDevPtrMpp8u aMask,
                                                                  size_t aMaskStep, DevPtrMpp8u aBuffer,
                                                                  size_t aBufferSize, MppiSize aSizeROI,
-                                                                 CPtrMppStreamCtx aStreamCtx)
+                                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3002,7 +3033,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSumBufferSize_32fc64f_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3017,7 +3048,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSumBufferSize_32fc64f_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3033,7 +3064,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSum_32fc64fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                 DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3051,7 +3082,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSum_32fc64fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3070,7 +3101,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanBufferSize_32fc_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3084,7 +3115,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanBufferSize_32fc_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3099,7 +3130,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMean_32fc64fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                  DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3117,7 +3148,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMean_32fc64fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                  size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3136,7 +3168,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanStdBufferSize_32fc_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3150,7 +3182,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanStdBufferSize_32fc_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3165,7 +3197,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMeanStd_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aMean,
                                                 DevPtrMpp64f aStd, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3185,7 +3217,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMeanStd_32fc_C1M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aMean,
                                                  DevPtrMpp64f aStd, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                  DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3206,7 +3238,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompare_32fc8u_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                   size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst,
-                                                  size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3226,7 +3258,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareC_32fc8u_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                                    MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3246,7 +3278,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareDevC_32fc8u_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                       DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3265,7 +3297,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareFloat_32fc8u_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3284,7 +3316,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEps_32fc8u_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, Mpp32f aEpsilon,
                                                        DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3303,7 +3335,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareEqEpsC_32fc8u_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                                         Mpp32f aEpsilon, DevPtrMpp8u aDst, size_t aDstStep,
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3322,7 +3354,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEpsDevC_32fc8u_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                            ConstDevPtrMpp32fc aConst, Mpp32f aEpsilon, DevPtrMpp8u aDst,
                                                            size_t aDstStep, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3341,7 +3373,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIf_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                   size_t aSrc2Step, MPPCompareOp aCompare, Mpp32fc aValue,
                                                   DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3362,7 +3394,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, Mpp32fc aConst,
                                                    MPPCompareOp aCompare, Mpp32fc aValue, DevPtrMpp32fc aDst,
-                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3383,7 +3415,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfDevC_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare, Mpp32fc aValue,
                                                       DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3403,7 +3435,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfFloat_32fc_C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        MPPCompareOp aCompare, Mpp32fc aValue, DevPtrMpp32fc aDst,
-                                                       size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                       size_t aDstStep, MppiSize aSizeROI,
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3422,7 +3455,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIf_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                    size_t aSrc2Step, MPPCompareOp aCompare, Mpp32fc aValue,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3441,7 +3474,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
                                                     MPPCompareOp aCompare, Mpp32fc aValue, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3459,7 +3492,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfDevC_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                        ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare, Mpp32fc aValue,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3477,7 +3510,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfFloat_32fc_C1I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                         MPPCompareOp aCompare, Mpp32fc aValue, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3493,7 +3526,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3510,7 +3543,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                               size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3529,7 +3562,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C2P2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDstChannel1,
                                                size_t aDstChannel1Step, DevPtrMpp32fc aDstChannel2,
-                                               size_t aDstChannel2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               size_t aDstChannel2Step, MppiSize aSizeROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3549,7 +3583,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_P2C2(DevPtrMpp32fc aSrcChannel1, size_t aSrcChannel1Step,
                                                DevPtrMpp32fc aSrcChannel2, size_t aSrcChannel2Step, DevPtrMpp32fc aDst,
-                                               size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3569,7 +3603,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopyBorder_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                    size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                                    MPPBorderType aBorder, MppiSize aSizeROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3589,7 +3623,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopyBorder_32fc_C2Cb(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                      size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                                      const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3610,7 +3644,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopySubpix_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                    size_t aDstStep, const Mpp32f aDelta[2],
                                                    MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3628,7 +3662,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3643,7 +3677,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3659,7 +3693,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3677,7 +3711,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3694,7 +3728,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C2CI(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                               Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3709,7 +3743,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C2CI(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                  Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                  Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3726,7 +3760,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSwapChannel_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                                    size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3742,7 +3776,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSwapChannel_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3756,7 +3790,8 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciTranspose_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                                  size_t aDstStep, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aDstStep, MppiSize aSizeROISrc,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3774,7 +3809,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3793,7 +3828,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3811,7 +3846,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3828,7 +3863,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3844,7 +3879,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3859,7 +3894,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3876,7 +3911,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3897,7 +3932,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3917,7 +3952,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3937,7 +3972,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3956,7 +3991,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3974,7 +4009,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -3992,7 +4027,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4011,7 +4046,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4029,7 +4064,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4046,7 +4081,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4062,7 +4097,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4077,7 +4112,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4092,7 +4127,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubInv_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4108,7 +4143,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubInvC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4124,7 +4159,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvDevC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                     ConstDevPtrMpp32fc aConst, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4141,7 +4176,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciSub_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4162,7 +4197,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4182,7 +4217,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4202,7 +4237,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4221,7 +4256,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4239,7 +4274,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4257,7 +4292,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInv_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4276,7 +4311,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4294,7 +4329,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvDevC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      ConstDevPtrMpp32fc aConst, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4312,7 +4348,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4331,7 +4367,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4349,7 +4385,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4366,7 +4402,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4382,7 +4418,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4397,7 +4433,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4414,7 +4450,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMul_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4435,7 +4471,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4455,7 +4491,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4475,7 +4511,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4494,7 +4530,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4512,7 +4548,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4530,7 +4566,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4549,7 +4585,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4567,7 +4603,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4584,7 +4620,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4600,7 +4636,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4615,7 +4651,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4630,7 +4666,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivInv_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4646,7 +4682,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivInvC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4662,7 +4698,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvDevC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                     ConstDevPtrMpp32fc aConst, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4679,7 +4715,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4700,7 +4736,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4720,7 +4756,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4740,7 +4776,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4759,7 +4795,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4777,7 +4813,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4795,7 +4831,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInv_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4814,7 +4850,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4832,7 +4868,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvDevC_32fc_C2IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      ConstDevPtrMpp32fc aConst, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4849,7 +4886,8 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddSquare_32fc_C2I(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
-                                                   size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   size_t aSrcDstStep, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4866,7 +4904,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddSquare_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                    size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4885,7 +4923,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddProduct_32fc_C2I(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aSrcDst,
-                                                    size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    size_t aSrcDstStep, MppiSize aSizeROI,
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4905,7 +4944,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddProduct_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aSrcDst,
                                                     size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4927,7 +4966,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aDst,
                                                     size_t aDstStep, Mpp32fc aAlpha, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4947,7 +4986,8 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                      ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aDst,
                                                      size_t aDstStep, Mpp32fc aAlpha, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4968,7 +5008,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C2I(DevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                      size_t aSrcDstStep, Mpp32fc aAlpha, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -4984,7 +5024,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C2IM(DevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                       size_t aSrcDstStep, Mpp32fc aAlpha, ConstDevPtrMpp8u aMask,
-                                                      size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                      size_t aMaskStep, MppiSize aSizeROI,
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5001,7 +5042,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciExp_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5017,7 +5058,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciExp_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5031,7 +5072,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciLn_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5047,7 +5088,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciLn_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5061,7 +5102,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqr_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5077,7 +5118,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqr_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5091,7 +5132,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqrt_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5107,7 +5148,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqrt_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx)
+                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5122,7 +5163,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciConjMul_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5140,7 +5181,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConjMul_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                 size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5156,7 +5197,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConj_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5172,7 +5213,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConj_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx)
+                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5185,40 +5226,62 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciMagnitude_32fc32f_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciMagnitude_32fc32f_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                     DevPtrMpp32f aDst, size_t aDstStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
             const StreamCtx *_StreamCtx =
                 aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
             const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
             const ImageView<Pixel32fcC2> _Src1(reinterpret_cast<Pixel32fcC2 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
-                                               {_SizeROI, aSrc1Step});
+                                               {_SizeSrc1, aSrc1Step});
             ImageView<Pixel32fC2> _Dst(reinterpret_cast<Pixel32fC2 *>(aDst), {_SizeROI, aDstStep});
             _Src1.Magnitude(_Dst, *_StreamCtx);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciMagnitudeSqr_32fc32f_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                        size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciMagnitudeSqr_32fc32f_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                        DevPtrMpp32f aDst, size_t aDstStep, MppiSize aSizeROI,
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
             const StreamCtx *_StreamCtx =
                 aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
             const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
             const ImageView<Pixel32fcC2> _Src1(reinterpret_cast<Pixel32fcC2 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
-                                               {_SizeROI, aSrc1Step});
+                                               {_SizeSrc1, aSrc1Step});
             ImageView<Pixel32fC2> _Dst(reinterpret_cast<Pixel32fC2 *>(aDst), {_SizeROI, aDstStep});
             _Src1.MagnitudeSqr(_Dst, *_StreamCtx);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
+    MPPErrorCode DLLEXPORT mppciMagnitudeLog_32fc32f_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                        DevPtrMpp32f aDst, size_t aDstStep, Mpp32f aOffset,
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
+    {
+        try
+        {
+            const StreamCtx *_StreamCtx =
+                aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
+            const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
+            const ImageView<Pixel32fcC2> _Src1(reinterpret_cast<Pixel32fcC2 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
+                                               {_SizeSrc1, aSrc1Step});
+            ImageView<Pixel32fC2> _Dst(reinterpret_cast<Pixel32fC2 *>(aDst), {_SizeROI, aDstStep});
+            _Src1.MagnitudeLog(_Dst, aOffset, *_StreamCtx);
+        }
+        CATCH_AND_RETURN_ERRORCODE;
+    }
+
     MPPErrorCode DLLEXPORT mppciAngle_32fc32f_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                 size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5234,7 +5297,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciReal_32fc32f_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5250,7 +5313,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciImag_32fc32f_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5269,7 +5332,7 @@ extern "C"
                                                        MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                        MppiSize aDstSize, MPPFixedFilter aFilter, MPPMaskSize aMaskSize,
                                                        const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5294,7 +5357,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, MPPFixedFilter aFilter, MPPMaskSize aMaskSize,
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5319,7 +5382,7 @@ extern "C"
                                                            MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                            Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                            const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5345,7 +5408,7 @@ extern "C"
                                                          MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                          Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                          MPPBorderType aBorder, MppiRect aSrcROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5370,7 +5433,7 @@ extern "C"
                                                         MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                         Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                         const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5395,7 +5458,7 @@ extern "C"
                                                       MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                       MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                       Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5420,7 +5483,7 @@ extern "C"
                                                            MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                            Mpp32s aFilterCenter, const Mpp32fc aConstant[2],
                                                            MPPBorderType aBorder, MppiRect aSrcROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5443,7 +5506,7 @@ extern "C"
                                                          MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                          MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                          Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5466,7 +5529,7 @@ extern "C"
                                                      MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                      Mpp32s aFilterCenter, const Mpp32fc aConstant[2],
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5491,7 +5554,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                    MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                    Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5516,7 +5579,7 @@ extern "C"
                                                         MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                         Mpp32s aFilterCenter, const Mpp32fc aConstant[2],
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5539,7 +5602,7 @@ extern "C"
                                                       MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                       MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                       Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5561,7 +5624,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                      const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                     MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                     MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5585,7 +5648,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciBoxFilter_32fc_C2R(ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step,
                                                    MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                    MppiSize aDstSize, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5609,7 +5672,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                   MppiFilterArea aFilterArea, const Mpp32fc aConstant[2],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5637,7 +5701,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                 MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                 MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5665,7 +5729,7 @@ extern "C"
                                                       MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                       MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[2],
                                                       MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5690,7 +5754,7 @@ extern "C"
                                                     MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                     MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                     MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                    MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5716,7 +5780,7 @@ extern "C"
                                                       DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                       const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                                       const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                      MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                      MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5747,7 +5811,7 @@ extern "C"
                                                     DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                     const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                                     MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5776,7 +5840,7 @@ extern "C"
                                                           MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                           MPPInterpolationMode aInterpolation,
                                                           const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5801,7 +5865,7 @@ extern "C"
                                                         MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                         MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                         MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5825,7 +5889,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         MppiSize aDstSize, const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[2],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5856,7 +5920,7 @@ extern "C"
                                                         DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5885,7 +5949,7 @@ extern "C"
                                                            MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                            MPPInterpolationMode aInterpolation,
                                                            const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5910,7 +5974,7 @@ extern "C"
                                                          MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                          MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                          MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5934,7 +5998,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         MppiSize aDstSize, const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5965,7 +6029,7 @@ extern "C"
                                                          DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                          const Mpp64f aPerspective[3][3],
                                                          MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -5992,7 +6056,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciWarpPerspectiveBack_32fc_C2RCb(
         ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
         MppiSize aDstSize, const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6017,7 +6081,7 @@ extern "C"
                                                              MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                              MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                              MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                             MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                             MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6041,7 +6105,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         MppiSize aDstSize, const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6072,7 +6136,7 @@ extern "C"
                                                              size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
                                                              MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                              MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                             MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                             MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6100,7 +6164,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                   MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                   MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[2],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6125,7 +6190,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                 MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6145,13 +6210,11 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciRotate_32fc_P2RCb(ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step,
-                                                  ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
-                                                  MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
-                                                  DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
-                                                  Mpp64f aAngleInDeg, const Mpp64f aShift[2],
-                                                  MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[2],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciRotate_32fc_P2RCb(
+        ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
+        MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
+        MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
+        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6182,7 +6245,7 @@ extern "C"
                                                 DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                 Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6208,7 +6271,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciResize_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                size_t aDstStep, MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6228,7 +6291,7 @@ extern "C"
                                                size_t aSrc2Step, DevPtrMpp32fc aDst1, size_t aDst1Step,
                                                DevPtrMpp32fc aDst2, size_t aDst2Step,
                                                MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6252,7 +6315,7 @@ extern "C"
                                                           MppiSize aDstSize, const Mpp64f aScale[2],
                                                           const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                                           const Mpp32fc aConstant[2], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6279,7 +6342,7 @@ extern "C"
                                                         MppiSize aDstSize, const Mpp64f aScale[2],
                                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6304,7 +6367,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         MppiSize aDstSize, const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6336,7 +6399,7 @@ extern "C"
                                                         DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                         const Mpp64f aScale[2], const Mpp64f aShift[2],
                                                         MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6363,7 +6426,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMirror_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                size_t aDstStep, MPPMirrorAxis aAxis, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6380,7 +6443,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMirror_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6399,7 +6462,7 @@ extern "C"
                                                    MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
                                                    size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
                                                    const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6426,7 +6489,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                  MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
                                                  size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6454,7 +6518,7 @@ extern "C"
                                                  size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
                                                  size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation,
                                                  const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6485,7 +6549,7 @@ extern "C"
                                                ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                                ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                                MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                               MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                               MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6516,7 +6580,8 @@ extern "C"
                                                    DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                    ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                                    MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[2],
-                                                   MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MPPBorderType aBorder, MppiRect aSrcROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6549,7 +6614,7 @@ extern "C"
                                                  DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                  ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                                  MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                 MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6575,14 +6640,12 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciRemap_32fc_P2RCb(ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step,
-                                                 ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
-                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
-                                                 DevPtrMpp32fc aDst2, size_t aDst2Step, MppiSize aDstSize,
-                                                 ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
-                                                 ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
-                                                 MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[2],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciRemap_32fc_P2RCb(
+        ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
+        MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
+        MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
+        ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation,
+        const Mpp32fc aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6618,7 +6681,7 @@ extern "C"
                                                size_t aDst2Step, MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMapX,
                                                size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
                                                size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6648,7 +6711,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageErrorBufferSize_32fc_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx)
+                                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6662,7 +6725,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageErrorBufferSize_32fc_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6679,7 +6742,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                         DevPtrMpp64f aDstScalar, DevPtrMpp8u aBuffer,
                                                         size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6702,7 +6765,7 @@ extern "C"
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                          DevPtrMpp64f aDstScalar, ConstDevPtrMpp8u aMask,
                                                          size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6724,7 +6787,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageRelativeErrorBufferSize_32fc_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                       CPtrMppStreamCtx aStreamCtx)
+                                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6738,7 +6801,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageRelativeErrorBufferSize_32fc_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                        CPtrMppStreamCtx aStreamCtx)
+                                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6755,7 +6818,7 @@ extern "C"
                                                                 ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step,
                                                                 DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                 DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6779,7 +6842,7 @@ extern "C"
                                                                  DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                                  DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6801,7 +6864,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDotProductBufferSize_32fc_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx)
+                                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6815,7 +6878,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDotProductBufferSize_32fc_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx)
+                                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6832,7 +6895,7 @@ extern "C"
                                                        ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64fc aDst,
                                                        DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer,
                                                        size_t aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6855,7 +6918,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64fc aDst,
                                                         DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask,
                                                         size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6877,7 +6940,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMSEBufferSize_32fc_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6891,7 +6954,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMSEBufferSize_32fc_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6907,7 +6970,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMSE_32fc64fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp64fc aDst, DevPtrMpp64fc aDstScalar,
                                                 DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6929,7 +6992,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMSE_32fc64fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, DevPtrMpp64fc aDst, DevPtrMpp64fc aDstScalar,
                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6951,7 +7014,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumErrorBufferSize_32fc_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx)
+                                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6965,7 +7028,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumErrorBufferSize_32fc_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -6982,7 +7045,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                         DevPtrMpp64f aDstScalar, DevPtrMpp8u aBuffer,
                                                         size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7005,7 +7068,7 @@ extern "C"
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                          DevPtrMpp64f aDstScalar, ConstDevPtrMpp8u aMask,
                                                          size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7027,7 +7090,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumRelativeErrorBufferSize_32fc_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                       CPtrMppStreamCtx aStreamCtx)
+                                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7041,7 +7104,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumRelativeErrorBufferSize_32fc_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                        CPtrMppStreamCtx aStreamCtx)
+                                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7058,7 +7121,7 @@ extern "C"
                                                                 ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step,
                                                                 DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                 DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7082,7 +7145,7 @@ extern "C"
                                                                  DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                                  DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7104,7 +7167,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSumBufferSize_32fc64f_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7119,7 +7182,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSumBufferSize_32fc64f_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7135,7 +7198,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSum_32fc64fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                 DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7155,7 +7218,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciSum_32fc64fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                  DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                  DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7175,7 +7238,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanBufferSize_32fc_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7189,7 +7252,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanBufferSize_32fc_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7204,7 +7267,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMean_32fc64fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                  DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7224,7 +7287,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMean_32fc64fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                   DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                   DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7244,7 +7307,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanStdBufferSize_32fc_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7258,7 +7321,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanStdBufferSize_32fc_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7274,7 +7337,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMeanStd_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aMean,
                                                 DevPtrMpp64f aStd, DevPtrMpp64fc aMeanScalar, DevPtrMpp64f aStdScalar,
                                                 DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7296,7 +7359,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMeanStd_32fc_C2M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aMean,
                                                  DevPtrMpp64f aStd, DevPtrMpp64fc aMeanScalar, DevPtrMpp64f aStdScalar,
                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7320,7 +7383,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompare_32fc8u_C2C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, MPPCompareOp aCompare,
                                                     DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7340,7 +7403,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareC_32fc8u_C2C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                      const Mpp32fc aConst[2], MPPCompareOp aCompare, DevPtrMpp8u aDst,
-                                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aDstStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7360,7 +7424,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareDevC_32fc8u_C2C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                         ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                         DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7379,7 +7443,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareFloat_32fc8u_C2C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                          MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7397,7 +7461,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompare_32fc8u_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                   size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst,
-                                                  size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7417,7 +7481,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareC_32fc8u_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                                    MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7437,7 +7501,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareDevC_32fc8u_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                       DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7456,7 +7520,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareFloat_32fc8u_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7475,7 +7539,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEps_32fc8u_C2C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, Mpp32f aEpsilon,
                                                          DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7495,7 +7559,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEpsC_32fc8u_C2C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                           const Mpp32fc aConst[2], Mpp32f aEpsilon, DevPtrMpp8u aDst,
                                                           size_t aDstStep, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7514,7 +7578,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEpsDevC_32fc8u_C2C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                              ConstDevPtrMpp32fc aConst, Mpp32f aEpsilon,
                                                              DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx)
+                                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7533,7 +7597,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIf_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                   size_t aSrc2Step, MPPCompareOp aCompare, const Mpp32fc aValue[2],
                                                   DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7554,7 +7618,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[2],
                                                    MPPCompareOp aCompare, const Mpp32fc aValue[2], DevPtrMpp32fc aDst,
-                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7575,7 +7639,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfDevC_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                       const Mpp32fc aValue[2], DevPtrMpp32fc aDst, size_t aDstStep,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7596,7 +7660,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfFloat_32fc_C2(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        MPPCompareOp aCompare, const Mpp32fc aValue[2],
                                                        DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7615,7 +7679,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIf_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                    size_t aSrc2Step, MPPCompareOp aCompare, const Mpp32fc aValue[2],
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7634,7 +7698,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[2],
                                                     MPPCompareOp aCompare, const Mpp32fc aValue[2], MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7653,7 +7717,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfDevC_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                        ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                        const Mpp32fc aValue[2], MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7671,7 +7735,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfFloat_32fc_C2I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                         MPPCompareOp aCompare, const Mpp32fc aValue[2],
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7687,7 +7751,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7704,7 +7768,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                               size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7724,7 +7788,8 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C3P3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDstChannel1,
                                                size_t aDstChannel1Step, DevPtrMpp32fc aDstChannel2,
                                                size_t aDstChannel2Step, DevPtrMpp32fc aDstChannel3,
-                                               size_t aDstChannel3Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               size_t aDstChannel3Step, MppiSize aSizeROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7747,7 +7812,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopy_32fc_P3C3(DevPtrMpp32fc aSrcChannel1, size_t aSrcChannel1Step,
                                                DevPtrMpp32fc aSrcChannel2, size_t aSrcChannel2Step,
                                                DevPtrMpp32fc aSrcChannel3, size_t aSrcChannel3Step, DevPtrMpp32fc aDst,
-                                               size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7769,7 +7834,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopyBorder_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                    size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                                    MPPBorderType aBorder, MppiSize aSizeROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7789,7 +7854,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopyBorder_32fc_C3Cb(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                      size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                                      const Mpp32fc aConstant[3], MPPBorderType aBorder,
-                                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7810,7 +7875,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopySubpix_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                    size_t aDstStep, const Mpp32f aDelta[2],
                                                    MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7828,7 +7893,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7843,7 +7908,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7859,7 +7924,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7877,7 +7942,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7894,7 +7959,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C3CI(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                               Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7909,7 +7974,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C3CI(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                  Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                  Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7927,7 +7992,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSwapChannel_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      const Mpp32s aDstChannels[3], MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7942,7 +8007,8 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciTranspose_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                                  size_t aDstStep, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aDstStep, MppiSize aSizeROISrc,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7960,7 +8026,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7979,7 +8045,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -7997,7 +8063,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8014,7 +8080,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8030,7 +8096,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8045,7 +8111,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8062,7 +8128,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8083,7 +8149,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8103,7 +8169,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8123,7 +8189,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8142,7 +8208,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8160,7 +8226,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8178,7 +8244,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8197,7 +8263,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8215,7 +8281,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8232,7 +8298,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8248,7 +8314,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8263,7 +8329,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8278,7 +8344,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubInv_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8294,7 +8360,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubInvC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8310,7 +8376,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvDevC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                     ConstDevPtrMpp32fc aConst, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8327,7 +8393,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciSub_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8348,7 +8414,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8368,7 +8434,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8388,7 +8454,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8407,7 +8473,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8425,7 +8491,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8443,7 +8509,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInv_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8462,7 +8528,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8480,7 +8546,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvDevC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      ConstDevPtrMpp32fc aConst, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8498,7 +8565,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8517,7 +8584,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8535,7 +8602,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8552,7 +8619,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8568,7 +8635,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8583,7 +8650,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8600,7 +8667,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMul_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8621,7 +8688,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8641,7 +8708,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8661,7 +8728,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8680,7 +8747,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8698,7 +8765,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8716,7 +8783,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8735,7 +8802,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8753,7 +8820,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8770,7 +8837,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8786,7 +8853,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8801,7 +8868,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8816,7 +8883,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivInv_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8832,7 +8899,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivInvC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8848,7 +8915,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvDevC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                     ConstDevPtrMpp32fc aConst, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8865,7 +8932,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8886,7 +8953,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8906,7 +8973,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8926,7 +8993,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8945,7 +9012,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8963,7 +9030,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -8981,7 +9048,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInv_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9000,7 +9067,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9018,7 +9085,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvDevC_32fc_C3IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      ConstDevPtrMpp32fc aConst, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9035,7 +9103,8 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddSquare_32fc_C3I(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
-                                                   size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   size_t aSrcDstStep, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9052,7 +9121,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddSquare_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                    size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9071,7 +9140,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddProduct_32fc_C3I(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aSrcDst,
-                                                    size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    size_t aSrcDstStep, MppiSize aSizeROI,
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9091,7 +9161,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddProduct_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aSrcDst,
                                                     size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9113,7 +9183,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aDst,
                                                     size_t aDstStep, Mpp32fc aAlpha, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9133,7 +9203,8 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                      ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aDst,
                                                      size_t aDstStep, Mpp32fc aAlpha, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9154,7 +9225,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C3I(DevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                      size_t aSrcDstStep, Mpp32fc aAlpha, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9170,7 +9241,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C3IM(DevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                       size_t aSrcDstStep, Mpp32fc aAlpha, ConstDevPtrMpp8u aMask,
-                                                      size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                      size_t aMaskStep, MppiSize aSizeROI,
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9187,7 +9259,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciExp_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9203,7 +9275,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciExp_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9217,7 +9289,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciLn_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9233,7 +9305,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciLn_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9247,7 +9319,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqr_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9263,7 +9335,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqr_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9277,7 +9349,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqrt_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9293,7 +9365,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqrt_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx)
+                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9308,7 +9380,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciConjMul_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9326,7 +9398,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConjMul_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                 size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9342,7 +9414,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConj_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9358,7 +9430,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConj_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx)
+                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9371,40 +9443,62 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciMagnitude_32fc32f_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciMagnitude_32fc32f_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                     DevPtrMpp32f aDst, size_t aDstStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
             const StreamCtx *_StreamCtx =
                 aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
             const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
             const ImageView<Pixel32fcC3> _Src1(reinterpret_cast<Pixel32fcC3 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
-                                               {_SizeROI, aSrc1Step});
+                                               {_SizeSrc1, aSrc1Step});
             ImageView<Pixel32fC3> _Dst(reinterpret_cast<Pixel32fC3 *>(aDst), {_SizeROI, aDstStep});
             _Src1.Magnitude(_Dst, *_StreamCtx);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciMagnitudeSqr_32fc32f_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                        size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciMagnitudeSqr_32fc32f_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                        DevPtrMpp32f aDst, size_t aDstStep, MppiSize aSizeROI,
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
             const StreamCtx *_StreamCtx =
                 aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
             const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
             const ImageView<Pixel32fcC3> _Src1(reinterpret_cast<Pixel32fcC3 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
-                                               {_SizeROI, aSrc1Step});
+                                               {_SizeSrc1, aSrc1Step});
             ImageView<Pixel32fC3> _Dst(reinterpret_cast<Pixel32fC3 *>(aDst), {_SizeROI, aDstStep});
             _Src1.MagnitudeSqr(_Dst, *_StreamCtx);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
+    MPPErrorCode DLLEXPORT mppciMagnitudeLog_32fc32f_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                        DevPtrMpp32f aDst, size_t aDstStep, Mpp32f aOffset,
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
+    {
+        try
+        {
+            const StreamCtx *_StreamCtx =
+                aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
+            const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
+            const ImageView<Pixel32fcC3> _Src1(reinterpret_cast<Pixel32fcC3 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
+                                               {_SizeSrc1, aSrc1Step});
+            ImageView<Pixel32fC3> _Dst(reinterpret_cast<Pixel32fC3 *>(aDst), {_SizeROI, aDstStep});
+            _Src1.MagnitudeLog(_Dst, aOffset, *_StreamCtx);
+        }
+        CATCH_AND_RETURN_ERRORCODE;
+    }
+
     MPPErrorCode DLLEXPORT mppciAngle_32fc32f_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                 size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9420,7 +9514,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciReal_32fc32f_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9436,7 +9530,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciImag_32fc32f_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9455,7 +9549,7 @@ extern "C"
                                                        MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                        MppiSize aDstSize, MPPFixedFilter aFilter, MPPMaskSize aMaskSize,
                                                        const Mpp32fc aConstant[3], MPPBorderType aBorder,
-                                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9480,7 +9574,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, MPPFixedFilter aFilter, MPPMaskSize aMaskSize,
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9505,7 +9599,7 @@ extern "C"
                                                            MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                            Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                            const Mpp32fc aConstant[3], MPPBorderType aBorder,
-                                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9531,7 +9625,7 @@ extern "C"
                                                          MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                          Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                          MPPBorderType aBorder, MppiRect aSrcROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9556,7 +9650,7 @@ extern "C"
                                                         MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                         Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                         const Mpp32fc aConstant[3], MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9581,7 +9675,7 @@ extern "C"
                                                       MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                       MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                       Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9606,7 +9700,7 @@ extern "C"
                                                            MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                            Mpp32s aFilterCenter, const Mpp32fc aConstant[3],
                                                            MPPBorderType aBorder, MppiRect aSrcROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9629,7 +9723,7 @@ extern "C"
                                                          MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                          MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                          Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9652,7 +9746,7 @@ extern "C"
                                                      MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                      Mpp32s aFilterCenter, const Mpp32fc aConstant[3],
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9677,7 +9771,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                    MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                    Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9702,7 +9796,7 @@ extern "C"
                                                         MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                         Mpp32s aFilterCenter, const Mpp32fc aConstant[3],
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9725,7 +9819,7 @@ extern "C"
                                                       MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                       MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                       Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9747,7 +9841,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                      const Mpp32fc aConstant[3], MPPBorderType aBorder,
-                                                     MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                     MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9771,7 +9865,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciBoxFilter_32fc_C3R(ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step,
                                                    MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                    MppiSize aDstSize, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9795,7 +9889,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                   MppiFilterArea aFilterArea, const Mpp32fc aConstant[3],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9823,7 +9918,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                 MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                 MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9851,7 +9946,7 @@ extern "C"
                                                       MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                       MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
                                                       MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9876,7 +9971,7 @@ extern "C"
                                                     MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                     MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                     MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                    MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9901,7 +9996,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9936,7 +10031,7 @@ extern "C"
                                                     DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3,
                                                     size_t aDst3Step, MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                     MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                    MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9968,7 +10063,7 @@ extern "C"
                                                           MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                           MPPInterpolationMode aInterpolation,
                                                           const Mpp32fc aConstant[3], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -9993,7 +10088,7 @@ extern "C"
                                                         MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                         MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                         MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10018,7 +10113,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10053,7 +10148,7 @@ extern "C"
                                                         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3,
                                                         size_t aDst3Step, MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                         MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10085,7 +10180,7 @@ extern "C"
                                                            MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                            MPPInterpolationMode aInterpolation,
                                                            const Mpp32fc aConstant[3], MPPBorderType aBorder,
-                                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10110,7 +10205,7 @@ extern "C"
                                                          MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                          MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                          MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10135,7 +10230,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10168,7 +10263,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-        CPtrMppStreamCtx aStreamCtx)
+        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10198,7 +10293,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciWarpPerspectiveBack_32fc_C3RCb(
         ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
         MppiSize aDstSize, const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-        const Mpp32fc aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        const Mpp32fc aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10223,7 +10318,7 @@ extern "C"
                                                              MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                              MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                              MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                             MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                             MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10248,7 +10343,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10281,7 +10376,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-        CPtrMppStreamCtx aStreamCtx)
+        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10312,7 +10407,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                   MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                   MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10337,7 +10433,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                 MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10362,7 +10458,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         Mpp64f aAngleInDeg, const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10390,14 +10486,12 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciRotate_32fc_P3R(ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step,
-                                                ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
-                                                ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step,
-                                                MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
-                                                DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3,
-                                                size_t aDst3Step, MppiSize aDstSize, Mpp64f aAngleInDeg,
-                                                const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciRotate_32fc_P3R(
+        ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
+        ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
+        DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
+        Mpp64f aAngleInDeg, const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
+        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10426,7 +10520,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciResize_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                size_t aDstStep, MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10447,7 +10541,7 @@ extern "C"
                                                DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2,
                                                size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step,
                                                MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10474,7 +10568,7 @@ extern "C"
                                                           MppiSize aDstSize, const Mpp64f aScale[2],
                                                           const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                                           const Mpp32fc aConstant[3], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10501,7 +10595,7 @@ extern "C"
                                                         MppiSize aDstSize, const Mpp64f aScale[2],
                                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10527,7 +10621,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10561,7 +10655,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10591,7 +10685,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMirror_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                size_t aDstStep, MPPMirrorAxis aAxis, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10608,7 +10702,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMirror_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10627,7 +10721,7 @@ extern "C"
                                                    MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
                                                    size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
                                                    const Mpp32fc aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10654,7 +10748,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                  MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
                                                  size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10682,7 +10777,7 @@ extern "C"
                                                  size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
                                                  size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation,
                                                  const Mpp32fc aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10713,7 +10808,7 @@ extern "C"
                                                ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                                ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                                MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                               MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                               MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10743,7 +10838,7 @@ extern "C"
         ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
-        const Mpp32fc aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        const Mpp32fc aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10773,14 +10868,12 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciRemapC2_32fc_P3R(ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step,
-                                                 ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
-                                                 ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step,
-                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
-                                                 DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3,
-                                                 size_t aDst3Step, MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
-                                                 size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciRemapC2_32fc_P3R(
+        ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2BasePtr, size_t aSrc2Step,
+        ConstDevPtrMpp32fc aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step,
+        DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
+        ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10815,7 +10908,7 @@ extern "C"
         DevPtrMpp32fc aDst2, size_t aDst2Step, DevPtrMpp32fc aDst3, size_t aDst3Step, MppiSize aDstSize,
         ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
         size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10856,7 +10949,7 @@ extern "C"
                                                MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMapX,
                                                size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
                                                size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10889,7 +10982,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageErrorBufferSize_32fc_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx)
+                                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10903,7 +10996,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageErrorBufferSize_32fc_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10920,7 +11013,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                         DevPtrMpp64f aDstScalar, DevPtrMpp8u aBuffer,
                                                         size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10943,7 +11036,7 @@ extern "C"
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                          DevPtrMpp64f aDstScalar, ConstDevPtrMpp8u aMask,
                                                          size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10965,7 +11058,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageRelativeErrorBufferSize_32fc_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                       CPtrMppStreamCtx aStreamCtx)
+                                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10979,7 +11072,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageRelativeErrorBufferSize_32fc_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                        CPtrMppStreamCtx aStreamCtx)
+                                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -10996,7 +11089,7 @@ extern "C"
                                                                 ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step,
                                                                 DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                 DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11020,7 +11113,7 @@ extern "C"
                                                                  DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                                  DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11042,7 +11135,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDotProductBufferSize_32fc_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx)
+                                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11056,7 +11149,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDotProductBufferSize_32fc_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx)
+                                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11073,7 +11166,7 @@ extern "C"
                                                        ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64fc aDst,
                                                        DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer,
                                                        size_t aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11096,7 +11189,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64fc aDst,
                                                         DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask,
                                                         size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11118,7 +11211,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMSEBufferSize_32fc_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11132,7 +11225,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMSEBufferSize_32fc_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11148,7 +11241,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMSE_32fc64fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp64fc aDst, DevPtrMpp64fc aDstScalar,
                                                 DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11170,7 +11263,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMSE_32fc64fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, DevPtrMpp64fc aDst, DevPtrMpp64fc aDstScalar,
                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11192,7 +11285,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumErrorBufferSize_32fc_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx)
+                                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11206,7 +11299,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumErrorBufferSize_32fc_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11223,7 +11316,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                         DevPtrMpp64f aDstScalar, DevPtrMpp8u aBuffer,
                                                         size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11246,7 +11339,7 @@ extern "C"
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                          DevPtrMpp64f aDstScalar, ConstDevPtrMpp8u aMask,
                                                          size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11268,7 +11361,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumRelativeErrorBufferSize_32fc_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                       CPtrMppStreamCtx aStreamCtx)
+                                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11282,7 +11375,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumRelativeErrorBufferSize_32fc_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                        CPtrMppStreamCtx aStreamCtx)
+                                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11299,7 +11392,7 @@ extern "C"
                                                                 ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step,
                                                                 DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                 DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11323,7 +11416,7 @@ extern "C"
                                                                  DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                                  DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11345,7 +11438,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSumBufferSize_32fc64f_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11360,7 +11453,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSumBufferSize_32fc64f_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11376,7 +11469,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSum_32fc64fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                 DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11396,7 +11489,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciSum_32fc64fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                  DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                  DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11416,7 +11509,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanBufferSize_32fc_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11430,7 +11523,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanBufferSize_32fc_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11445,7 +11538,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMean_32fc64fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                  DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11465,7 +11558,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMean_32fc64fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                   DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                   DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11485,7 +11578,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanStdBufferSize_32fc_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11499,7 +11592,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanStdBufferSize_32fc_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11515,7 +11608,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMeanStd_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aMean,
                                                 DevPtrMpp64f aStd, DevPtrMpp64fc aMeanScalar, DevPtrMpp64f aStdScalar,
                                                 DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11537,7 +11630,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMeanStd_32fc_C3M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aMean,
                                                  DevPtrMpp64f aStd, DevPtrMpp64fc aMeanScalar, DevPtrMpp64f aStdScalar,
                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11561,7 +11654,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompare_32fc8u_C3C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, MPPCompareOp aCompare,
                                                     DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11581,7 +11674,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareC_32fc8u_C3C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                      const Mpp32fc aConst[3], MPPCompareOp aCompare, DevPtrMpp8u aDst,
-                                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aDstStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11601,7 +11695,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareDevC_32fc8u_C3C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                         ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                         DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11620,7 +11714,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareFloat_32fc8u_C3C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                          MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11638,7 +11732,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompare_32fc8u_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                   size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst,
-                                                  size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11658,7 +11752,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareC_32fc8u_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                                    MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11678,7 +11772,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareDevC_32fc8u_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                       DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11697,7 +11791,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareFloat_32fc8u_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11716,7 +11810,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEps_32fc8u_C3C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, Mpp32f aEpsilon,
                                                          DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11736,7 +11830,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEpsC_32fc8u_C3C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                           const Mpp32fc aConst[3], Mpp32f aEpsilon, DevPtrMpp8u aDst,
                                                           size_t aDstStep, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11755,7 +11849,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEpsDevC_32fc8u_C3C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                              ConstDevPtrMpp32fc aConst, Mpp32f aEpsilon,
                                                              DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx)
+                                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11774,7 +11868,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIf_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                   size_t aSrc2Step, MPPCompareOp aCompare, const Mpp32fc aValue[3],
                                                   DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11795,7 +11889,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[3],
                                                    MPPCompareOp aCompare, const Mpp32fc aValue[3], DevPtrMpp32fc aDst,
-                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11816,7 +11910,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfDevC_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                       const Mpp32fc aValue[3], DevPtrMpp32fc aDst, size_t aDstStep,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11837,7 +11931,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfFloat_32fc_C3(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        MPPCompareOp aCompare, const Mpp32fc aValue[3],
                                                        DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11856,7 +11950,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIf_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                    size_t aSrc2Step, MPPCompareOp aCompare, const Mpp32fc aValue[3],
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11875,7 +11969,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[3],
                                                     MPPCompareOp aCompare, const Mpp32fc aValue[3], MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11894,7 +11988,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfDevC_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                        ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                        const Mpp32fc aValue[3], MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11912,7 +12006,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfFloat_32fc_C3I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                         MPPCompareOp aCompare, const Mpp32fc aValue[3],
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11928,7 +12022,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11945,7 +12039,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCopy_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                               size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11966,7 +12060,8 @@ extern "C"
                                                size_t aDstChannel1Step, DevPtrMpp32fc aDstChannel2,
                                                size_t aDstChannel2Step, DevPtrMpp32fc aDstChannel3,
                                                size_t aDstChannel3Step, DevPtrMpp32fc aDstChannel4,
-                                               size_t aDstChannel4Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               size_t aDstChannel4Step, MppiSize aSizeROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -11992,7 +12087,7 @@ extern "C"
                                                DevPtrMpp32fc aSrcChannel2, size_t aSrcChannel2Step,
                                                DevPtrMpp32fc aSrcChannel3, size_t aSrcChannel3Step,
                                                DevPtrMpp32fc aSrcChannel4, size_t aSrcChannel4Step, DevPtrMpp32fc aDst,
-                                               size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12016,7 +12111,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopyBorder_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                    size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                                    MPPBorderType aBorder, MppiSize aSizeROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12036,7 +12131,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopyBorder_32fc_C4Cb(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                      size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                                      const Mpp32fc aConstant[4], MPPBorderType aBorder,
-                                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12057,7 +12152,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCopySubpix_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                    size_t aDstStep, const Mpp32f aDelta[2],
                                                    MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12075,7 +12170,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12090,7 +12185,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12106,7 +12201,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12124,7 +12219,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12141,7 +12236,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetC_32fc_C4CI(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, Mpp32fc aConst,
-                                               Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                               Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12156,7 +12251,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSetDevC_32fc_C4CI(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                  Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                  Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12174,7 +12269,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSwapChannel_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      const Mpp32s aDstChannels[4], MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12189,7 +12284,8 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciTranspose_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                                  size_t aDstStep, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aDstStep, MppiSize aSizeROISrc,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12207,7 +12303,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12226,7 +12322,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12244,7 +12340,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12261,7 +12357,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12277,7 +12373,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12292,7 +12388,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12309,7 +12405,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12330,7 +12426,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12350,7 +12446,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12370,7 +12466,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAdd_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12389,7 +12485,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12407,7 +12503,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddDevC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12425,7 +12521,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12444,7 +12540,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12462,7 +12558,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12479,7 +12575,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12495,7 +12591,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12510,7 +12606,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12525,7 +12621,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubInv_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12541,7 +12637,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSubInvC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12557,7 +12653,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvDevC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                     ConstDevPtrMpp32fc aConst, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12574,7 +12670,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciSub_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12595,7 +12691,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12615,7 +12711,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12635,7 +12731,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSub_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12654,7 +12750,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12672,7 +12768,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubDevC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12690,7 +12786,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInv_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12709,7 +12805,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12727,7 +12823,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSubInvDevC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      ConstDevPtrMpp32fc aConst, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12745,7 +12842,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12764,7 +12861,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12782,7 +12879,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12799,7 +12896,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12815,7 +12912,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12830,7 +12927,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12847,7 +12944,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMul_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12868,7 +12965,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12888,7 +12985,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12908,7 +13005,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMul_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12927,7 +13024,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12945,7 +13042,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMulDevC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12963,7 +13060,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -12982,7 +13079,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                              DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13000,7 +13097,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                 DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13017,7 +13114,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13033,7 +13130,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13048,7 +13145,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13063,7 +13160,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivInv_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13079,7 +13176,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDivInvC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13095,7 +13192,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvDevC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                     ConstDevPtrMpp32fc aConst, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13112,7 +13209,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13133,7 +13230,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                               DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13153,7 +13250,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aConst,
                                                  DevPtrMpp32fc aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13173,7 +13270,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDiv_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                               size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13192,7 +13289,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13210,7 +13307,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivDevC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aConst,
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13228,7 +13325,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInv_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13247,7 +13344,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
                                                   ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13265,7 +13362,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciDivInvDevC_32fc_C4IM(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                      ConstDevPtrMpp32fc aConst, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13282,7 +13380,8 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAddSquare_32fc_C4I(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
-                                                   size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   size_t aSrcDstStep, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13299,7 +13398,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddSquare_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                    size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13318,7 +13417,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddProduct_32fc_C4I(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aSrcDst,
-                                                    size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    size_t aSrcDstStep, MppiSize aSizeROI,
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13338,7 +13438,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddProduct_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aSrcDst,
                                                     size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13360,7 +13460,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aDst,
                                                     size_t aDstStep, Mpp32fc aAlpha, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13380,7 +13480,8 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                      ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp32fc aDst,
                                                      size_t aDstStep, Mpp32fc aAlpha, ConstDevPtrMpp8u aMask,
-                                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aMaskStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13401,7 +13502,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C4I(DevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                      size_t aSrcDstStep, Mpp32fc aAlpha, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13417,7 +13518,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciAddWeighted_32fc_C4IM(DevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aSrcDst,
                                                       size_t aSrcDstStep, Mpp32fc aAlpha, ConstDevPtrMpp8u aMask,
-                                                      size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                      size_t aMaskStep, MppiSize aSizeROI,
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13434,7 +13536,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciExp_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13450,7 +13552,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciExp_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13464,7 +13566,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciLn_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13480,7 +13582,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciLn_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx)
+                                            CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13494,7 +13596,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqr_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13510,7 +13612,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqr_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx)
+                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13524,7 +13626,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqrt_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13540,7 +13642,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSqrt_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx)
+                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13555,7 +13657,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciConjMul_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp32fc aDst, size_t aDstStep,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13573,7 +13675,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConjMul_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
-                                                 size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13589,7 +13691,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConj_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13605,7 +13707,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciConj_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx)
+                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13618,40 +13720,62 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciMagnitude_32fc32f_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciMagnitude_32fc32f_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                     DevPtrMpp32f aDst, size_t aDstStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
             const StreamCtx *_StreamCtx =
                 aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
             const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
             const ImageView<Pixel32fcC4> _Src1(reinterpret_cast<Pixel32fcC4 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
-                                               {_SizeROI, aSrc1Step});
+                                               {_SizeSrc1, aSrc1Step});
             ImageView<Pixel32fC4> _Dst(reinterpret_cast<Pixel32fC4 *>(aDst), {_SizeROI, aDstStep});
             _Src1.Magnitude(_Dst, *_StreamCtx);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciMagnitudeSqr_32fc32f_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                        size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+    MPPErrorCode DLLEXPORT mppciMagnitudeSqr_32fc32f_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                        DevPtrMpp32f aDst, size_t aDstStep, MppiSize aSizeROI,
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
             const StreamCtx *_StreamCtx =
                 aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
             const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
             const ImageView<Pixel32fcC4> _Src1(reinterpret_cast<Pixel32fcC4 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
-                                               {_SizeROI, aSrc1Step});
+                                               {_SizeSrc1, aSrc1Step});
             ImageView<Pixel32fC4> _Dst(reinterpret_cast<Pixel32fC4 *>(aDst), {_SizeROI, aDstStep});
             _Src1.MagnitudeSqr(_Dst, *_StreamCtx);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
+    MPPErrorCode DLLEXPORT mppciMagnitudeLog_32fc32f_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, MppiSize aSizeSrc1,
+                                                        DevPtrMpp32f aDst, size_t aDstStep, Mpp32f aOffset,
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
+    {
+        try
+        {
+            const StreamCtx *_StreamCtx =
+                aStreamCtx == nullptr ? &StreamCtxSingleton::Get() : reinterpret_cast<const StreamCtx *>(aStreamCtx);
+            const Size2D _SizeROI(aSizeROI.width, aSizeROI.height);
+            const Size2D _SizeSrc1(aSizeSrc1.width, aSizeSrc1.height);
+            const ImageView<Pixel32fcC4> _Src1(reinterpret_cast<Pixel32fcC4 *>(const_cast<DevPtrMpp32fc>(aSrc1)),
+                                               {_SizeSrc1, aSrc1Step});
+            ImageView<Pixel32fC4> _Dst(reinterpret_cast<Pixel32fC4 *>(aDst), {_SizeROI, aDstStep});
+            _Src1.MagnitudeLog(_Dst, aOffset, *_StreamCtx);
+        }
+        CATCH_AND_RETURN_ERRORCODE;
+    }
+
     MPPErrorCode DLLEXPORT mppciAngle_32fc32f_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                 size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13667,7 +13791,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciReal_32fc32f_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13683,7 +13807,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciImag_32fc32f_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
-                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13702,7 +13826,7 @@ extern "C"
                                                        MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                        MppiSize aDstSize, MPPFixedFilter aFilter, MPPMaskSize aMaskSize,
                                                        const Mpp32fc aConstant[4], MPPBorderType aBorder,
-                                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13727,7 +13851,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, MPPFixedFilter aFilter, MPPMaskSize aMaskSize,
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13752,7 +13876,7 @@ extern "C"
                                                            MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                            Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                            const Mpp32fc aConstant[4], MPPBorderType aBorder,
-                                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13778,7 +13902,7 @@ extern "C"
                                                          MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                          Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                          MPPBorderType aBorder, MppiRect aSrcROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13803,7 +13927,7 @@ extern "C"
                                                         MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                         Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                         const Mpp32fc aConstant[4], MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13828,7 +13952,7 @@ extern "C"
                                                       MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                       MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                       Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13853,7 +13977,7 @@ extern "C"
                                                            MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                            Mpp32s aFilterCenter, const Mpp32fc aConstant[4],
                                                            MPPBorderType aBorder, MppiRect aSrcROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13876,7 +14000,7 @@ extern "C"
                                                          MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                          MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                          Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13899,7 +14023,7 @@ extern "C"
                                                      MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                      Mpp32s aFilterCenter, const Mpp32fc aConstant[4],
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx)
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13924,7 +14048,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                    MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                    Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13949,7 +14073,7 @@ extern "C"
                                                         MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                         Mpp32s aFilterCenter, const Mpp32fc aConstant[4],
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13972,7 +14096,7 @@ extern "C"
                                                       MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                       MppiSize aDstSize, Mpp32f aScalingValue, Mpp32s aFilterSize,
                                                       Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -13994,7 +14118,7 @@ extern "C"
                                                      MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                      MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                      const Mpp32fc aConstant[4], MPPBorderType aBorder,
-                                                     MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                     MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14018,7 +14142,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciBoxFilter_32fc_C4R(ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step,
                                                    MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                    MppiSize aDstSize, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14042,7 +14166,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                   MppiFilterArea aFilterArea, const Mpp32fc aConstant[4],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14070,7 +14195,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                 MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                                 MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14098,7 +14223,7 @@ extern "C"
                                                       MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                       MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
                                                       MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14123,7 +14248,7 @@ extern "C"
                                                     MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                     MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                     MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                    MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                    MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14149,7 +14274,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14186,7 +14311,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-        CPtrMppStreamCtx aStreamCtx)
+        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14221,7 +14346,7 @@ extern "C"
                                                           MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                           MPPInterpolationMode aInterpolation,
                                                           const Mpp32fc aConstant[4], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14246,7 +14371,7 @@ extern "C"
                                                         MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                         MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                         MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14272,7 +14397,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14309,7 +14434,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-        CPtrMppStreamCtx aStreamCtx)
+        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14344,7 +14469,7 @@ extern "C"
                                                            MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                            MPPInterpolationMode aInterpolation,
                                                            const Mpp32fc aConstant[4], MPPBorderType aBorder,
-                                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14369,7 +14494,7 @@ extern "C"
                                                          MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                          MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                          MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14395,7 +14520,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14432,7 +14557,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-        CPtrMppStreamCtx aStreamCtx)
+        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14465,7 +14590,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciWarpPerspectiveBack_32fc_C4RCb(
         ConstDevPtrMpp32fc aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
         MppiSize aDstSize, const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-        const Mpp32fc aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        const Mpp32fc aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14490,7 +14615,7 @@ extern "C"
                                                              MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                              MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                              MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                             MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                             MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14516,7 +14641,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14553,7 +14678,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-        CPtrMppStreamCtx aStreamCtx)
+        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14587,7 +14712,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                   MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                   MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14612,7 +14738,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                 MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14638,7 +14764,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         Mpp64f aAngleInDeg, const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14675,7 +14801,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         Mpp64f aAngleInDeg, const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14707,7 +14833,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciResize_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                size_t aDstStep, MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14729,7 +14855,7 @@ extern "C"
                                                size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
                                                DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4,
                                                size_t aDst4Step, MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14760,7 +14886,7 @@ extern "C"
                                                           MppiSize aDstSize, const Mpp64f aScale[2],
                                                           const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                                           const Mpp32fc aConstant[4], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14787,7 +14913,7 @@ extern "C"
                                                         MppiSize aDstSize, const Mpp64f aScale[2],
                                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                                         MPPBorderType aBorder, MppiRect aSrcROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14814,7 +14940,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14852,7 +14978,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14885,7 +15011,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMirror_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp32fc aDst,
                                                size_t aDstStep, MPPMirrorAxis aAxis, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx)
+                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14902,7 +15028,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMirror_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14921,7 +15047,7 @@ extern "C"
                                                    MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
                                                    size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
                                                    const Mpp32fc aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx)
+                                                   CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14948,7 +15074,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp32fc aDst, size_t aDstStep,
                                                  MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap,
                                                  size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -14976,7 +15103,7 @@ extern "C"
                                                  size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
                                                  size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation,
                                                  const Mpp32fc aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15007,7 +15134,7 @@ extern "C"
                                                ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                                ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                                MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                               MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+                                               MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15038,7 +15165,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
-        const Mpp32fc aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        const Mpp32fc aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15077,7 +15204,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp32fc aDst1, size_t aDst1Step, DevPtrMpp32fc aDst2, size_t aDst2Step,
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep, MPPInterpolationMode aInterpolation,
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15116,7 +15243,7 @@ extern "C"
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
         size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation, const Mpp32fc aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx)
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15159,7 +15286,7 @@ extern "C"
         DevPtrMpp32fc aDst3, size_t aDst3Step, DevPtrMpp32fc aDst4, size_t aDst4Step, MppiSize aDstSize,
         ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep, ConstDevPtrMpp32f aCoordinateMapY,
         size_t aCoordinateMapYStep, MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-        CPtrMppStreamCtx aStreamCtx)
+        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15195,7 +15322,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageErrorBufferSize_32fc_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx)
+                                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15209,7 +15336,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageErrorBufferSize_32fc_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15226,7 +15353,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                         DevPtrMpp64f aDstScalar, DevPtrMpp8u aBuffer,
                                                         size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15249,7 +15376,7 @@ extern "C"
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                          DevPtrMpp64f aDstScalar, ConstDevPtrMpp8u aMask,
                                                          size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15271,7 +15398,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageRelativeErrorBufferSize_32fc_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                       CPtrMppStreamCtx aStreamCtx)
+                                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15285,7 +15412,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciAverageRelativeErrorBufferSize_32fc_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                        CPtrMppStreamCtx aStreamCtx)
+                                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15302,7 +15429,7 @@ extern "C"
                                                                 ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step,
                                                                 DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                 DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15326,7 +15453,7 @@ extern "C"
                                                                  DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                                  DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15348,7 +15475,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDotProductBufferSize_32fc_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx)
+                                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15362,7 +15489,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciDotProductBufferSize_32fc_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx)
+                                                              CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15379,7 +15506,7 @@ extern "C"
                                                        ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64fc aDst,
                                                        DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer,
                                                        size_t aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15402,7 +15529,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64fc aDst,
                                                         DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask,
                                                         size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15424,7 +15551,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMSEBufferSize_32fc_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15438,7 +15565,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMSEBufferSize_32fc_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15454,7 +15581,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMSE_32fc64fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp64fc aDst, DevPtrMpp64fc aDstScalar,
                                                 DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15476,7 +15603,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMSE_32fc64fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                  size_t aSrc2Step, DevPtrMpp64fc aDst, DevPtrMpp64fc aDstScalar,
                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15498,7 +15625,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumErrorBufferSize_32fc_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx)
+                                                               CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15512,7 +15639,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumErrorBufferSize_32fc_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                CPtrMppStreamCtx aStreamCtx)
+                                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15529,7 +15656,7 @@ extern "C"
                                                         ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                         DevPtrMpp64f aDstScalar, DevPtrMpp8u aBuffer,
                                                         size_t aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15552,7 +15679,7 @@ extern "C"
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, DevPtrMpp64f aDst,
                                                          DevPtrMpp64f aDstScalar, ConstDevPtrMpp8u aMask,
                                                          size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15574,7 +15701,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumRelativeErrorBufferSize_32fc_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                       CPtrMppStreamCtx aStreamCtx)
+                                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15588,7 +15715,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMaximumRelativeErrorBufferSize_32fc_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                                        CPtrMppStreamCtx aStreamCtx)
+                                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15605,7 +15732,7 @@ extern "C"
                                                                 ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step,
                                                                 DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                 DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15629,7 +15756,7 @@ extern "C"
                                                                  DevPtrMpp64f aDst, DevPtrMpp64f aDstScalar,
                                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                                  DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15651,7 +15778,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSumBufferSize_32fc64f_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15666,7 +15793,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciSumBufferSize_32fc64f_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15682,7 +15809,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciSum_32fc64fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                 DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15702,7 +15829,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciSum_32fc64fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                  DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                  DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                 CPtrMppStreamCtx aStreamCtx)
+                                                 CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15722,7 +15849,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanBufferSize_32fc_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15736,7 +15863,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanBufferSize_32fc_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15751,7 +15878,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciMean_32fc64fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                  DevPtrMpp64fc aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15771,7 +15898,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMean_32fc64fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aDst,
                                                   DevPtrMpp64fc aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                                   DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15791,7 +15918,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanStdBufferSize_32fc_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15805,7 +15932,7 @@ extern "C"
     }
 
     MPPErrorCode DLLEXPORT mppciMeanStdBufferSize_32fc_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx)
+                                                           CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15821,7 +15948,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMeanStd_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aMean,
                                                 DevPtrMpp64f aStd, DevPtrMpp64fc aMeanScalar, DevPtrMpp64f aStdScalar,
                                                 DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx)
+                                                CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15843,7 +15970,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciMeanStd_32fc_C4M(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, DevPtrMpp64fc aMean,
                                                  DevPtrMpp64f aStd, DevPtrMpp64fc aMeanScalar, DevPtrMpp64f aStdScalar,
                                                  ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                 size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15867,7 +15994,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompare_32fc8u_C4C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, MPPCompareOp aCompare,
                                                     DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15887,7 +16014,8 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareC_32fc8u_C4C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                      const Mpp32fc aConst[4], MPPCompareOp aCompare, DevPtrMpp8u aDst,
-                                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                     size_t aDstStep, MppiSize aSizeROI,
+                                                     CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15907,7 +16035,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareDevC_32fc8u_C4C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                         ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                         DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                        CPtrMppStreamCtx aStreamCtx)
+                                                        CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15926,7 +16054,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareFloat_32fc8u_C4C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                          MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15944,7 +16072,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompare_32fc8u_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                   size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst,
-                                                  size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                  size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15964,7 +16092,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareC_32fc8u_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                                    MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -15984,7 +16112,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareDevC_32fc8u_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                       DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx)
+                                                      CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16003,7 +16131,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciCompareFloat_32fc8u_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16022,7 +16150,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEps_32fc8u_C4C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                          ConstDevPtrMpp32fc aSrc2, size_t aSrc2Step, Mpp32f aEpsilon,
                                                          DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                         CPtrMppStreamCtx aStreamCtx)
+                                                         CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16042,7 +16170,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEpsC_32fc8u_C4C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                           const Mpp32fc aConst[4], Mpp32f aEpsilon, DevPtrMpp8u aDst,
                                                           size_t aDstStep, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx)
+                                                          CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16061,7 +16189,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciCompareEqEpsDevC_32fc8u_C4C1(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                              ConstDevPtrMpp32fc aConst, Mpp32f aEpsilon,
                                                              DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx)
+                                                             CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16080,7 +16208,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIf_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, ConstDevPtrMpp32fc aSrc2,
                                                   size_t aSrc2Step, MPPCompareOp aCompare, const Mpp32fc aValue[4],
                                                   DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                  CPtrMppStreamCtx aStreamCtx)
+                                                  CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16101,7 +16229,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step, const Mpp32fc aConst[4],
                                                    MPPCompareOp aCompare, const Mpp32fc aValue[4], DevPtrMpp32fc aDst,
-                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16122,7 +16250,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfDevC_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                       const Mpp32fc aValue[4], DevPtrMpp32fc aDst, size_t aDstStep,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16143,7 +16271,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfFloat_32fc_C4(ConstDevPtrMpp32fc aSrc1, size_t aSrc1Step,
                                                        MPPCompareOp aCompare, const Mpp32fc aValue[4],
                                                        DevPtrMpp32fc aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16162,7 +16290,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIf_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32fc aSrc2,
                                                    size_t aSrc2Step, MPPCompareOp aCompare, const Mpp32fc aValue[4],
-                                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16181,7 +16309,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep, const Mpp32fc aConst[4],
                                                     MPPCompareOp aCompare, const Mpp32fc aValue[4], MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx)
+                                                    CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16200,7 +16328,7 @@ extern "C"
     MPPErrorCode DLLEXPORT mppciReplaceIfDevC_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                        ConstDevPtrMpp32fc aConst, MPPCompareOp aCompare,
                                                        const Mpp32fc aValue[4], MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx)
+                                                       CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {
@@ -16218,7 +16346,7 @@ extern "C"
 
     MPPErrorCode DLLEXPORT mppciReplaceIfFloat_32fc_C4I(DevPtrMpp32fc aSrcDst, size_t aSrcDstStep,
                                                         MPPCompareOp aCompare, const Mpp32fc aValue[4],
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx)
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx)
     {
         try
         {

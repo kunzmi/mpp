@@ -25,31 +25,31 @@ extern "C"
     typedef float Mpp32f;          // 32-bit (IEEE) floating-point numbers
     typedef double Mpp64f;         // 64-bit floating-point numbers
 
-    typedef unsigned char *DevPtrMpp8u;       // 8-bit unsigned chars
-    typedef signed char *DevPtrMpp8s;         // 8-bit signed chars
-    typedef unsigned short *DevPtrMpp16u;     // 16-bit unsigned integers
-    typedef short *DevPtrMpp16s;              // 16-bit signed integers
-    typedef unsigned int *DevPtrMpp32u;       // 32-bit unsigned integers
-    typedef int *DevPtrMpp32s;                // 32-bit signed integers
-    typedef unsigned long long *DevPtrMpp64u; // 64-bit unsigned integers
-    typedef long long *DevPtrMpp64s;          // 64-bit signed integers
-    typedef __half *DevPtrMpp16f;             // 16-bit half precision floating-point number
-    typedef __nv_bfloat16 *DevPtrMpp16bf;     // 16-bit BFLOAT floating-point number
-    typedef float *DevPtrMpp32f;              // 32-bit (IEEE) floating-point numbers
-    typedef double *DevPtrMpp64f;             // 64-bit floating-point numbers
+    typedef unsigned char *DevPtrMpp8u;   // 8-bit unsigned chars
+    typedef signed char *DevPtrMpp8s;     // 8-bit signed chars
+    typedef unsigned short *DevPtrMpp16u; // 16-bit unsigned integers
+    typedef short *DevPtrMpp16s;          // 16-bit signed integers
+    typedef unsigned int *DevPtrMpp32u;   // 32-bit unsigned integers
+    typedef int *DevPtrMpp32s;            // 32-bit signed integers
+    typedef uint64_t *DevPtrMpp64u;       // 64-bit unsigned integers
+    typedef int64_t *DevPtrMpp64s;        // 64-bit signed integers
+    typedef __half *DevPtrMpp16f;         // 16-bit half precision floating-point number
+    typedef __nv_bfloat16 *DevPtrMpp16bf; // 16-bit BFLOAT floating-point number
+    typedef float *DevPtrMpp32f;          // 32-bit (IEEE) floating-point numbers
+    typedef double *DevPtrMpp64f;         // 64-bit floating-point numbers
 
-    typedef const unsigned char *ConstDevPtrMpp8u;       // 8-bit unsigned chars
-    typedef const signed char *ConstDevPtrMpp8s;         // 8-bit signed chars
-    typedef const unsigned short *ConstDevPtrMpp16u;     // 16-bit unsigned integers
-    typedef const short *ConstDevPtrMpp16s;              // 16-bit signed integers
-    typedef const unsigned int *ConstDevPtrMpp32u;       // 32-bit unsigned integers
-    typedef const int *ConstDevPtrMpp32s;                // 32-bit signed integers
-    typedef const unsigned long long *ConstDevPtrMpp64u; // 64-bit unsigned integers
-    typedef const long long *ConstDevPtrMpp64s;          // 64-bit signed integers
-    typedef const __half *ConstDevPtrMpp16f;             // 16-bit half precision floating-point number
-    typedef const __nv_bfloat16 *ConstDevPtrMpp16bf;     // 16-bit BFLOAT floating-point number
-    typedef const float *ConstDevPtrMpp32f;              // 32-bit (IEEE) floating-point numbers
-    typedef const double *ConstDevPtrMpp64f;             // 64-bit floating-point numbers
+    typedef const unsigned char *ConstDevPtrMpp8u;   // 8-bit unsigned chars
+    typedef const signed char *ConstDevPtrMpp8s;     // 8-bit signed chars
+    typedef const unsigned short *ConstDevPtrMpp16u; // 16-bit unsigned integers
+    typedef const short *ConstDevPtrMpp16s;          // 16-bit signed integers
+    typedef const unsigned int *ConstDevPtrMpp32u;   // 32-bit unsigned integers
+    typedef const int *ConstDevPtrMpp32s;            // 32-bit signed integers
+    typedef const uint64_t *ConstDevPtrMpp64u;       // 64-bit unsigned integers
+    typedef const int64_t *ConstDevPtrMpp64s;        // 64-bit signed integers
+    typedef const __half *ConstDevPtrMpp16f;         // 16-bit half precision floating-point number
+    typedef const __nv_bfloat16 *ConstDevPtrMpp16bf; // 16-bit BFLOAT floating-point number
+    typedef const float *ConstDevPtrMpp32f;          // 32-bit (IEEE) floating-point numbers
+    typedef const double *ConstDevPtrMpp64f;         // 64-bit floating-point numbers
 
     /// <summary>
     /// Complex Number
@@ -123,7 +123,7 @@ extern "C"
         /// Round to the nearest even integer.<para/>
         /// All fractional numbers are rounded to their nearest integer. The ambiguous
         /// cases (i.e. integer.5) are rounded to the closest even integer.<para/>
-        /// __float2int_rn in CUDA<para/>
+        /// C++ nearbyint() function with FE_TONEAREST rounding mode enabled on x86 CPUs<para/>
         /// E.g.<para/>
         /// - roundNear(0.4) = 0<para/>
         /// - roundNear(0.5) = 0<para/>
@@ -151,9 +151,9 @@ extern "C"
         MPP_ROUND_NearestTiesAwayFromZero,
         /// <summary>
         /// Round towards zero (truncation).<para/>
-        /// All fractional numbers of the form integer.decimals are truncated to
+        /// All fractional numbers of the form integer. Decimals are truncated to
         /// integer.<para/>
-        /// __float2int_rz in CUDA<para/>
+        /// C++ trunc() function<para/>
         /// - roundZero(0.4)  = 0<para/>
         /// - roundZero(0.5)  = 0<para/>
         /// - roundZero(0.6)  = 0<para/>
@@ -1001,8 +1001,8 @@ extern "C"
         /// WarpSize
         /// </summary>
         int WarpSize;
-    } MppStreamCtx;
-    typedef const MppStreamCtx *CPtrMppStreamCtx;
+    } MppCudaStreamCtx;
+    typedef const MppCudaStreamCtx *CPtrMppCudaStreamCtx;
 
     // NOLINTEND(modernize-use-using,performance-enum-size)
 #ifdef __cplusplus

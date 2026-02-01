@@ -30,6 +30,7 @@ add_library(mppci_capi_8s SHARED
 target_link_libraries(mppci_capi_8s PRIVATE project_options project_warnings )
 target_link_libraries(mppci_capi_8s PUBLIC  					
 						backends.cuda.image.arithmetic8s
+						backends.cuda.image.colorConversion8s
 						backends.cuda.image.dataExchangeAndInit8s 
 						backends.cuda.image.filtering8s 
 						backends.cuda.image.geometryTransforms8s 
@@ -219,6 +220,7 @@ add_library(mppci_capi_64f SHARED
 target_link_libraries(mppci_capi_64f PRIVATE project_options project_warnings )
 target_link_libraries(mppci_capi_64f PUBLIC  
 						backends.cuda.image.arithmetic64f
+						backends.cuda.image.colorConversion64f
 						backends.cuda.image.dataExchangeAndInit64f 
 						backends.cuda.image.filtering64f 
 						backends.cuda.image.geometryTransforms64f 

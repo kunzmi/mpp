@@ -17,14 +17,14 @@ extern "C"
     /// Copy image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                     ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -36,7 +36,7 @@ extern "C"
     /// <param name="aConstant">Constant value needed in case BorderType::Constant</param>
     MPPErrorCode mppciCopyBorder_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, const Mpp32s aLowerBorderSize[2], MPPBorderType aBorder,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -48,7 +48,7 @@ extern "C"
     /// <param name="aBorder">Border control paramter</param>
     MPPErrorCode mppciCopyBorder_16bf_C1Cb(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                            size_t aDstStep, const Mpp32s aLowerBorderSize[2], Mpp16bf aConstant,
-                                           MPPBorderType aBorder, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy subpix.
@@ -58,452 +58,452 @@ extern "C"
     /// <param name="aInterpolation">Interpolation mode to use</param>
     MPPErrorCode mppciCopySubpix_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, const Mpp32f aDelta[2], MPPInterpolationMode aInterpolation,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, ConstDevPtrMpp8u aMask,
-                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Transpose image.
     /// </summary>
     MPPErrorCode mppciTranspose_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                        MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
-                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
                                     size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, ConstDevPtrMpp8u aMask,
-                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
-                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
                                     size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, ConstDevPtrMpp8u aMask,
-                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
-                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
                                     size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, ConstDevPtrMpp8u aMask,
-                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
-                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
                                     size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, ConstDevPtrMpp8u aMask,
-                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_C1IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_C1I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
-                                         size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                          size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciAddProduct_16bf_C1I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
@@ -511,14 +511,14 @@ extern "C"
     MPPErrorCode mppciAddProduct_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
                                           ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
@@ -526,132 +526,132 @@ extern "C"
     MPPErrorCode mppciAddWeighted_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C1I(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                            size_t aSrcDstStep, Mpp16bf aAlpha, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C1IM(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                             size_t aSrcDstStep, Mpp16bf aAlpha, ConstDevPtrMpp8u aMask,
-                                            size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst, DevPtrMpp16bf aDst,
-                                       size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = exp(aSrc1) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = exp(aSrcDst) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = log(aSrc1) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = log(aSrcDst) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc1 (aSrc1^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrcDst * aSrcDst (aSrcDst^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = Sqrt(aSrc1) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = Sqrt(aSrcDst) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aAlpha,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aAlpha,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using alpha opacity values contained in each image. Last color channel is alpha channel, 1
@@ -659,7 +659,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciAlphaComp_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MPPAlphaOp aAlphaOp,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using constant alpha values.
@@ -667,23 +667,23 @@ extern "C"
     MPPErrorCode mppciAlphaCompC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha1,
                                          Mpp16bf aAlpha2, MPPAlphaOp aAlphaOp, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              MPPFixedFilter aFilter, MPPMaskSize aMaskSize, Mpp16bf aConstant,
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MPPFixedFilter aFilter, MPPMaskSize aMaskSize, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -692,7 +692,7 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                  Mpp32s aFilterCenter, Mpp16bf aConstant, MPPBorderType aBorder,
-                                                 MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -700,7 +700,8 @@ extern "C"
     MPPErrorCode mppciSeparableFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -709,7 +710,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -717,7 +718,7 @@ extern "C"
     MPPErrorCode mppciColumnFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -727,7 +728,7 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, Mpp16bf aScalingValue, Mpp32s aFilterSize,
                                                  Mpp32s aFilterCenter, Mpp16bf aConstant, MPPBorderType aBorder,
-                                                 MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -736,7 +737,8 @@ extern "C"
     MPPErrorCode mppciColumnWindowSum_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -745,7 +747,7 @@ extern "C"
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                            Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -753,7 +755,7 @@ extern "C"
     MPPErrorCode mppciRowFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -763,7 +765,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -772,7 +774,7 @@ extern "C"
     MPPErrorCode mppciRowWindowSum_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -780,7 +782,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, Mpp16bf aConstant, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -788,7 +790,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
@@ -799,7 +801,7 @@ extern "C"
                                                             MppiSize aSrcFullSize, DevPtrMpp32f aDst, size_t aDstStep,
                                                             MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                             Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                            CPtrMppStreamCtx aStreamCtx);
+                                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A specialised box filter for one-channel images that returns in first channel result image the mean value under
@@ -810,7 +812,7 @@ extern "C"
                                                           MppiSize aSrcFullSize, DevPtrMpp32f aDst, size_t aDstStep,
                                                           MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                           MPPBorderType aBorder, MppiRect aSrcROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -818,7 +820,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, Mpp16bf aConstant, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -826,7 +828,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -834,7 +836,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, Mpp16bf aConstant, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -842,7 +844,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Median filter (only filter sizes 3x3, 5x5 and 7x7 are implemented).
@@ -850,7 +852,7 @@ extern "C"
     MPPErrorCode mppciMedianFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -858,7 +860,7 @@ extern "C"
     MPPErrorCode mppciWienerFilter_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               MppiFilterArea aFilterArea, Mpp32f aNoise, Mpp16bf aConstant,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -866,7 +868,7 @@ extern "C"
     MPPErrorCode mppciWienerFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, Mpp32f aNoise, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -879,7 +881,7 @@ extern "C"
                                                             MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                             Mpp32f aDelta, Mpp16bf aValGT, Mpp16bf aValLE,
                                                             Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                            CPtrMppStreamCtx aStreamCtx);
+                                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -891,7 +893,7 @@ extern "C"
                                                           MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                           MppiSize aDstSize, MppiFilterArea aFilterArea, Mpp32f aDelta,
                                                           Mpp16bf aValGT, Mpp16bf aValLE, MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -902,7 +904,7 @@ extern "C"
     MPPErrorCode mppciFilter_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         ConstDevPtrMpp32f aFilter, MppiFilterArea aFilterArea, Mpp16bf aConstant,
-                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -913,7 +915,7 @@ extern "C"
     MPPErrorCode mppciFilter_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -931,7 +933,7 @@ extern "C"
                                                       MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                       ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                       Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -949,7 +951,7 @@ extern "C"
                                                     MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                     ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                     MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -964,7 +966,8 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                Mpp32f aWeight, Mpp32f aThreshold, Mpp16bf aConstant,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -979,7 +982,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                              Mpp32f aWeight, Mpp32f aThreshold, MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -998,7 +1001,7 @@ extern "C"
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                             Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -1016,7 +1019,7 @@ extern "C"
     MPPErrorCode mppciWarpAffine_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -1035,7 +1038,8 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                 MPPInterpolationMode aInterpolation, Mpp16bf aConstant,
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MPPBorderType aBorder, MppiRect aSrcROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -1054,7 +1058,7 @@ extern "C"
     MPPErrorCode mppciWarpAffineBack_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -1073,7 +1077,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                  MPPInterpolationMode aInterpolation, Mpp16bf aConstant,
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -1091,7 +1096,8 @@ extern "C"
     MPPErrorCode mppciWarpPerspective_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -1111,7 +1117,7 @@ extern "C"
                                                      MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                      MPPInterpolationMode aInterpolation, Mpp16bf aConstant,
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -1130,7 +1136,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                    MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                    MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -1147,7 +1153,7 @@ extern "C"
     MPPErrorCode mppciRotate_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, Mpp16bf aConstant,
-                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -1164,7 +1170,7 @@ extern "C"
     MPPErrorCode mppciRotate_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                       const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize<para/>
@@ -1177,7 +1183,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciResize_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                      MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -1205,7 +1211,8 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aScale[2], const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, Mpp16bf aConstant,
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MPPBorderType aBorder, MppiRect aSrcROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -1233,21 +1240,21 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               const Mpp64f aScale[2], const Mpp64f aShift[2],
                                               MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                              MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis
     /// </summary>
     MPPErrorCode mppciMirror_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                     MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis (inplace operation)
     /// </summary>
     MPPErrorCode mppciMirror_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -1265,7 +1272,7 @@ extern "C"
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                          MPPInterpolationMode aInterpolation, Mpp16bf aConstant, MPPBorderType aBorder,
-                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -1283,7 +1290,7 @@ extern "C"
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                        MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -1302,7 +1309,7 @@ extern "C"
                                        ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                        ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                        MPPInterpolationMode aInterpolation, Mpp16bf aConstant, MPPBorderType aBorder,
-                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -1321,7 +1328,7 @@ extern "C"
                                      ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                      ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                      MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -1329,7 +1336,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MppiFilterArea aFilterArea, Mpp16bf aConstant, MPPBorderType aBorder,
-                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -1337,7 +1344,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -1345,7 +1352,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, Mpp16bf aConstant, MPPBorderType aBorder,
-                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -1353,7 +1360,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -1362,7 +1369,7 @@ extern "C"
     MPPErrorCode mppciErosionMask_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, Mpp16bf aConstant,
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -1371,7 +1378,7 @@ extern "C"
     MPPErrorCode mppciErosionMask_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -1380,7 +1387,7 @@ extern "C"
     MPPErrorCode mppciErosionGray_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, Mpp16bf aConstant,
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -1389,7 +1396,7 @@ extern "C"
     MPPErrorCode mppciErosionGray_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -1398,7 +1405,7 @@ extern "C"
     MPPErrorCode mppciDilationMask_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, Mpp16bf aConstant,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -1407,7 +1414,7 @@ extern "C"
     MPPErrorCode mppciDilationMask_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -1416,7 +1423,7 @@ extern "C"
     MPPErrorCode mppciDilationGray_16bf_C1RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, Mpp16bf aConstant,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -1425,7 +1432,7 @@ extern "C"
     MPPErrorCode mppciDilationGray_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -1435,7 +1442,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, Mpp16bf aConstant, MPPBorderType aBorder,
-                                      MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -1445,7 +1452,7 @@ extern "C"
                                     DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                     DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                     MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -1455,7 +1462,7 @@ extern "C"
                                        DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                        MppiFilterArea aFilterArea, Mpp16bf aConstant, MPPBorderType aBorder,
-                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -1465,7 +1472,7 @@ extern "C"
                                      DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                      DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                      MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -1475,7 +1482,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, Mpp16bf aConstant, MPPBorderType aBorder,
-                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -1485,7 +1492,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -1495,7 +1502,7 @@ extern "C"
                                           DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, Mpp16bf aConstant,
-                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -1505,7 +1512,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -1515,7 +1522,7 @@ extern "C"
                                                     MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                                     MppiFilterArea aFilterArea, Mpp16bf aConstant,
                                                     MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -1523,21 +1530,22 @@ extern "C"
     MPPErrorCode mppciMorphologyGradient_16bf_C1R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step,
                                                   MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images.<para/>
@@ -1551,7 +1559,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciAverageError_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images where only pixels with mask != 0 are used.<para/>
@@ -1567,21 +1575,21 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                                size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images.<para/>
@@ -1597,7 +1605,7 @@ extern "C"
     MPPErrorCode mppciAverageRelativeError_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -1615,20 +1623,21 @@ extern "C"
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
                                                        size_t aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx);
+                                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProduct.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciDotProductBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciDotProductBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProductMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciDotProductBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images.<para/>
@@ -1641,7 +1650,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciDotProduct_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes dot product of two images where only pixels with mask != 0 are used.<para/>
@@ -1656,19 +1665,19 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                              size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSE.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSEMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images.<para/>
@@ -1681,7 +1690,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMSE_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images where only pixels with mask != 0 are used.<para/>
@@ -1696,21 +1705,21 @@ extern "C"
     MPPErrorCode mppciMSE_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images.<para/>
@@ -1725,7 +1734,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMaximumError_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images where only pixels with mask != 0 are used.<para/>
@@ -1742,21 +1751,21 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                                size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images.<para/>
@@ -1772,7 +1781,7 @@ extern "C"
     MPPErrorCode mppciMaximumRelativeError_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -1790,21 +1799,21 @@ extern "C"
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
                                                        size_t aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx);
+                                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes infinity norm of difference of pixels between two images.<para/>
@@ -1816,7 +1825,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormDiffInf_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes infinity norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -1830,20 +1839,21 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                               size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormDiffL1BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormDiffL1BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL1BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L1 norm of difference of pixels between two images.<para/>
@@ -1855,7 +1865,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormDiffL1_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L1 norm of difference of pixels between two images where only pixels with mask != 0 are used.<para/>
@@ -1869,20 +1879,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                              size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormDiffL2BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormDiffL2BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL2BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L2 norm of difference of pixels between two images.<para/>
@@ -1894,7 +1905,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormDiffL2_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L2 norm of difference of pixels between two images where only pixels with mask != 0 are used.<para/>
@@ -1908,20 +1919,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                              size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelInfBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelInfBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormRelInfBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes relative infinity norm of difference of pixels between two images.<para/>
@@ -1933,7 +1945,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormRelInf_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes relative infinity norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -1948,19 +1960,21 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                              size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes relative L1 norm of difference of pixels between two images.<para/>
@@ -1972,7 +1986,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormRelL1_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L1 norm of difference of pixels between two images where only pixels with mask != 0 are used.<para/>
@@ -1986,19 +2000,21 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                             size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes relative L2 norm of difference of pixels between two images.<para/>
@@ -2010,7 +2026,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormRelL2_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L2 norm of difference of pixels between two images where only pixels with mask != 0 are used.<para/>
@@ -2024,13 +2040,13 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, ConstDevPtrMpp8u aMask,
                                             size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for PSNR.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciPSNRBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciPSNRBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the PSNR of two images.
@@ -2043,19 +2059,21 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciPSNR_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, Mpp32f aValueRange, DevPtrMpp8u aBuffer,
-                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes infinity norm.<para/>
@@ -2066,7 +2084,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormInf_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes infinity norm where only pixels with mask != 0 are
@@ -2078,19 +2096,20 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormInf_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L1 norm.<para/>
@@ -2101,7 +2120,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL1_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L1 norm where only pixels with mask != 0 are
@@ -2113,19 +2132,20 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL1_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                         size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L2 norm.<para/>
@@ -2136,7 +2156,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL2_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes L2 norm where only pixels with mask != 0 are
@@ -2148,21 +2168,22 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL2_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                         size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Sum.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SumMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values.
@@ -2171,7 +2192,7 @@ extern "C"
     /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciSum_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                     size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values where only pixels with mask != 0 are used.
@@ -2182,19 +2203,19 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciSum_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Mean.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values.
@@ -2204,7 +2225,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMean_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values where only pixels with mask != 0 are used.
@@ -2215,19 +2236,21 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMean_16bf32f_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                        ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStd.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStdMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values.
@@ -2238,7 +2261,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMeanStd_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean, DevPtrMpp32f aStd,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values where only pixels with mask != 0 are used.
@@ -2250,21 +2273,21 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMeanStd_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean,
                                        DevPtrMpp32f aStd, ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRange.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRangeMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range.
@@ -2276,7 +2299,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciCountInRange_16bf64u_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aLowerLimit,
                                               Mpp16bf aUpperLimit, DevPtrMpp64u aDst, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range where only pixels with mask != 0 are used.
@@ -2290,14 +2313,14 @@ extern "C"
     MPPErrorCode mppciCountInRange_16bf64u_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aLowerLimit,
                                                Mpp16bf aUpperLimit, DevPtrMpp64u aDst, ConstDevPtrMpp8u aMask,
                                                size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the image quality index of two images. This implementation is identical to the one in NPP computing a
@@ -2309,14 +2332,14 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciQualityIndex_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndexWindow.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexWindowBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx);
+                                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the QualityIndex of two images. This function is implemented using a sliding window approach as is done
@@ -2329,13 +2352,13 @@ extern "C"
     MPPErrorCode mppciQualityIndexWindow_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                     DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciSSIMBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSSIMBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the SSIM of two images.
@@ -2353,13 +2376,13 @@ extern "C"
     MPPErrorCode mppciSSIM_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                       Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSSSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSSSIMBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSSSIMBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Multi-Scale-SSIM of two images.
@@ -2377,19 +2400,19 @@ extern "C"
     MPPErrorCode mppciMSSSIM_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                         Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Min.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value.
@@ -2398,7 +2421,7 @@ extern "C"
     /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMin_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, DevPtrMpp8u aBuffer,
-                                  size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value where only pixels with mask != 0 are used.
@@ -2409,19 +2432,19 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMin_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Max.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value.
@@ -2430,7 +2453,7 @@ extern "C"
     /// <param name="aBuffer">Temporary device memory buffer for computation.</param>
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMax_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, DevPtrMpp8u aBuffer,
-                                  size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value where only pixels with mask != 0 are used.
@@ -2441,19 +2464,20 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMax_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMax.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value.
@@ -2464,7 +2488,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMinMax_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                      DevPtrMpp16bf aDstMax, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value where only pixels with mask != 0 are used.
@@ -2477,19 +2501,21 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_C1M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                       DevPtrMpp16bf aDstMax, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -2502,7 +2528,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMinIndex_16bf_C1P3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                          DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp8u aBuffer,
-                                         size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -2517,19 +2543,21 @@ extern "C"
     MPPErrorCode mppciMinIndex_16bf_C1P3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                           DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, ConstDevPtrMpp8u aMask,
                                           size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -2542,7 +2570,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMaxIndex_16bf_C1P3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMax,
                                          DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp8u aBuffer,
-                                         size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -2557,21 +2585,21 @@ extern "C"
     MPPErrorCode mppciMaxIndex_16bf_C1P3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMax,
                                           DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, ConstDevPtrMpp8u aMask,
                                           size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_C1M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices. For multiple occurences of the same value the index
@@ -2584,7 +2612,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMinMaxIndex_16bf_C1P3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                             DevPtrMpp16bf aDstMax, DevPtrMppiIndexMinMax aDstIdx, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices where only pixels with mask != 0 are used. For multiple
@@ -2599,35 +2627,35 @@ extern "C"
     MPPErrorCode mppciMinMaxIndex_16bf_C1P3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                              DevPtrMpp16bf aDstMax, DevPtrMppiIndexMinMax aDstIdx,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Integral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciIntegralBufferSize_16bf32f_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Integral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciIntegralBufferSize_16bf64f_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SqrIntegral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciSqrIntegralBufferSize_16bf32f64f_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SqrIntegral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciSqrIntegralBufferSize_16bf64f64f_C1(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image.
@@ -2639,7 +2667,7 @@ extern "C"
     /// <returns></returns>
     MPPErrorCode mppciIntegral_16bf32f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           size_t aDstStep, Mpp32f aVal, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                          MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image.
@@ -2651,7 +2679,7 @@ extern "C"
     /// <returns></returns>
     MPPErrorCode mppciIntegral_16bf64f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp64f aDst,
                                           size_t aDstStep, Mpp64f aVal, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                          MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image and the squared integral image.
@@ -2665,7 +2693,7 @@ extern "C"
     MPPErrorCode mppciSqrIntegral_16bf32f64f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                                 size_t aDstStep, DevPtrMpp64f aSqr, size_t aSqrStep, Mpp32f aVal,
                                                 Mpp64f aValSqr, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                                MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image and the squared integral image.
@@ -2679,33 +2707,33 @@ extern "C"
     MPPErrorCode mppciSqrIntegral_16bf64f64f_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp64f aDst,
                                                 size_t aDstStep, DevPtrMpp64f aSqr, size_t aSqrStep, Mpp64f aVal,
                                                 Mpp64f aValSqr, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                                MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = min(aSrc1, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = min(aSrcDst, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = max(aSrc1, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = max(aSrcDst, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramEven.<para/>
@@ -2713,7 +2741,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramEvenBufferSize_16bf_C1(size_t *aBufferSize, Mpp32s aNumLevels, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The aLowerLevel (inclusive) and aUpperLevel (exclusive) define the boundaries of the range,
@@ -2728,7 +2756,7 @@ extern "C"
     MPPErrorCode mppciHistogramEven_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist,
                                             Mpp32f aLowerLevel, Mpp32f aUpperLevel, Mpp32s aNumLevels,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramRange.<para/>
@@ -2736,7 +2764,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramRangeBufferSize_16bf_C1(size_t *aBufferSize, Mpp32s aNumLevels, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx);
+                                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the histogram of an image within specified ranges.
@@ -2750,7 +2778,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciHistogramRange_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist,
                                              ConstDevPtrMpp32f aLevels, Mpp32s aNumLevels, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the un-normalized cross-correlation.<para/>
@@ -2762,7 +2790,7 @@ extern "C"
                                                      size_t aTemplateStep, MppiSize aTemplateSize, DevPtrMpp32f aDst,
                                                      size_t aDstStep, MppiSize aDstSize, Mpp16bf aConstant,
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the un-normalized cross-correlation.<para/>
@@ -2773,7 +2801,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, ConstDevPtrMpp16bf aTemplate,
                                                    size_t aTemplateStep, MppiSize aTemplateSize, DevPtrMpp32f aDst,
                                                    size_t aDstStep, MppiSize aDstSize, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the normalized cross-correlation.<para/>
@@ -2785,7 +2813,7 @@ extern "C"
                                                                size_t aTemplateStep, MppiSize aTemplateSize,
                                                                DevPtrMpp32f aDst, size_t aDstStep, MppiSize aDstSize,
                                                                Mpp16bf aConstant, MPPBorderType aBorder,
-                                                               MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                               MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the normalized cross-correlation.<para/>
@@ -2797,7 +2825,7 @@ extern "C"
                                                              size_t aTemplateStep, MppiSize aTemplateSize,
                                                              DevPtrMpp32f aDst, size_t aDstStep, MppiSize aDstSize,
                                                              MPPBorderType aBorder, MppiRect aSrcROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the normalized squared distance.<para/>
@@ -2809,7 +2837,7 @@ extern "C"
                                                              size_t aTemplateStep, MppiSize aTemplateSize,
                                                              DevPtrMpp32f aDst, size_t aDstStep, MppiSize aDstSize,
                                                              Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the normalized squared distance.<para/>
@@ -2821,7 +2849,7 @@ extern "C"
                                                            size_t aTemplateStep, MppiSize aTemplateSize,
                                                            DevPtrMpp32f aDst, size_t aDstStep, MppiSize aDstSize,
                                                            MPPBorderType aBorder, MppiRect aSrcROI,
-                                                           CPtrMppStreamCtx aStreamCtx);
+                                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
@@ -2832,7 +2860,7 @@ extern "C"
         ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32f aSrcBoxFilteredBasePtr,
         size_t aSrcBoxFilteredStep, MppiSize aSrcFullSize, ConstDevPtrMpp16bf aTemplate, size_t aTemplateStep,
         MppiSize aTemplateSize, ConstDevPtrMpp64f aMeanTemplate, DevPtrMpp32f aDst, size_t aDstStep, MppiSize aDstSize,
-        Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        Mpp16bf aConstant, MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the cross-correlation coefficient (CrossCorr_NormLevel in NPP).<para/>
@@ -2843,7 +2871,7 @@ extern "C"
         ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp32f aSrcBoxFilteredBasePtr,
         size_t aSrcBoxFilteredStep, MppiSize aSrcFullSize, ConstDevPtrMpp16bf aTemplate, size_t aTemplateStep,
         MppiSize aTemplateSize, ConstDevPtrMpp64f aMeanTemplate, DevPtrMpp32f aDst, size_t aDstStep, MppiSize aDstSize,
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -2860,7 +2888,7 @@ extern "C"
                                                     DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                     DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                     const Mpp32f aCenter[2], MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -2879,7 +2907,7 @@ extern "C"
                                                       DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                       DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                       const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -2889,7 +2917,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -2899,7 +2927,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst,
                                          MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -2909,7 +2937,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                             MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -2919,28 +2947,28 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                              DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aSrc2) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEps_16bf8u_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsC_16bf8u_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst,
                                               Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsDevC_16bf8u_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                                  Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                 CPtrMppStreamCtx aStreamCtx);
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -2948,7 +2976,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aThreshold,
                                         MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -2956,7 +2984,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                             MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -2964,7 +2992,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aThreshold,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -2972,7 +3000,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -2980,7 +3008,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aThreshold,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -2988,49 +3016,49 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aThreshold,
-                                         MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                             MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aThreshold,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aThreshold,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -3038,7 +3066,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aThreshold,
                                            Mpp16bf aValue, MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -3046,7 +3074,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aThreshold,
                                              Mpp16bf aValue, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -3054,7 +3082,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aThreshold,
                                              Mpp16bf aValue, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -3062,21 +3090,21 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aThreshold,
                                             Mpp16bf aValue, MPPCompareOp aCompare, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aThreshold,
-                                              Mpp16bf aValue, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              Mpp16bf aValue, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aThreshold,
-                                              Mpp16bf aValue, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              Mpp16bf aValue, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -3086,7 +3114,7 @@ extern "C"
     MPPErrorCode mppciThresholdLTGT_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aThresholdLT,
                                             Mpp16bf aValueLT, Mpp16bf aThresholdGT, Mpp16bf aValueGT,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -3095,7 +3123,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTGT_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aThresholdLT,
                                              Mpp16bf aValueLT, Mpp16bf aThresholdGT, Mpp16bf aValueGT,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aSrc2 fulfill aCompare, aSrc1 otherwise.<para/>
@@ -3107,7 +3135,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIf_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, MPPCompareOp aCompare, Mpp16bf aValue, DevPtrMpp16bf aDst,
-                                        size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -3119,7 +3147,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aConst,
                                          MPPCompareOp aCompare, Mpp16bf aValue, DevPtrMpp16bf aDst, size_t aDstStep,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -3131,7 +3159,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                             MPPCompareOp aCompare, Mpp16bf aValue, DevPtrMpp16bf aDst, size_t aDstStep,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), aSrc1
@@ -3144,7 +3172,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                              Mpp16bf aValue, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aSrc2 fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -3156,7 +3184,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIf_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, MPPCompareOp aCompare, Mpp16bf aValue, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -3168,7 +3196,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst,
                                           MPPCompareOp aCompare, Mpp16bf aValue, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -3180,7 +3208,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                              MPPCompareOp aCompare, Mpp16bf aValue, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst fulfills aCompare (for floating point checks, e.g. isinf()), aSrcDst
@@ -3192,7 +3220,7 @@ extern "C"
     /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPCompareOp aCompare,
-                                              Mpp16bf aValue, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              Mpp16bf aValue, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Grayscale Color Filter Array to RGB Color Debayer conversion.<para/>
@@ -3206,7 +3234,7 @@ extern "C"
     MPPErrorCode mppciCFAToRGB_16bf_C1C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MPPBayerGridPosition aBayerGrid, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Grayscale Color Filter Array to RGB Color Debayer conversion.<para/>
@@ -3220,7 +3248,7 @@ extern "C"
     MPPErrorCode mppciCFAToRGB_16bf_C1C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp16bf aAlpha,
                                           MPPBayerGridPosition aBayerGrid, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion.<para/>
@@ -3234,7 +3262,7 @@ extern "C"
                                   ConstDevPtrMpp32f aLevels, ConstDevPtrMpp32f aValues, size_t aLUTSize,
                                   ConstDevPtrMpp32s aAccelerator, size_t aAcceleratorSize,
                                   MPPInterpolationMode aInterpolationMode, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion - inplace.<para/>
@@ -3247,34 +3275,50 @@ extern "C"
     MPPErrorCode mppciLUT_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32f aLevels,
                                    ConstDevPtrMpp32f aValues, size_t aLUTSize, ConstDevPtrMpp32s aAccelerator,
                                    size_t aAcceleratorSize, MPPInterpolationMode aInterpolationMode, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrc1 source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the destination image aDst.
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
+                                           size_t aSrc2Step, Mpp16bf aColorKey, DevPtrMpp16bf aDst, size_t aDstStep,
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrcDst source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the same source image (inplace operation).
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_C1I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
+                                            size_t aSrc2Step, Mpp16bf aColorKey, MppiSize aSizeROI,
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                     ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy packed image pixels to planar images.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C2P2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstChannel1,
                                      size_t aDstChannel1Step, DevPtrMpp16bf aDstChannel2, size_t aDstChannel2Step,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy planar image pixels to packed pixel image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_P2C2(DevPtrMpp16bf aSrcChannel1, size_t aSrcChannel1Step, DevPtrMpp16bf aSrcChannel2,
                                      size_t aSrcChannel2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -3286,7 +3330,7 @@ extern "C"
     /// <param name="aConstant">Constant value needed in case BorderType::Constant</param>
     MPPErrorCode mppciCopyBorder_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, const Mpp32s aLowerBorderSize[2], MPPBorderType aBorder,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -3299,7 +3343,7 @@ extern "C"
     MPPErrorCode mppciCopyBorder_16bf_C2Cb(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                            size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                            const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy subpix.
@@ -3309,481 +3353,485 @@ extern "C"
     /// <param name="aInterpolation">Interpolation mode to use</param>
     MPPErrorCode mppciCopySubpix_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, const Mpp32f aDelta[2], MPPInterpolationMode aInterpolation,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set channel aChannel of all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C2CI(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, Mpp32s aChannel,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set channel aChannel of all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C2CI(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                        Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Swap channels for two channel images.
     /// </summary>
     MPPErrorCode mppciSwapChannel_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
-                                          size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Swap channels (inplace) for two channel images.
     /// </summary>
     MPPErrorCode mppciSwapChannel_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Transpose image.
     /// </summary>
     MPPErrorCode mppciTranspose_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                        MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_C2IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_C2I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
-                                         size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                          size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciAddProduct_16bf_C2I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
@@ -3791,14 +3839,14 @@ extern "C"
     MPPErrorCode mppciAddProduct_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
                                           ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
@@ -3806,133 +3854,133 @@ extern "C"
     MPPErrorCode mppciAddWeighted_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C2I(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                            size_t aSrcDstStep, Mpp16bf aAlpha, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C2IM(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                             size_t aSrcDstStep, Mpp16bf aAlpha, ConstDevPtrMpp8u aMask,
-                                            size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = exp(aSrc1) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = exp(aSrcDst) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = log(aSrc1) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = log(aSrcDst) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc1 (aSrc1^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrcDst * aSrcDst (aSrcDst^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = Sqrt(aSrc1) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = Sqrt(aSrcDst) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aAlpha,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aAlpha,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using alpha opacity values contained in each image. Last color channel is alpha channel, 1
@@ -3940,7 +3988,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciAlphaComp_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MPPAlphaOp aAlphaOp,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using constant alpha values.
@@ -3948,23 +3996,23 @@ extern "C"
     MPPErrorCode mppciAlphaCompC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha1,
                                          Mpp16bf aAlpha2, MPPAlphaOp aAlphaOp, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_C2RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              MPPFixedFilter aFilter, MPPMaskSize aMaskSize, const Mpp16bf aConstant[2],
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MPPFixedFilter aFilter, MPPMaskSize aMaskSize, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -3973,7 +4021,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                  Mpp32s aFilterCenter, const Mpp16bf aConstant[2],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -3981,7 +4030,8 @@ extern "C"
     MPPErrorCode mppciSeparableFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -3990,7 +4040,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -3998,7 +4048,7 @@ extern "C"
     MPPErrorCode mppciColumnFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -4008,7 +4058,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, Mpp16bf aScalingValue, Mpp32s aFilterSize,
                                                  Mpp32s aFilterCenter, const Mpp16bf aConstant[2],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -4017,7 +4068,8 @@ extern "C"
     MPPErrorCode mppciColumnWindowSum_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -4026,7 +4078,7 @@ extern "C"
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                            const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -4034,7 +4086,7 @@ extern "C"
     MPPErrorCode mppciRowFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -4044,7 +4096,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -4053,7 +4105,7 @@ extern "C"
     MPPErrorCode mppciRowWindowSum_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -4061,7 +4113,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_C2RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[2],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -4069,7 +4121,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -4077,7 +4129,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_C2RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[2],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -4085,7 +4137,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -4093,7 +4145,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_C2RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[2],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -4101,7 +4153,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Median filter (only filter sizes 3x3, 5x5 and 7x7 are implemented).
@@ -4109,7 +4161,7 @@ extern "C"
     MPPErrorCode mppciMedianFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -4118,7 +4170,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               MppiFilterArea aFilterArea, const Mpp32f aNoise[2],
                                               const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -4126,7 +4178,7 @@ extern "C"
     MPPErrorCode mppciWienerFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, const Mpp32f aNoise[2], MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -4140,7 +4192,7 @@ extern "C"
                                                             const Mpp32f aDelta[2], const Mpp16bf aValGT[2],
                                                             const Mpp16bf aValLE[2], const Mpp16bf aConstant[2],
                                                             MPPBorderType aBorder, MppiRect aSrcROI,
-                                                            CPtrMppStreamCtx aStreamCtx);
+                                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -4153,7 +4205,7 @@ extern "C"
                                                           MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                           const Mpp32f aDelta[2], const Mpp16bf aValGT[2],
                                                           const Mpp16bf aValLE[2], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -4165,7 +4217,7 @@ extern "C"
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         ConstDevPtrMpp32f aFilter, MppiFilterArea aFilterArea,
                                         const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -4176,7 +4228,7 @@ extern "C"
     MPPErrorCode mppciFilter_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -4195,7 +4247,7 @@ extern "C"
                                                       MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                       ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                       MPPNorm aNorm, const Mpp16bf aConstant[2], MPPBorderType aBorder,
-                                                      MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -4214,7 +4266,7 @@ extern "C"
                                                     MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                     ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                     MPPNorm aNorm, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -4229,7 +4281,8 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                Mpp32f aWeight, Mpp32f aThreshold, const Mpp16bf aConstant[2],
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -4244,7 +4297,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                              Mpp32f aWeight, Mpp32f aThreshold, MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -4263,7 +4316,7 @@ extern "C"
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                             const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -4281,7 +4334,7 @@ extern "C"
     MPPErrorCode mppciWarpAffine_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -4301,7 +4354,7 @@ extern "C"
                                             DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2,
                                             size_t aDst2Step, MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                             MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -4321,7 +4374,7 @@ extern "C"
                                           DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
                                           MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                           MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -4340,7 +4393,8 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                 MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MPPBorderType aBorder, MppiRect aSrcROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -4359,7 +4413,7 @@ extern "C"
     MPPErrorCode mppciWarpAffineBack_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -4380,7 +4434,7 @@ extern "C"
                                                 DevPtrMpp16bf aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                 const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                                 const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -4401,7 +4455,7 @@ extern "C"
                                               DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2,
                                               size_t aDst2Step, MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                               MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                              MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -4420,7 +4474,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                  MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -4438,7 +4493,8 @@ extern "C"
     MPPErrorCode mppciWarpPerspective_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -4459,7 +4515,7 @@ extern "C"
                                                  DevPtrMpp16bf aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                  const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
                                                  const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                 CPtrMppStreamCtx aStreamCtx);
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -4479,7 +4535,7 @@ extern "C"
                                                DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2,
                                                size_t aDst2Step, MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                               MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -4499,7 +4555,7 @@ extern "C"
                                                      MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                      MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -4518,7 +4574,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                    MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                    MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -4537,7 +4593,7 @@ extern "C"
         ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
         MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
         MppiSize aDstSize, const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-        const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -4558,7 +4614,7 @@ extern "C"
                                                    DevPtrMpp16bf aDst2, size_t aDst2Step, MppiSize aDstSize,
                                                    const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
                                                    MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx);
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -4576,7 +4632,7 @@ extern "C"
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                         const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -4593,7 +4649,7 @@ extern "C"
     MPPErrorCode mppciRotate_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                       const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -4612,7 +4668,7 @@ extern "C"
                                         DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
                                         MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                         MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -4631,7 +4687,7 @@ extern "C"
                                       DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
                                       MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                       MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize<para/>
@@ -4644,7 +4700,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciResize_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                      MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize<para/>
@@ -4658,7 +4714,7 @@ extern "C"
     MPPErrorCode mppciResize_16bf_P2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2,
                                      size_t aDst2Step, MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -4686,7 +4742,8 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aScale[2], const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MPPBorderType aBorder, MppiRect aSrcROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -4714,7 +4771,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               const Mpp64f aScale[2], const Mpp64f aShift[2],
                                               MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                              MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -4738,13 +4795,11 @@ extern "C"
     /// fall outside this expanded area, the pixel value is not defined. <para/> For
     /// BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    MPPErrorCode mppciResizeSqrPixel_16bf_P2RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step,
-                                                ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
-                                                MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step,
-                                                DevPtrMpp16bf aDst2, size_t aDst2Step, MppiSize aDstSize,
-                                                const Mpp64f aScale[2], const Mpp64f aShift[2],
-                                                MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciResizeSqrPixel_16bf_P2RCb(
+        ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
+        MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
+        MppiSize aDstSize, const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
+        const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -4773,21 +4828,21 @@ extern "C"
                                               DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2,
                                               size_t aDst2Step, MppiSize aDstSize, const Mpp64f aScale[2],
                                               const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis
     /// </summary>
     MPPErrorCode mppciMirror_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                     MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis (inplace operation)
     /// </summary>
     MPPErrorCode mppciMirror_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -4805,7 +4860,7 @@ extern "C"
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                          MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -4823,7 +4878,7 @@ extern "C"
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                        MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -4842,7 +4897,7 @@ extern "C"
                                        ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                        ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                        MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -4861,7 +4916,7 @@ extern "C"
                                      ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                      ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                      MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -4880,7 +4935,7 @@ extern "C"
                                          DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
                                          MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                          MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -4899,7 +4954,7 @@ extern "C"
                                        DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
                                        MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                        MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -4919,7 +4974,7 @@ extern "C"
                                        MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                        ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                        MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[2],
-                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -4939,7 +4994,7 @@ extern "C"
                                      ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                      ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                      MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -4947,7 +5002,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_C2RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MppiFilterArea aFilterArea, const Mpp16bf aConstant[2], MPPBorderType aBorder,
-                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -4955,7 +5010,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -4963,7 +5018,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_C2RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, const Mpp16bf aConstant[2], MPPBorderType aBorder,
-                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -4971,7 +5026,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -4981,7 +5036,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                              const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -4990,7 +5045,7 @@ extern "C"
     MPPErrorCode mppciErosionMask_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -5000,7 +5055,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
                                              const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -5009,7 +5064,7 @@ extern "C"
     MPPErrorCode mppciErosionGray_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -5019,7 +5074,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                               const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -5028,7 +5083,7 @@ extern "C"
     MPPErrorCode mppciDilationMask_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -5038,7 +5093,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
                                               const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -5047,7 +5102,7 @@ extern "C"
     MPPErrorCode mppciDilationGray_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -5057,7 +5112,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, const Mpp16bf aConstant[2], MPPBorderType aBorder,
-                                      MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -5067,7 +5122,7 @@ extern "C"
                                     DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                     DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                     MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -5077,7 +5132,7 @@ extern "C"
                                        DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                        MppiFilterArea aFilterArea, const Mpp16bf aConstant[2], MPPBorderType aBorder,
-                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -5087,7 +5142,7 @@ extern "C"
                                      DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                      DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                      MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -5097,7 +5152,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, const Mpp16bf aConstant[2], MPPBorderType aBorder,
-                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -5107,7 +5162,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -5118,7 +5173,7 @@ extern "C"
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                           const Mpp16bf aConstant[2], MPPBorderType aBorder, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -5128,7 +5183,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -5138,7 +5193,7 @@ extern "C"
                                                     MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                                     MppiFilterArea aFilterArea, const Mpp16bf aConstant[2],
                                                     MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -5146,21 +5201,22 @@ extern "C"
     MPPErrorCode mppciMorphologyGradient_16bf_C2R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step,
                                                   MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images.<para/>
@@ -5177,7 +5233,7 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images where only pixels with mask != 0 are used.<para/>
@@ -5195,21 +5251,21 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images.<para/>
@@ -5227,7 +5283,7 @@ extern "C"
     MPPErrorCode mppciAverageRelativeError_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -5247,20 +5303,21 @@ extern "C"
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask,
                                                        size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProduct.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciDotProductBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciDotProductBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProductMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciDotProductBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images.<para/>
@@ -5276,7 +5333,7 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images where only pixels with mask != 0 are used.<para/>
@@ -5294,19 +5351,19 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSE.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSEMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images.<para/>
@@ -5321,7 +5378,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMSE_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer,
-                                     size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images where only pixels with mask != 0 are used.<para/>
@@ -5338,21 +5395,21 @@ extern "C"
     MPPErrorCode mppciMSE_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images.<para/>
@@ -5370,7 +5427,7 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images where only pixels with mask != 0 are used.<para/>
@@ -5389,21 +5446,21 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images.<para/>
@@ -5421,7 +5478,7 @@ extern "C"
     MPPErrorCode mppciMaximumRelativeError_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -5441,21 +5498,21 @@ extern "C"
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask,
                                                        size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm of difference of pixels between two images.<para/>
@@ -5471,7 +5528,7 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -5489,20 +5546,21 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormDiffL1BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormDiffL1BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL1BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm of difference of pixels between two images.<para/>
@@ -5517,7 +5575,7 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -5534,20 +5592,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormDiffL2BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormDiffL2BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL2BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm of difference of pixels between two images.<para/>
@@ -5563,7 +5622,7 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -5581,20 +5640,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelInfBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelInfBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormRelInfBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative infinity norm of difference of pixels between two images.<para/>
@@ -5610,7 +5670,7 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative infinity norm of difference of pixels between two images where only pixels with mask != 0
@@ -5627,19 +5687,21 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L1 norm of difference of pixels between two images.<para/>
@@ -5655,7 +5717,7 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                            DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L1 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -5673,19 +5735,21 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L2 norm of difference of pixels between two images.<para/>
@@ -5701,7 +5765,7 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                            DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L2 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -5719,13 +5783,13 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for PSNR.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciPSNRBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciPSNRBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the PSNR of two images. <para/> For multi-channel images, the
@@ -5741,19 +5805,21 @@ extern "C"
     MPPErrorCode mppciPSNR_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar, Mpp32f aValueRange,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm.<para/>
@@ -5767,7 +5833,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormInf_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm where only pixels with mask != 0 are
@@ -5784,19 +5850,20 @@ extern "C"
     MPPErrorCode mppciNormInf_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                           DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm.<para/>
@@ -5810,7 +5877,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL1_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm where only pixels with mask != 0 are
@@ -5827,19 +5894,20 @@ extern "C"
     MPPErrorCode mppciNormL1_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm.<para/>
@@ -5853,7 +5921,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL2_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm where only pixels with mask != 0 are
@@ -5870,21 +5938,22 @@ extern "C"
     MPPErrorCode mppciNormL2_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Sum.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SumMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values.<para/>For multi-channel images, the
@@ -5896,7 +5965,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciSum_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                      DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
@@ -5910,19 +5979,19 @@ extern "C"
     MPPErrorCode mppciSum_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Mean.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values.<para/>For multi-channel images, the
@@ -5934,7 +6003,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMean_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
@@ -5948,19 +6017,21 @@ extern "C"
     MPPErrorCode mppciMean_16bf32f_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                        DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStd.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStdMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values.<para/>For multi-channel images, the
@@ -5975,7 +6046,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMeanStd_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean, DevPtrMpp32f aStd,
                                       DevPtrMpp32f aMeanScalar, DevPtrMpp32f aStdScalar, DevPtrMpp8u aBuffer,
-                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values where only pixels with mask != 0 are used.<para/>For
@@ -5993,21 +6064,21 @@ extern "C"
     MPPErrorCode mppciMeanStd_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean,
                                        DevPtrMpp32f aStd, DevPtrMpp32f aMeanScalar, DevPtrMpp32f aStdScalar,
                                        ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRange.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRangeMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range.<para/>For multi-channel images, the
@@ -6022,7 +6093,7 @@ extern "C"
     MPPErrorCode mppciCountInRange_16bf64u_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aLowerLimit[2],
                                               const Mpp16bf aUpperLimit[2], DevPtrMpp64u aDst, DevPtrMpp64u aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range where only pixels with mask != 0 are used.<para/>For multi-channel
@@ -6038,14 +6109,14 @@ extern "C"
     MPPErrorCode mppciCountInRange_16bf64u_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aLowerLimit[2],
                                                const Mpp16bf aUpperLimit[2], DevPtrMpp64u aDst, DevPtrMpp64u aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the image quality index of two images. This implementation is identical to the one in NPP computing a
@@ -6057,14 +6128,14 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciQualityIndex_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndexWindow.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexWindowBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx);
+                                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the QualityIndex of two images. This function is implemented using a sliding window approach as is done
@@ -6077,13 +6148,13 @@ extern "C"
     MPPErrorCode mppciQualityIndexWindow_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                     DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciSSIMBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSSIMBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the SSIM of two images.
@@ -6101,13 +6172,13 @@ extern "C"
     MPPErrorCode mppciSSIM_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                       Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSSSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSSSIMBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSSSIMBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Multi-Scale-SSIM of two images.
@@ -6125,19 +6196,19 @@ extern "C"
     MPPErrorCode mppciMSSSIM_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                         Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Min.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value.
@@ -6150,7 +6221,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMin_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                   DevPtrMpp16bf aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value where only pixels with mask != 0 are used.<para/> For
@@ -6165,19 +6236,19 @@ extern "C"
     MPPErrorCode mppciMin_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    DevPtrMpp16bf aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                    DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Max.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value.
@@ -6190,7 +6261,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMax_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                   DevPtrMpp16bf aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value where only pixels with mask != 0 are used.<para/> For
@@ -6205,19 +6276,20 @@ extern "C"
     MPPErrorCode mppciMax_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    DevPtrMpp16bf aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                    DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMax.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value.<para/>
@@ -6233,7 +6305,7 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                      DevPtrMpp16bf aDstMax, DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                      DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value where only pixels with mask != 0 are used.<para/>
@@ -6250,19 +6322,21 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_C2M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                       DevPtrMpp16bf aDstMax, DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -6284,7 +6358,7 @@ extern "C"
     MPPErrorCode mppciMinIndex_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                        DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMinScalar,
                                        DevPtrMpp32s aDstScalarIdx, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -6309,19 +6383,21 @@ extern "C"
                                         DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMinScalar,
                                         DevPtrMpp32s aDstScalarIdx, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -6343,7 +6419,7 @@ extern "C"
     MPPErrorCode mppciMaxIndex_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMax,
                                        DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMaxScalar,
                                        DevPtrMpp32s aDstScalarIdx, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -6368,21 +6444,21 @@ extern "C"
                                         DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMaxScalar,
                                         DevPtrMpp32s aDstScalarIdx, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_C2M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices. For multiple occurences of the same value the index
@@ -6408,7 +6484,7 @@ extern "C"
                                           DevPtrMpp16bf aDstMax, DevPtrMppiIndexMinMax aDstIdx,
                                           DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                           DevPtrMppiIndexMinMaxChannel aDstScalarIdx, DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices where only pixels with mask != 0 are used. For multiple
@@ -6436,35 +6512,35 @@ extern "C"
                                            DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                            DevPtrMppiIndexMinMaxChannel aDstScalarIdx, ConstDevPtrMpp8u aMask,
                                            size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Integral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciIntegralBufferSize_16bf32f_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Integral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciIntegralBufferSize_16bf64f_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SqrIntegral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciSqrIntegralBufferSize_16bf32f64f_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SqrIntegral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciSqrIntegralBufferSize_16bf64f64f_C2(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image.
@@ -6476,7 +6552,7 @@ extern "C"
     /// <returns></returns>
     MPPErrorCode mppciIntegral_16bf32f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           size_t aDstStep, const Mpp32f aVal[2], DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image.
@@ -6488,7 +6564,7 @@ extern "C"
     /// <returns></returns>
     MPPErrorCode mppciIntegral_16bf64f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp64f aDst,
                                           size_t aDstStep, const Mpp64f aVal[2], DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image and the squared integral image.
@@ -6502,7 +6578,8 @@ extern "C"
     MPPErrorCode mppciSqrIntegral_16bf32f64f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                                 size_t aDstStep, DevPtrMpp64f aSqr, size_t aSqrStep,
                                                 const Mpp32f aVal[2], const Mpp64f aValSqr[2], DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                                size_t aBufferSize, MppiSize aSizeROISrc,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image and the squared integral image.
@@ -6516,33 +6593,34 @@ extern "C"
     MPPErrorCode mppciSqrIntegral_16bf64f64f_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp64f aDst,
                                                 size_t aDstStep, DevPtrMpp64f aSqr, size_t aSqrStep,
                                                 const Mpp64f aVal[2], const Mpp64f aValSqr[2], DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                                size_t aBufferSize, MppiSize aSizeROISrc,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = min(aSrc1, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = min(aSrcDst, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = max(aSrc1, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = max(aSrcDst, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramEven.<para/>
@@ -6550,7 +6628,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramEvenBufferSize_16bf_C2(size_t *aBufferSize, const Mpp32s aNumLevels[2],
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The aLowerLevel (inclusive) and aUpperLevel (exclusive) define the boundaries of the range,
@@ -6565,7 +6643,7 @@ extern "C"
     MPPErrorCode mppciHistogramEven_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist[2],
                                             const Mpp32f aLowerLevel[2], const Mpp32f aUpperLevel[2],
                                             Mpp32s aNumLevels[2], DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramRange.<para/>
@@ -6573,7 +6651,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramRangeBufferSize_16bf_C2(size_t *aBufferSize, const Mpp32s aNumLevels[2],
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the histogram of an image within specified ranges.
@@ -6587,7 +6665,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciHistogramRange_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist[2],
                                              ConstDevPtrMpp32f aLevels[2], Mpp32s aNumLevels[2], DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -6604,7 +6682,7 @@ extern "C"
                                                     DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                     DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                     const Mpp32f aCenter[2], MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -6623,7 +6701,7 @@ extern "C"
                                                       DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                       DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                       const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -6633,7 +6711,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_C2C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -6643,7 +6721,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_C2C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                            MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -6653,7 +6731,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_C2C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                               MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -6663,7 +6741,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_C2C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                                DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -6672,7 +6750,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -6681,7 +6759,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                          MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -6690,7 +6768,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                             MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -6699,28 +6777,28 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                              DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aSrc2) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEps_16bf8u_C2C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsC_16bf8u_C2C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                                 Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsDevC_16bf8u_C2C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                    ConstDevPtrMpp16bf aConst, Mpp16bf aEpsilon, DevPtrMpp8u aDst,
-                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -6728,7 +6806,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[2],
                                         MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -6736,7 +6814,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                             MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -6744,7 +6822,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[2],
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -6752,7 +6830,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -6760,7 +6838,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[2],
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -6768,49 +6846,49 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[2],
-                                         MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                             MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[2],
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[2],
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -6818,7 +6896,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[2],
                                            const Mpp16bf aValue[2], MPPCompareOp aCompare, DevPtrMpp16bf aDst,
-                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -6826,7 +6904,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[2],
                                              const Mpp16bf aValue[2], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -6834,7 +6912,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[2],
                                              const Mpp16bf aValue[2], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -6842,21 +6920,23 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[2],
                                             const Mpp16bf aValue[2], MPPCompareOp aCompare, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[2],
-                                              const Mpp16bf aValue[2], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[2], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[2],
-                                              const Mpp16bf aValue[2], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[2], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -6866,7 +6946,7 @@ extern "C"
     MPPErrorCode mppciThresholdLTGT_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThresholdLT[2],
                                             const Mpp16bf aValueLT[2], const Mpp16bf aThresholdGT[2],
                                             const Mpp16bf aValueGT[2], DevPtrMpp16bf aDst, size_t aDstStep,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -6875,7 +6955,8 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTGT_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThresholdLT[2],
                                              const Mpp16bf aValueLT[2], const Mpp16bf aThresholdGT[2],
-                                             const Mpp16bf aValueGT[2], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             const Mpp16bf aValueGT[2], MppiSize aSizeROI,
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aSrc2 fulfill aCompare, aSrc1 otherwise.<para/>
@@ -6888,7 +6969,7 @@ extern "C"
     MPPErrorCode mppciReplaceIf_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, MPPCompareOp aCompare, const Mpp16bf aValue[2],
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -6900,7 +6981,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[2],
                                          MPPCompareOp aCompare, const Mpp16bf aValue[2], DevPtrMpp16bf aDst,
-                                         size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -6912,7 +6993,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                             MPPCompareOp aCompare, const Mpp16bf aValue[2], DevPtrMpp16bf aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), aSrc1
@@ -6925,7 +7006,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                              const Mpp16bf aValue[2], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aSrc2 fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -6937,7 +7018,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIf_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, MPPCompareOp aCompare, const Mpp16bf aValue[2],
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -6949,7 +7030,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[2],
                                           MPPCompareOp aCompare, const Mpp16bf aValue[2], MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -6961,7 +7042,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                              MPPCompareOp aCompare, const Mpp16bf aValue[2], MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst fulfills aCompare (for floating point checks, e.g. isinf()), aSrcDst
@@ -6973,7 +7054,8 @@ extern "C"
     /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPCompareOp aCompare,
-                                              const Mpp16bf aValue[2], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[2], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion.<para/>
@@ -6987,7 +7069,7 @@ extern "C"
                                   ConstDevPtrMpp32f aLevels[2], ConstDevPtrMpp32f aValues[2], size_t aLUTSize[2],
                                   ConstDevPtrMpp32s aAccelerator[2], size_t aAcceleratorSize[2],
                                   MPPInterpolationMode aInterpolationMode, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion - inplace.<para/>
@@ -7000,20 +7082,55 @@ extern "C"
     MPPErrorCode mppciLUT_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32f aLevels[2],
                                    ConstDevPtrMpp32f aValues[2], size_t aLUTSize[2], ConstDevPtrMpp32s aAccelerator[2],
                                    size_t aAcceleratorSize[2], MPPInterpolationMode aInterpolationMode,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrc1 source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the destination image aDst.
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_C2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
+                                           size_t aSrc2Step, const Mpp16bf aColorKey[2], DevPtrMpp16bf aDst,
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrcDst source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the same source image (inplace operation).
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_C2I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
+                                            size_t aSrc2Step, const Mpp16bf aColorKey[2], MppiSize aSizeROI,
+                                            CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// Converts from packed C2 422 sampling to planar P2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if input is in format YCbCr, true for CbYCr.</param>
+    MPPErrorCode mppciConvertSampling422_16bf_C2P2(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstLuma,
+                                                   size_t aDstLumaStep, DevPtrMpp16bf aDstChroma, size_t aDstChromaStep,
+                                                   bool aSwapLumaChroma, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// Converts from packed C2 422 sampling to planar P3 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if input is in format YCbCr, true for CbYCr.</param>
+    MPPErrorCode mppciConvertSampling422_16bf_C2P3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstLuma,
+                                                   size_t aDstLumaStep, DevPtrMpp16bf aDstChroma1,
+                                                   size_t aDstChroma1Step, DevPtrMpp16bf aDstChroma2,
+                                                   size_t aDstChroma2Step, bool aSwapLumaChroma, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                     ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy packed image pixels to planar images.
@@ -7021,7 +7138,7 @@ extern "C"
     MPPErrorCode mppciCopy_16bf_C3P3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstChannel1,
                                      size_t aDstChannel1Step, DevPtrMpp16bf aDstChannel2, size_t aDstChannel2Step,
                                      DevPtrMpp16bf aDstChannel3, size_t aDstChannel3Step, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy planar image pixels to packed pixel image.
@@ -7029,7 +7146,7 @@ extern "C"
     MPPErrorCode mppciCopy_16bf_P3C3(DevPtrMpp16bf aSrcChannel1, size_t aSrcChannel1Step, DevPtrMpp16bf aSrcChannel2,
                                      size_t aSrcChannel2Step, DevPtrMpp16bf aSrcChannel3, size_t aSrcChannel3Step,
                                      DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -7041,7 +7158,7 @@ extern "C"
     /// <param name="aConstant">Constant value needed in case BorderType::Constant</param>
     MPPErrorCode mppciCopyBorder_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, const Mpp32s aLowerBorderSize[2], MPPBorderType aBorder,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -7054,7 +7171,7 @@ extern "C"
     MPPErrorCode mppciCopyBorder_16bf_C3Cb(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                            size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                            const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy subpix.
@@ -7064,45 +7181,45 @@ extern "C"
     /// <param name="aInterpolation">Interpolation mode to use</param>
     MPPErrorCode mppciCopySubpix_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, const Mpp32f aDelta[2], MPPInterpolationMode aInterpolation,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set channel aChannel of all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C3CI(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, Mpp32s aChannel,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set channel aChannel of all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C3CI(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                        Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Swap channels (inplace)<para/>
@@ -7112,431 +7229,435 @@ extern "C"
     /// E.g. Given an RGB image, aDstChannels = [2,1,0] converts aSrcDst to BGR channel order.
     /// </summary>
     MPPErrorCode mppciSwapChannel_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp32s aDstChannels[3],
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Transpose image.
     /// </summary>
     MPPErrorCode mppciTranspose_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                        MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_C3IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_C3I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
-                                         size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                          size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciAddProduct_16bf_C3I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
@@ -7544,14 +7665,14 @@ extern "C"
     MPPErrorCode mppciAddProduct_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
                                           ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
@@ -7559,133 +7680,133 @@ extern "C"
     MPPErrorCode mppciAddWeighted_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C3I(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                            size_t aSrcDstStep, Mpp16bf aAlpha, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C3IM(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                             size_t aSrcDstStep, Mpp16bf aAlpha, ConstDevPtrMpp8u aMask,
-                                            size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = exp(aSrc1) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = exp(aSrcDst) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = log(aSrc1) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = log(aSrcDst) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc1 (aSrc1^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrcDst * aSrcDst (aSrcDst^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = Sqrt(aSrc1) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = Sqrt(aSrcDst) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aAlpha,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aAlpha,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using alpha opacity values contained in each image. Last color channel is alpha channel, 1
@@ -7693,7 +7814,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciAlphaComp_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MPPAlphaOp aAlphaOp,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using constant alpha values.
@@ -7701,23 +7822,23 @@ extern "C"
     MPPErrorCode mppciAlphaCompC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha1,
                                          Mpp16bf aAlpha2, MPPAlphaOp aAlphaOp, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_C3RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              MPPFixedFilter aFilter, MPPMaskSize aMaskSize, const Mpp16bf aConstant[3],
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MPPFixedFilter aFilter, MPPMaskSize aMaskSize, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -7726,7 +7847,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                  Mpp32s aFilterCenter, const Mpp16bf aConstant[3],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -7734,7 +7856,8 @@ extern "C"
     MPPErrorCode mppciSeparableFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -7743,7 +7866,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -7751,7 +7874,7 @@ extern "C"
     MPPErrorCode mppciColumnFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -7761,7 +7884,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, Mpp16bf aScalingValue, Mpp32s aFilterSize,
                                                  Mpp32s aFilterCenter, const Mpp16bf aConstant[3],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -7770,7 +7894,8 @@ extern "C"
     MPPErrorCode mppciColumnWindowSum_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -7779,7 +7904,7 @@ extern "C"
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                            const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -7787,7 +7912,7 @@ extern "C"
     MPPErrorCode mppciRowFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -7797,7 +7922,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -7806,7 +7931,7 @@ extern "C"
     MPPErrorCode mppciRowWindowSum_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -7814,7 +7939,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_C3RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -7822,7 +7947,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -7830,7 +7955,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_C3RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -7838,7 +7963,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -7846,7 +7971,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_C3RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -7854,7 +7979,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Median filter (only filter sizes 3x3, 5x5 and 7x7 are implemented).
@@ -7862,7 +7987,7 @@ extern "C"
     MPPErrorCode mppciMedianFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -7871,7 +7996,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               MppiFilterArea aFilterArea, const Mpp32f aNoise[3],
                                               const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -7879,7 +8004,7 @@ extern "C"
     MPPErrorCode mppciWienerFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, const Mpp32f aNoise[3], MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -7893,7 +8018,7 @@ extern "C"
                                                             const Mpp32f aDelta[3], const Mpp16bf aValGT[3],
                                                             const Mpp16bf aValLE[3], const Mpp16bf aConstant[3],
                                                             MPPBorderType aBorder, MppiRect aSrcROI,
-                                                            CPtrMppStreamCtx aStreamCtx);
+                                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -7906,7 +8031,7 @@ extern "C"
                                                           MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                           const Mpp32f aDelta[3], const Mpp16bf aValGT[3],
                                                           const Mpp16bf aValLE[3], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -7918,7 +8043,7 @@ extern "C"
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         ConstDevPtrMpp32f aFilter, MppiFilterArea aFilterArea,
                                         const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -7929,7 +8054,7 @@ extern "C"
     MPPErrorCode mppciFilter_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -7948,7 +8073,7 @@ extern "C"
                                                       MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                       ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                       MPPNorm aNorm, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                                      MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -7967,7 +8092,7 @@ extern "C"
                                                     MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                     ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                     MPPNorm aNorm, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -7982,7 +8107,8 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                Mpp32f aWeight, Mpp32f aThreshold, const Mpp16bf aConstant[3],
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -7997,7 +8123,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                              Mpp32f aWeight, Mpp32f aThreshold, MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -8016,7 +8142,7 @@ extern "C"
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                             const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -8034,7 +8160,7 @@ extern "C"
     MPPErrorCode mppciWarpAffine_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -8056,7 +8182,7 @@ extern "C"
                                             size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize,
                                             const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                             const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -8077,7 +8203,7 @@ extern "C"
                                           DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
                                           DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize,
                                           const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -8096,7 +8222,8 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                 MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MPPBorderType aBorder, MppiRect aSrcROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -8115,7 +8242,7 @@ extern "C"
     MPPErrorCode mppciWarpAffineBack_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -8130,14 +8257,12 @@ extern "C"
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    MPPErrorCode mppciWarpAffineBack_16bf_P3RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step,
-                                                ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
-                                                ConstDevPtrMpp16bf aSrc3BasePtr, size_t aSrc3Step,
-                                                MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step,
-                                                DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3,
-                                                size_t aDst3Step, MppiSize aDstSize, const Mpp64f aAffine[2][3],
-                                                MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciWarpAffineBack_16bf_P3RCb(
+        ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
+        ConstDevPtrMpp16bf aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step,
+        DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize,
+        const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -8160,7 +8285,7 @@ extern "C"
                                               size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step,
                                               MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                               MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                              MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -8179,7 +8304,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                  MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -8197,7 +8323,8 @@ extern "C"
     MPPErrorCode mppciWarpPerspective_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -8212,14 +8339,12 @@ extern "C"
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    MPPErrorCode mppciWarpPerspective_16bf_P3RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step,
-                                                 ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
-                                                 ConstDevPtrMpp16bf aSrc3BasePtr, size_t aSrc3Step,
-                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step,
-                                                 DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3,
-                                                 size_t aDst3Step, MppiSize aDstSize, const Mpp64f aPerspective[3][3],
-                                                 MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciWarpPerspective_16bf_P3RCb(
+        ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
+        ConstDevPtrMpp16bf aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step,
+        DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize,
+        const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -8241,7 +8366,7 @@ extern "C"
                                                size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step,
                                                MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                               MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -8261,7 +8386,7 @@ extern "C"
                                                      MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                      MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -8280,7 +8405,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                    MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                    MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -8300,7 +8425,7 @@ extern "C"
         ConstDevPtrMpp16bf aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step,
         DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -8322,7 +8447,7 @@ extern "C"
                                                    DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3,
                                                    size_t aDst3Step, MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                    MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -8340,7 +8465,7 @@ extern "C"
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                         const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -8357,7 +8482,7 @@ extern "C"
     MPPErrorCode mppciRotate_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                       const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -8378,7 +8503,7 @@ extern "C"
                                         DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                         const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -8398,7 +8523,7 @@ extern "C"
                                       DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
                                       DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                       const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize<para/>
@@ -8411,7 +8536,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciResize_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                      MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize<para/>
@@ -8426,7 +8551,7 @@ extern "C"
                                      size_t aSrc2Step, ConstDevPtrMpp16bf aSrc3, size_t aSrc3Step, DevPtrMpp16bf aDst1,
                                      size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3,
                                      size_t aDst3Step, MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -8454,7 +8579,8 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aScale[2], const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MPPBorderType aBorder, MppiRect aSrcROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -8482,7 +8608,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               const Mpp64f aScale[2], const Mpp64f aShift[2],
                                               MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                              MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -8511,7 +8637,7 @@ extern "C"
         ConstDevPtrMpp16bf aSrc3BasePtr, size_t aSrc3Step, MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step,
         DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize,
         const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -8542,21 +8668,21 @@ extern "C"
                                               size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step,
                                               MppiSize aDstSize, const Mpp64f aScale[2], const Mpp64f aShift[2],
                                               MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                              MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis
     /// </summary>
     MPPErrorCode mppciMirror_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                     MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis (inplace operation)
     /// </summary>
     MPPErrorCode mppciMirror_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -8574,7 +8700,7 @@ extern "C"
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                          MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -8592,7 +8718,7 @@ extern "C"
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                        MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -8611,7 +8737,7 @@ extern "C"
                                        ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                        ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                        MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -8630,7 +8756,7 @@ extern "C"
                                      ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                      ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                      MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -8651,7 +8777,7 @@ extern "C"
                                          DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                          MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -8672,7 +8798,7 @@ extern "C"
                                        DevPtrMpp16bf aDst3, size_t aDst3Step, MppiSize aDstSize,
                                        ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                        MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -8694,7 +8820,7 @@ extern "C"
                                        ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                        ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                        MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -8715,7 +8841,7 @@ extern "C"
                                      ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                      ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                      MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -8723,7 +8849,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_C3RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -8731,7 +8857,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -8739,7 +8865,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_C3RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -8747,7 +8873,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -8757,7 +8883,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                              const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -8766,7 +8892,7 @@ extern "C"
     MPPErrorCode mppciErosionMask_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -8776,7 +8902,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
                                              const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -8785,7 +8911,7 @@ extern "C"
     MPPErrorCode mppciErosionGray_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -8795,7 +8921,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                               const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -8804,7 +8930,7 @@ extern "C"
     MPPErrorCode mppciDilationMask_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -8814,7 +8940,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
                                               const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -8823,7 +8949,7 @@ extern "C"
     MPPErrorCode mppciDilationGray_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -8833,7 +8959,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                      MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -8843,7 +8969,7 @@ extern "C"
                                     DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                     DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                     MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -8853,7 +8979,7 @@ extern "C"
                                        DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                        MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -8863,7 +8989,7 @@ extern "C"
                                      DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                      DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                      MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -8873,7 +8999,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -8883,7 +9009,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -8894,7 +9020,7 @@ extern "C"
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                           const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -8904,7 +9030,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -8914,7 +9040,7 @@ extern "C"
                                                     MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                                     MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
                                                     MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -8922,21 +9048,22 @@ extern "C"
     MPPErrorCode mppciMorphologyGradient_16bf_C3R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step,
                                                   MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images.<para/>
@@ -8953,7 +9080,7 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images where only pixels with mask != 0 are used.<para/>
@@ -8971,21 +9098,21 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images.<para/>
@@ -9003,7 +9130,7 @@ extern "C"
     MPPErrorCode mppciAverageRelativeError_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -9023,20 +9150,21 @@ extern "C"
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask,
                                                        size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProduct.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciDotProductBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciDotProductBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProductMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciDotProductBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images.<para/>
@@ -9052,7 +9180,7 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images where only pixels with mask != 0 are used.<para/>
@@ -9070,19 +9198,19 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSE.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSEMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images.<para/>
@@ -9097,7 +9225,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMSE_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer,
-                                     size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images where only pixels with mask != 0 are used.<para/>
@@ -9114,21 +9242,21 @@ extern "C"
     MPPErrorCode mppciMSE_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images.<para/>
@@ -9146,7 +9274,7 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images where only pixels with mask != 0 are used.<para/>
@@ -9165,21 +9293,21 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images.<para/>
@@ -9197,7 +9325,7 @@ extern "C"
     MPPErrorCode mppciMaximumRelativeError_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -9217,21 +9345,21 @@ extern "C"
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask,
                                                        size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm of difference of pixels between two images.<para/>
@@ -9247,7 +9375,7 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -9265,20 +9393,21 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormDiffL1BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormDiffL1BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL1BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm of difference of pixels between two images.<para/>
@@ -9293,7 +9422,7 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -9310,20 +9439,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormDiffL2BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormDiffL2BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL2BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm of difference of pixels between two images.<para/>
@@ -9339,7 +9469,7 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -9357,20 +9487,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelInfBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelInfBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormRelInfBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative infinity norm of difference of pixels between two images.<para/>
@@ -9386,7 +9517,7 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative infinity norm of difference of pixels between two images where only pixels with mask != 0
@@ -9403,19 +9534,21 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L1 norm of difference of pixels between two images.<para/>
@@ -9431,7 +9564,7 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                            DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L1 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -9449,19 +9582,21 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L2 norm of difference of pixels between two images.<para/>
@@ -9477,7 +9612,7 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                            DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L2 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -9495,13 +9630,13 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for PSNR.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciPSNRBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciPSNRBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the PSNR of two images. <para/> For multi-channel images, the
@@ -9517,19 +9652,21 @@ extern "C"
     MPPErrorCode mppciPSNR_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar, Mpp32f aValueRange,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm.<para/>
@@ -9543,7 +9680,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormInf_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm where only pixels with mask != 0 are
@@ -9560,19 +9697,20 @@ extern "C"
     MPPErrorCode mppciNormInf_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                           DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm.<para/>
@@ -9586,7 +9724,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL1_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm where only pixels with mask != 0 are
@@ -9603,19 +9741,20 @@ extern "C"
     MPPErrorCode mppciNormL1_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm.<para/>
@@ -9629,7 +9768,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL2_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm where only pixels with mask != 0 are
@@ -9646,21 +9785,22 @@ extern "C"
     MPPErrorCode mppciNormL2_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Sum.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SumMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values.<para/>For multi-channel images, the
@@ -9672,7 +9812,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciSum_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                      DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
@@ -9686,19 +9826,19 @@ extern "C"
     MPPErrorCode mppciSum_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Mean.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values.<para/>For multi-channel images, the
@@ -9710,7 +9850,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMean_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
@@ -9724,19 +9864,21 @@ extern "C"
     MPPErrorCode mppciMean_16bf32f_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                        DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStd.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStdMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values.<para/>For multi-channel images, the
@@ -9751,7 +9893,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMeanStd_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean, DevPtrMpp32f aStd,
                                       DevPtrMpp32f aMeanScalar, DevPtrMpp32f aStdScalar, DevPtrMpp8u aBuffer,
-                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values where only pixels with mask != 0 are used.<para/>For
@@ -9769,21 +9911,21 @@ extern "C"
     MPPErrorCode mppciMeanStd_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean,
                                        DevPtrMpp32f aStd, DevPtrMpp32f aMeanScalar, DevPtrMpp32f aStdScalar,
                                        ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRange.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRangeMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range.<para/>For multi-channel images, the
@@ -9798,7 +9940,7 @@ extern "C"
     MPPErrorCode mppciCountInRange_16bf64u_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aLowerLimit[3],
                                               const Mpp16bf aUpperLimit[3], DevPtrMpp64u aDst, DevPtrMpp64u aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range where only pixels with mask != 0 are used.<para/>For multi-channel
@@ -9814,14 +9956,14 @@ extern "C"
     MPPErrorCode mppciCountInRange_16bf64u_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aLowerLimit[3],
                                                const Mpp16bf aUpperLimit[3], DevPtrMpp64u aDst, DevPtrMpp64u aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the image quality index of two images. This implementation is identical to the one in NPP computing a
@@ -9833,14 +9975,14 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciQualityIndex_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndexWindow.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexWindowBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx);
+                                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the QualityIndex of two images. This function is implemented using a sliding window approach as is done
@@ -9853,13 +9995,13 @@ extern "C"
     MPPErrorCode mppciQualityIndexWindow_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                     DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciSSIMBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSSIMBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the SSIM of two images.
@@ -9877,13 +10019,13 @@ extern "C"
     MPPErrorCode mppciSSIM_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                       Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSSSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSSSIMBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSSSIMBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Multi-Scale-SSIM of two images.
@@ -9901,19 +10043,19 @@ extern "C"
     MPPErrorCode mppciMSSSIM_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                         Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Min.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value.
@@ -9926,7 +10068,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMin_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                   DevPtrMpp16bf aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value where only pixels with mask != 0 are used.<para/> For
@@ -9941,19 +10083,19 @@ extern "C"
     MPPErrorCode mppciMin_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    DevPtrMpp16bf aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                    DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Max.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value.
@@ -9966,7 +10108,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMax_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                   DevPtrMpp16bf aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value where only pixels with mask != 0 are used.<para/> For
@@ -9981,19 +10123,20 @@ extern "C"
     MPPErrorCode mppciMax_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    DevPtrMpp16bf aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                    DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMax.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value.<para/>
@@ -10009,7 +10152,7 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                      DevPtrMpp16bf aDstMax, DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                      DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value where only pixels with mask != 0 are used.<para/>
@@ -10026,19 +10169,21 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_C3M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                       DevPtrMpp16bf aDstMax, DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -10060,7 +10205,7 @@ extern "C"
     MPPErrorCode mppciMinIndex_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                        DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMinScalar,
                                        DevPtrMpp32s aDstScalarIdx, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -10085,19 +10230,21 @@ extern "C"
                                         DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMinScalar,
                                         DevPtrMpp32s aDstScalarIdx, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -10119,7 +10266,7 @@ extern "C"
     MPPErrorCode mppciMaxIndex_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMax,
                                        DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMaxScalar,
                                        DevPtrMpp32s aDstScalarIdx, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -10144,21 +10291,21 @@ extern "C"
                                         DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMaxScalar,
                                         DevPtrMpp32s aDstScalarIdx, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_C3M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices. For multiple occurences of the same value the index
@@ -10184,7 +10331,7 @@ extern "C"
                                           DevPtrMpp16bf aDstMax, DevPtrMppiIndexMinMax aDstIdx,
                                           DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                           DevPtrMppiIndexMinMaxChannel aDstScalarIdx, DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices where only pixels with mask != 0 are used. For multiple
@@ -10212,35 +10359,35 @@ extern "C"
                                            DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                            DevPtrMppiIndexMinMaxChannel aDstScalarIdx, ConstDevPtrMpp8u aMask,
                                            size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Integral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciIntegralBufferSize_16bf32f_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Integral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciIntegralBufferSize_16bf64f_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SqrIntegral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciSqrIntegralBufferSize_16bf32f64f_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SqrIntegral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciSqrIntegralBufferSize_16bf64f64f_C3(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image.
@@ -10252,7 +10399,7 @@ extern "C"
     /// <returns></returns>
     MPPErrorCode mppciIntegral_16bf32f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           size_t aDstStep, const Mpp32f aVal[3], DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image.
@@ -10264,7 +10411,7 @@ extern "C"
     /// <returns></returns>
     MPPErrorCode mppciIntegral_16bf64f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp64f aDst,
                                           size_t aDstStep, const Mpp64f aVal[3], DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image and the squared integral image.
@@ -10278,7 +10425,8 @@ extern "C"
     MPPErrorCode mppciSqrIntegral_16bf32f64f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                                 size_t aDstStep, DevPtrMpp64f aSqr, size_t aSqrStep,
                                                 const Mpp32f aVal[3], const Mpp64f aValSqr[3], DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                                size_t aBufferSize, MppiSize aSizeROISrc,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image and the squared integral image.
@@ -10292,33 +10440,34 @@ extern "C"
     MPPErrorCode mppciSqrIntegral_16bf64f64f_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp64f aDst,
                                                 size_t aDstStep, DevPtrMpp64f aSqr, size_t aSqrStep,
                                                 const Mpp64f aVal[3], const Mpp64f aValSqr[3], DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                                size_t aBufferSize, MppiSize aSizeROISrc,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = min(aSrc1, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = min(aSrcDst, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = max(aSrc1, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = max(aSrcDst, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramEven.<para/>
@@ -10326,7 +10475,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramEvenBufferSize_16bf_C3(size_t *aBufferSize, const Mpp32s aNumLevels[3],
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The aLowerLevel (inclusive) and aUpperLevel (exclusive) define the boundaries of the range,
@@ -10341,7 +10490,7 @@ extern "C"
     MPPErrorCode mppciHistogramEven_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist[3],
                                             const Mpp32f aLowerLevel[3], const Mpp32f aUpperLevel[3],
                                             Mpp32s aNumLevels[3], DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramRange.<para/>
@@ -10349,7 +10498,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramRangeBufferSize_16bf_C3(size_t *aBufferSize, const Mpp32s aNumLevels[3],
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the histogram of an image within specified ranges.
@@ -10363,7 +10512,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciHistogramRange_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist[3],
                                              ConstDevPtrMpp32f aLevels[3], Mpp32s aNumLevels[3], DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -10380,7 +10529,7 @@ extern "C"
                                                     DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                     DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                     const Mpp32f aCenter[2], MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -10399,7 +10548,7 @@ extern "C"
                                                       DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                       DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                       const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -10409,7 +10558,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_C3C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -10419,7 +10568,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_C3C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                            MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -10429,7 +10578,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_C3C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                               MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -10439,7 +10588,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_C3C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                                DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -10448,7 +10597,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -10457,7 +10606,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                          MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -10466,7 +10615,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                             MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -10475,28 +10624,28 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                              DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aSrc2) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEps_16bf8u_C3C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsC_16bf8u_C3C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                                 Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsDevC_16bf8u_C3C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                    ConstDevPtrMpp16bf aConst, Mpp16bf aEpsilon, DevPtrMpp8u aDst,
-                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -10504,7 +10653,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                         MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -10512,7 +10661,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                             MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -10520,7 +10669,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -10528,7 +10677,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -10536,7 +10685,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -10544,49 +10693,49 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                         MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                             MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -10594,7 +10743,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                            const Mpp16bf aValue[3], MPPCompareOp aCompare, DevPtrMpp16bf aDst,
-                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -10602,7 +10751,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                              const Mpp16bf aValue[3], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -10610,7 +10759,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                              const Mpp16bf aValue[3], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -10618,21 +10767,23 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
                                             const Mpp16bf aValue[3], MPPCompareOp aCompare, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                              const Mpp16bf aValue[3], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[3], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                              const Mpp16bf aValue[3], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[3], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -10642,7 +10793,7 @@ extern "C"
     MPPErrorCode mppciThresholdLTGT_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThresholdLT[3],
                                             const Mpp16bf aValueLT[3], const Mpp16bf aThresholdGT[3],
                                             const Mpp16bf aValueGT[3], DevPtrMpp16bf aDst, size_t aDstStep,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -10651,7 +10802,8 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTGT_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThresholdLT[3],
                                              const Mpp16bf aValueLT[3], const Mpp16bf aThresholdGT[3],
-                                             const Mpp16bf aValueGT[3], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             const Mpp16bf aValueGT[3], MppiSize aSizeROI,
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aSrc2 fulfill aCompare, aSrc1 otherwise.<para/>
@@ -10664,7 +10816,7 @@ extern "C"
     MPPErrorCode mppciReplaceIf_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, MPPCompareOp aCompare, const Mpp16bf aValue[3],
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -10676,7 +10828,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                          MPPCompareOp aCompare, const Mpp16bf aValue[3], DevPtrMpp16bf aDst,
-                                         size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -10688,7 +10840,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                             MPPCompareOp aCompare, const Mpp16bf aValue[3], DevPtrMpp16bf aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), aSrc1
@@ -10701,7 +10853,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                              const Mpp16bf aValue[3], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aSrc2 fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -10713,7 +10865,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIf_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, MPPCompareOp aCompare, const Mpp16bf aValue[3],
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -10725,7 +10877,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                           MPPCompareOp aCompare, const Mpp16bf aValue[3], MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -10737,7 +10889,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                              MPPCompareOp aCompare, const Mpp16bf aValue[3], MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst fulfills aCompare (for floating point checks, e.g. isinf()), aSrcDst
@@ -10749,7 +10901,8 @@ extern "C"
     /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPCompareOp aCompare,
-                                              const Mpp16bf aValue[3], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[3], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// RGB Color to Grayscale Bayer Color Filter Array conversion.<para/>
@@ -10758,7 +10911,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciRGBToCFA_16bf_C3C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, MPPBayerGridPosition aBayerGrid, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion.<para/>
@@ -10772,7 +10925,7 @@ extern "C"
                                   ConstDevPtrMpp32f aLevels[3], ConstDevPtrMpp32f aValues[3], size_t aLUTSize[3],
                                   ConstDevPtrMpp32s aAccelerator[3], size_t aAcceleratorSize[3],
                                   MPPInterpolationMode aInterpolationMode, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion - inplace.<para/>
@@ -10785,20 +10938,57 @@ extern "C"
     MPPErrorCode mppciLUT_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32f aLevels[3],
                                    ConstDevPtrMpp32f aValues[3], size_t aLUTSize[3], ConstDevPtrMpp32s aAccelerator[3],
                                    size_t aAcceleratorSize[3], MPPInterpolationMode aInterpolationMode,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrc1 source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the destination image aDst.
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_C3(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
+                                           size_t aSrc2Step, const Mpp16bf aColorKey[3], DevPtrMpp16bf aDst,
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrcDst source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the same source image (inplace operation).
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_C3I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
+                                            size_t aSrc2Step, const Mpp16bf aColorKey[3], MppiSize aSizeROI,
+                                            CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// Converts from planar P2 422 sampling to packed C2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if output should be in format YCbCr, true for CbYCr.</param>
+    MPPErrorCode mppciConvertSampling422_16bf_P2C2(DevPtrMpp16bf aSrcLuma, size_t aSrcLumaStep,
+                                                   DevPtrMpp16bf aSrcChroma, size_t aSrcChromaStep,
+                                                   DevPtrMpp16bf aDstLumaChroma, size_t aDstLumaChromaStep,
+                                                   bool aSwapLumaChroma, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// Converts from planar P3 422 sampling to packed C2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if output should be in format YCbCr, true for CbYCr.</param>
+    MPPErrorCode mppciConvertSampling422_16bf_P3C2(DevPtrMpp16bf aSrcLuma, size_t aSrcLumaStep,
+                                                   DevPtrMpp16bf aSrcChroma1, size_t aSrcChroma1Step,
+                                                   DevPtrMpp16bf aSrcChroma2, size_t aSrcChroma2Step,
+                                                   DevPtrMpp16bf aDstLumaChroma, size_t aDstLumaChromaStep,
+                                                   bool aSwapLumaChroma, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                     ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy packed image pixels to planar images.
@@ -10806,7 +10996,7 @@ extern "C"
     MPPErrorCode mppciCopy_16bf_C4P4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstChannel1,
                                      size_t aDstChannel1Step, DevPtrMpp16bf aDstChannel2, size_t aDstChannel2Step,
                                      DevPtrMpp16bf aDstChannel3, size_t aDstChannel3Step, DevPtrMpp16bf aDstChannel4,
-                                     size_t aDstChannel4Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aDstChannel4Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy planar image pixels to packed pixel image.
@@ -10814,7 +11004,7 @@ extern "C"
     MPPErrorCode mppciCopy_16bf_P4C4(DevPtrMpp16bf aSrcChannel1, size_t aSrcChannel1Step, DevPtrMpp16bf aSrcChannel2,
                                      size_t aSrcChannel2Step, DevPtrMpp16bf aSrcChannel3, size_t aSrcChannel3Step,
                                      DevPtrMpp16bf aSrcChannel4, size_t aSrcChannel4Step, DevPtrMpp16bf aDst,
-                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -10826,7 +11016,7 @@ extern "C"
     /// <param name="aConstant">Constant value needed in case BorderType::Constant</param>
     MPPErrorCode mppciCopyBorder_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, const Mpp32s aLowerBorderSize[2], MPPBorderType aBorder,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -10839,7 +11029,7 @@ extern "C"
     MPPErrorCode mppciCopyBorder_16bf_C4Cb(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                            size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                            const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy subpix.
@@ -10849,45 +11039,45 @@ extern "C"
     /// <param name="aInterpolation">Interpolation mode to use</param>
     MPPErrorCode mppciCopySubpix_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                          size_t aDstStep, const Mpp32f aDelta[2], MPPInterpolationMode aInterpolation,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set channel aChannel of all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_C4CI(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, Mpp32s aChannel,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set channel aChannel of all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_C4CI(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                        Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Swap channels (inplace)<para/>
@@ -10897,431 +11087,435 @@ extern "C"
     /// E.g. Given an RGB image, aDstChannels = [2,1,0] converts aSrcDst to BGR channel order.
     /// </summary>
     MPPErrorCode mppciSwapChannel_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp32s aDstChannels[4],
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Transpose image.
     /// </summary>
     MPPErrorCode mppciTranspose_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                        MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                   size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
-                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                     DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_C4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_C4I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
-                                         size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                          size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciAddProduct_16bf_C4I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
@@ -11329,14 +11523,14 @@ extern "C"
     MPPErrorCode mppciAddProduct_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
                                           ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
@@ -11344,120 +11538,120 @@ extern "C"
     MPPErrorCode mppciAddWeighted_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C4I(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                            size_t aSrcDstStep, Mpp16bf aAlpha, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_C4IM(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                             size_t aSrcDstStep, Mpp16bf aAlpha, ConstDevPtrMpp8u aMask,
-                                            size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = exp(aSrc1) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = exp(aSrcDst) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = log(aSrc1) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                 MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                 MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = log(aSrcDst) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc1 (aSrc1^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrcDst * aSrcDst (aSrcDst^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = Sqrt(aSrc1) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = Sqrt(aSrcDst) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with alpha from fourth color channel.
@@ -11467,7 +11661,7 @@ extern "C"
     /// same for all values. Values may differ by 1.
     /// </summary>
     MPPErrorCode mppciAlphaPremul_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
-                                          size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with alpha from fourth color channel.
@@ -11477,20 +11671,20 @@ extern "C"
     /// same for all values. Values may differ by 1.
     /// </summary>
     MPPErrorCode mppciAlphaPremul_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aAlpha,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aAlpha,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using alpha opacity values contained in each image. Last color channel is alpha channel, 1
@@ -11498,7 +11692,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciAlphaComp_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MPPAlphaOp aAlphaOp,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using constant alpha values.
@@ -11506,23 +11700,23 @@ extern "C"
     MPPErrorCode mppciAlphaCompC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha1,
                                          Mpp16bf aAlpha2, MPPAlphaOp aAlphaOp, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_C4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              MPPFixedFilter aFilter, MPPMaskSize aMaskSize, const Mpp16bf aConstant[4],
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MPPFixedFilter aFilter, MPPMaskSize aMaskSize, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -11531,7 +11725,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                  Mpp32s aFilterCenter, const Mpp16bf aConstant[4],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -11539,7 +11734,8 @@ extern "C"
     MPPErrorCode mppciSeparableFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -11548,7 +11744,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -11556,7 +11752,7 @@ extern "C"
     MPPErrorCode mppciColumnFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -11566,7 +11762,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, Mpp16bf aScalingValue, Mpp32s aFilterSize,
                                                  Mpp32s aFilterCenter, const Mpp16bf aConstant[4],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -11575,7 +11772,8 @@ extern "C"
     MPPErrorCode mppciColumnWindowSum_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -11584,7 +11782,7 @@ extern "C"
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                            const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -11592,7 +11790,7 @@ extern "C"
     MPPErrorCode mppciRowFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -11602,7 +11800,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -11611,7 +11809,7 @@ extern "C"
     MPPErrorCode mppciRowWindowSum_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -11619,7 +11817,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_C4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[4],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -11627,7 +11825,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -11635,7 +11833,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_C4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[4],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -11643,7 +11841,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -11651,7 +11849,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_C4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[4],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -11659,7 +11857,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Median filter (only filter sizes 3x3, 5x5 and 7x7 are implemented).
@@ -11667,7 +11865,7 @@ extern "C"
     MPPErrorCode mppciMedianFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -11676,7 +11874,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               MppiFilterArea aFilterArea, const Mpp32f aNoise[4],
                                               const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -11684,7 +11882,7 @@ extern "C"
     MPPErrorCode mppciWienerFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, const Mpp32f aNoise[4], MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -11698,7 +11896,7 @@ extern "C"
                                                             const Mpp32f aDelta[4], const Mpp16bf aValGT[4],
                                                             const Mpp16bf aValLE[4], const Mpp16bf aConstant[4],
                                                             MPPBorderType aBorder, MppiRect aSrcROI,
-                                                            CPtrMppStreamCtx aStreamCtx);
+                                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -11711,7 +11909,7 @@ extern "C"
                                                           MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                           const Mpp32f aDelta[4], const Mpp16bf aValGT[4],
                                                           const Mpp16bf aValLE[4], MPPBorderType aBorder,
-                                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -11723,7 +11921,7 @@ extern "C"
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         ConstDevPtrMpp32f aFilter, MppiFilterArea aFilterArea,
                                         const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -11734,7 +11932,7 @@ extern "C"
     MPPErrorCode mppciFilter_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp32f aFilter,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -11753,7 +11951,7 @@ extern "C"
                                                       MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                       ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                       MPPNorm aNorm, const Mpp16bf aConstant[4], MPPBorderType aBorder,
-                                                      MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -11772,7 +11970,7 @@ extern "C"
                                                     MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                     ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                     MPPNorm aNorm, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -11787,7 +11985,8 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                Mpp32f aWeight, Mpp32f aThreshold, const Mpp16bf aConstant[4],
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -11802,7 +12001,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                              Mpp32f aWeight, Mpp32f aThreshold, MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -11821,7 +12020,7 @@ extern "C"
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                             const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -11839,7 +12038,7 @@ extern "C"
     MPPErrorCode mppciWarpAffine_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -11860,7 +12059,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
         DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -11883,7 +12082,7 @@ extern "C"
                                           DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step,
                                           MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                           MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -11902,7 +12101,8 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                 MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MPPBorderType aBorder, MppiRect aSrcROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -11921,7 +12121,7 @@ extern "C"
     MPPErrorCode mppciWarpAffineBack_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -11942,7 +12142,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
         DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -11966,7 +12166,7 @@ extern "C"
                                               size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step,
                                               DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
                                               const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -11985,7 +12185,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                  MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -12003,7 +12204,8 @@ extern "C"
     MPPErrorCode mppciWarpPerspective_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -12024,7 +12226,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
         DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -12039,15 +12241,13 @@ extern "C"
     /// fall outside this expanded area, the pixel value is not defined. <para/>
     /// For BorderType::Constant, the constant value to use must be provided.
     /// </summary>
-    MPPErrorCode mppciWarpPerspective_16bf_P4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step,
-                                               ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
-                                               ConstDevPtrMpp16bf aSrc3BasePtr, size_t aSrc3Step,
-                                               ConstDevPtrMpp16bf aSrc4BasePtr, size_t aSrc4Step, MppiSize aSrcFullSize,
-                                               DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2,
-                                               size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step,
-                                               DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
-                                               const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciWarpPerspective_16bf_P4R(
+        ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2BasePtr, size_t aSrc2Step,
+        ConstDevPtrMpp16bf aSrc3BasePtr, size_t aSrc3Step, ConstDevPtrMpp16bf aSrc4BasePtr, size_t aSrc4Step,
+        MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
+        DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
+        const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
+        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -12067,7 +12267,7 @@ extern "C"
                                                      MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                      MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -12086,7 +12286,7 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                    MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                    MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                   MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                   MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -12107,7 +12307,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
         DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -12128,7 +12328,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
         DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aPerspective[3][3], MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-        CPtrMppStreamCtx aStreamCtx);
+        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -12146,7 +12346,7 @@ extern "C"
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                         const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                         const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -12163,7 +12363,7 @@ extern "C"
     MPPErrorCode mppciRotate_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                       const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -12185,7 +12385,7 @@ extern "C"
                                         DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step,
                                         MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                         MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -12207,7 +12407,7 @@ extern "C"
                                       DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step,
                                       MppiSize aDstSize, Mpp64f aAngleInDeg, const Mpp64f aShift[2],
                                       MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize<para/>
@@ -12220,7 +12420,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciResize_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                      MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize<para/>
@@ -12236,7 +12436,7 @@ extern "C"
                                      ConstDevPtrMpp16bf aSrc4, size_t aSrc4Step, DevPtrMpp16bf aDst1, size_t aDst1Step,
                                      DevPtrMpp16bf aDst2, size_t aDst2Step, DevPtrMpp16bf aDst3, size_t aDst3Step,
                                      DevPtrMpp16bf aDst4, size_t aDst4Step, MPPInterpolationMode aInterpolation,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -12264,7 +12464,8 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aScale[2], const Mpp64f aShift[2],
                                                 MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-                                                MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MPPBorderType aBorder, MppiRect aSrcROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -12292,7 +12493,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               const Mpp64f aScale[2], const Mpp64f aShift[2],
                                               MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                              MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -12322,7 +12523,7 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
         DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -12352,21 +12553,21 @@ extern "C"
         MppiSize aSrcFullSize, DevPtrMpp16bf aDst1, size_t aDst1Step, DevPtrMpp16bf aDst2, size_t aDst2Step,
         DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step, MppiSize aDstSize,
         const Mpp64f aScale[2], const Mpp64f aShift[2], MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis
     /// </summary>
     MPPErrorCode mppciMirror_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                     MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis (inplace operation)
     /// </summary>
     MPPErrorCode mppciMirror_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -12384,7 +12585,7 @@ extern "C"
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                          MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -12402,7 +12603,7 @@ extern "C"
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                        MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -12421,7 +12622,7 @@ extern "C"
                                        ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                        ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                        MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -12440,7 +12641,7 @@ extern "C"
                                      ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                      ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                      MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -12462,7 +12663,7 @@ extern "C"
                                          DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step,
                                          MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                          MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -12484,7 +12685,7 @@ extern "C"
                                        DevPtrMpp16bf aDst3, size_t aDst3Step, DevPtrMpp16bf aDst4, size_t aDst4Step,
                                        MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                        MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -12507,7 +12708,7 @@ extern "C"
                                        MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                        ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                        MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[4],
-                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -12529,7 +12730,7 @@ extern "C"
                                      MppiSize aDstSize, ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                      ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                      MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -12537,7 +12738,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_C4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MppiFilterArea aFilterArea, const Mpp16bf aConstant[4], MPPBorderType aBorder,
-                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -12545,7 +12746,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -12553,7 +12754,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_C4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, const Mpp16bf aConstant[4], MPPBorderType aBorder,
-                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -12561,7 +12762,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -12571,7 +12772,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                              const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -12580,7 +12781,7 @@ extern "C"
     MPPErrorCode mppciErosionMask_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -12590,7 +12791,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
                                              const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -12599,7 +12800,7 @@ extern "C"
     MPPErrorCode mppciErosionGray_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -12609,7 +12810,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                               const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -12618,7 +12819,7 @@ extern "C"
     MPPErrorCode mppciDilationMask_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -12628,7 +12829,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
                                               const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -12637,7 +12838,7 @@ extern "C"
     MPPErrorCode mppciDilationGray_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -12647,7 +12848,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, const Mpp16bf aConstant[4], MPPBorderType aBorder,
-                                      MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -12657,7 +12858,7 @@ extern "C"
                                     DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                     DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                     MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -12667,7 +12868,7 @@ extern "C"
                                        DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                        MppiFilterArea aFilterArea, const Mpp16bf aConstant[4], MPPBorderType aBorder,
-                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -12677,7 +12878,7 @@ extern "C"
                                      DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                      DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                      MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -12687,7 +12888,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, const Mpp16bf aConstant[4], MPPBorderType aBorder,
-                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -12697,7 +12898,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -12708,7 +12909,7 @@ extern "C"
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                           const Mpp16bf aConstant[4], MPPBorderType aBorder, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -12718,7 +12919,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -12728,7 +12929,7 @@ extern "C"
                                                     MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                                     MppiFilterArea aFilterArea, const Mpp16bf aConstant[4],
                                                     MPPBorderType aBorder, MppiRect aSrcROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -12736,21 +12937,22 @@ extern "C"
     MPPErrorCode mppciMorphologyGradient_16bf_C4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step,
                                                   MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images.<para/>
@@ -12767,7 +12969,7 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images where only pixels with mask != 0 are used.<para/>
@@ -12785,21 +12987,21 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images.<para/>
@@ -12817,7 +13019,7 @@ extern "C"
     MPPErrorCode mppciAverageRelativeError_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -12837,20 +13039,21 @@ extern "C"
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask,
                                                        size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProduct.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciDotProductBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciDotProductBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProductMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciDotProductBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images.<para/>
@@ -12866,7 +13069,7 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images where only pixels with mask != 0 are used.<para/>
@@ -12884,19 +13087,19 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSE.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSEMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images.<para/>
@@ -12911,7 +13114,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMSE_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer,
-                                     size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images where only pixels with mask != 0 are used.<para/>
@@ -12928,21 +13131,21 @@ extern "C"
     MPPErrorCode mppciMSE_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images.<para/>
@@ -12960,7 +13163,7 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images where only pixels with mask != 0 are used.<para/>
@@ -12979,21 +13182,21 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images.<para/>
@@ -13011,7 +13214,7 @@ extern "C"
     MPPErrorCode mppciMaximumRelativeError_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                       ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -13031,21 +13234,21 @@ extern "C"
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask,
                                                        size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm of difference of pixels between two images.<para/>
@@ -13061,7 +13264,7 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -13079,20 +13282,21 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormDiffL1BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormDiffL1BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL1BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm of difference of pixels between two images.<para/>
@@ -13107,7 +13311,7 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -13124,20 +13328,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormDiffL2BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormDiffL2BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL2BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm of difference of pixels between two images.<para/>
@@ -13153,7 +13358,7 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -13171,20 +13376,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelInfBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelInfBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormRelInfBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative infinity norm of difference of pixels between two images.<para/>
@@ -13200,7 +13406,7 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative infinity norm of difference of pixels between two images where only pixels with mask != 0
@@ -13217,19 +13423,21 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L1 norm of difference of pixels between two images.<para/>
@@ -13245,7 +13453,7 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                            DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L1 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -13263,19 +13471,21 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L2 norm of difference of pixels between two images.<para/>
@@ -13291,7 +13501,7 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                            DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L2 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -13309,13 +13519,13 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for PSNR.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciPSNRBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciPSNRBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the PSNR of two images. <para/> For multi-channel images, the
@@ -13331,19 +13541,21 @@ extern "C"
     MPPErrorCode mppciPSNR_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar, Mpp32f aValueRange,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm.<para/>
@@ -13357,7 +13569,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormInf_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm where only pixels with mask != 0 are
@@ -13374,19 +13586,20 @@ extern "C"
     MPPErrorCode mppciNormInf_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                           DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm.<para/>
@@ -13400,7 +13613,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL1_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm where only pixels with mask != 0 are
@@ -13417,19 +13630,20 @@ extern "C"
     MPPErrorCode mppciNormL1_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm.<para/>
@@ -13443,7 +13657,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL2_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm where only pixels with mask != 0 are
@@ -13460,21 +13674,22 @@ extern "C"
     MPPErrorCode mppciNormL2_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Sum.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SumMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values.<para/>For multi-channel images, the
@@ -13486,7 +13701,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciSum_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                      DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
@@ -13500,19 +13715,19 @@ extern "C"
     MPPErrorCode mppciSum_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Mean.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values.<para/>For multi-channel images, the
@@ -13524,7 +13739,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMean_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
@@ -13538,19 +13753,21 @@ extern "C"
     MPPErrorCode mppciMean_16bf32f_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                        DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStd.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStdMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values.<para/>For multi-channel images, the
@@ -13565,7 +13782,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMeanStd_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean, DevPtrMpp32f aStd,
                                       DevPtrMpp32f aMeanScalar, DevPtrMpp32f aStdScalar, DevPtrMpp8u aBuffer,
-                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values where only pixels with mask != 0 are used.<para/>For
@@ -13583,21 +13800,21 @@ extern "C"
     MPPErrorCode mppciMeanStd_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean,
                                        DevPtrMpp32f aStd, DevPtrMpp32f aMeanScalar, DevPtrMpp32f aStdScalar,
                                        ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRange.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRangeMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range.<para/>For multi-channel images, the
@@ -13612,7 +13829,7 @@ extern "C"
     MPPErrorCode mppciCountInRange_16bf64u_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aLowerLimit[4],
                                               const Mpp16bf aUpperLimit[4], DevPtrMpp64u aDst, DevPtrMpp64u aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range where only pixels with mask != 0 are used.<para/>For multi-channel
@@ -13628,14 +13845,14 @@ extern "C"
     MPPErrorCode mppciCountInRange_16bf64u_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aLowerLimit[4],
                                                const Mpp16bf aUpperLimit[4], DevPtrMpp64u aDst, DevPtrMpp64u aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the image quality index of two images. This implementation is identical to the one in NPP computing a
@@ -13647,14 +13864,14 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciQualityIndex_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndexWindow.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexWindowBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                           CPtrMppStreamCtx aStreamCtx);
+                                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the QualityIndex of two images. This function is implemented using a sliding window approach as is done
@@ -13667,13 +13884,13 @@ extern "C"
     MPPErrorCode mppciQualityIndexWindow_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                     DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciSSIMBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSSIMBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the SSIM of two images.
@@ -13691,13 +13908,13 @@ extern "C"
     MPPErrorCode mppciSSIM_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                       Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSSSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSSSIMBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSSSIMBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Multi-Scale-SSIM of two images.
@@ -13715,19 +13932,19 @@ extern "C"
     MPPErrorCode mppciMSSSIM_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                         Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Min.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value.
@@ -13740,7 +13957,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMin_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                   DevPtrMpp16bf aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value where only pixels with mask != 0 are used.<para/> For
@@ -13755,19 +13972,19 @@ extern "C"
     MPPErrorCode mppciMin_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    DevPtrMpp16bf aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                    DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Max.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value.
@@ -13780,7 +13997,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMax_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                   DevPtrMpp16bf aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value where only pixels with mask != 0 are used.<para/> For
@@ -13795,19 +14012,20 @@ extern "C"
     MPPErrorCode mppciMax_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    DevPtrMpp16bf aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                    DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMax.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value.<para/>
@@ -13823,7 +14041,7 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                      DevPtrMpp16bf aDstMax, DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                      DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value where only pixels with mask != 0 are used.<para/>
@@ -13840,19 +14058,21 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_C4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                       DevPtrMpp16bf aDstMax, DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -13874,7 +14094,7 @@ extern "C"
     MPPErrorCode mppciMinIndex_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                        DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMinScalar,
                                        DevPtrMpp32s aDstScalarIdx, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -13899,19 +14119,21 @@ extern "C"
                                         DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMinScalar,
                                         DevPtrMpp32s aDstScalarIdx, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -13933,7 +14155,7 @@ extern "C"
     MPPErrorCode mppciMaxIndex_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMax,
                                        DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMaxScalar,
                                        DevPtrMpp32s aDstScalarIdx, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -13958,21 +14180,21 @@ extern "C"
                                         DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMaxScalar,
                                         DevPtrMpp32s aDstScalarIdx, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_C4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices. For multiple occurences of the same value the index
@@ -13998,7 +14220,7 @@ extern "C"
                                           DevPtrMpp16bf aDstMax, DevPtrMppiIndexMinMax aDstIdx,
                                           DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                           DevPtrMppiIndexMinMaxChannel aDstScalarIdx, DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices where only pixels with mask != 0 are used. For multiple
@@ -14026,35 +14248,35 @@ extern "C"
                                            DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                            DevPtrMppiIndexMinMaxChannel aDstScalarIdx, ConstDevPtrMpp8u aMask,
                                            size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Integral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciIntegralBufferSize_16bf32f_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Integral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciIntegralBufferSize_16bf64f_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SqrIntegral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciSqrIntegralBufferSize_16bf32f64f_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SqrIntegral.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciSqrIntegralBufferSize_16bf64f64f_C4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                          CPtrMppStreamCtx aStreamCtx);
+                                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image.
@@ -14066,7 +14288,7 @@ extern "C"
     /// <returns></returns>
     MPPErrorCode mppciIntegral_16bf32f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           size_t aDstStep, const Mpp32f aVal[4], DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image.
@@ -14078,7 +14300,7 @@ extern "C"
     /// <returns></returns>
     MPPErrorCode mppciIntegral_16bf64f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp64f aDst,
                                           size_t aDstStep, const Mpp64f aVal[4], DevPtrMpp8u aBuffer,
-                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image and the squared integral image.
@@ -14092,7 +14314,8 @@ extern "C"
     MPPErrorCode mppciSqrIntegral_16bf32f64f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                                 size_t aDstStep, DevPtrMpp64f aSqr, size_t aSqrStep,
                                                 const Mpp32f aVal[4], const Mpp64f aValSqr[4], DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                                size_t aBufferSize, MppiSize aSizeROISrc,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the integral image and the squared integral image.
@@ -14106,33 +14329,34 @@ extern "C"
     MPPErrorCode mppciSqrIntegral_16bf64f64f_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp64f aDst,
                                                 size_t aDstStep, DevPtrMpp64f aSqr, size_t aSqrStep,
                                                 const Mpp64f aVal[4], const Mpp64f aValSqr[4], DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROISrc, CPtrMppStreamCtx aStreamCtx);
+                                                size_t aBufferSize, MppiSize aSizeROISrc,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = min(aSrc1, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = min(aSrcDst, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = max(aSrc1, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = max(aSrcDst, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramEven.<para/>
@@ -14140,7 +14364,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramEvenBufferSize_16bf_C4(size_t *aBufferSize, const Mpp32s aNumLevels[4],
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The aLowerLevel (inclusive) and aUpperLevel (exclusive) define the boundaries of the range,
@@ -14155,7 +14379,7 @@ extern "C"
     MPPErrorCode mppciHistogramEven_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist[4],
                                             const Mpp32f aLowerLevel[4], const Mpp32f aUpperLevel[4],
                                             Mpp32s aNumLevels[4], DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramRange.<para/>
@@ -14163,7 +14387,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramRangeBufferSize_16bf_C4(size_t *aBufferSize, const Mpp32s aNumLevels[4],
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the histogram of an image within specified ranges.
@@ -14177,7 +14401,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciHistogramRange_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist[4],
                                              ConstDevPtrMpp32f aLevels[4], Mpp32s aNumLevels[4], DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -14194,7 +14418,7 @@ extern "C"
                                                     DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                     DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                     const Mpp32f aCenter[2], MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -14213,7 +14437,7 @@ extern "C"
                                                       DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                       DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                       const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
-                                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -14223,7 +14447,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_C4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -14233,7 +14457,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_C4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                            MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -14243,7 +14467,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_C4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                               MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -14253,7 +14477,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_C4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                                DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -14262,7 +14486,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -14271,7 +14495,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                          MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -14280,7 +14504,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                             MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -14289,28 +14513,28 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                              DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aSrc2) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEps_16bf8u_C4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsC_16bf8u_C4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                                 Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsDevC_16bf8u_C4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                    ConstDevPtrMpp16bf aConst, Mpp16bf aEpsilon, DevPtrMpp8u aDst,
-                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                   size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -14318,7 +14542,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[4],
                                         MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -14326,7 +14550,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                             MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -14334,7 +14558,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[4],
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -14342,7 +14566,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -14350,7 +14574,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[4],
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -14358,49 +14582,49 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[4],
-                                         MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                             MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[4],
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[4],
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -14408,7 +14632,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[4],
                                            const Mpp16bf aValue[4], MPPCompareOp aCompare, DevPtrMpp16bf aDst,
-                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -14416,7 +14640,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[4],
                                              const Mpp16bf aValue[4], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -14424,7 +14648,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[4],
                                              const Mpp16bf aValue[4], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -14432,21 +14656,23 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[4],
                                             const Mpp16bf aValue[4], MPPCompareOp aCompare, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[4],
-                                              const Mpp16bf aValue[4], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[4], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[4],
-                                              const Mpp16bf aValue[4], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[4], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -14456,7 +14682,7 @@ extern "C"
     MPPErrorCode mppciThresholdLTGT_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThresholdLT[4],
                                             const Mpp16bf aValueLT[4], const Mpp16bf aThresholdGT[4],
                                             const Mpp16bf aValueGT[4], DevPtrMpp16bf aDst, size_t aDstStep,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -14465,7 +14691,8 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTGT_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThresholdLT[4],
                                              const Mpp16bf aValueLT[4], const Mpp16bf aThresholdGT[4],
-                                             const Mpp16bf aValueGT[4], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             const Mpp16bf aValueGT[4], MppiSize aSizeROI,
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aSrc2 fulfill aCompare, aSrc1 otherwise.<para/>
@@ -14478,7 +14705,7 @@ extern "C"
     MPPErrorCode mppciReplaceIf_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, MPPCompareOp aCompare, const Mpp16bf aValue[4],
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -14490,7 +14717,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[4],
                                          MPPCompareOp aCompare, const Mpp16bf aValue[4], DevPtrMpp16bf aDst,
-                                         size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -14502,7 +14729,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                             MPPCompareOp aCompare, const Mpp16bf aValue[4], DevPtrMpp16bf aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), aSrc1
@@ -14515,7 +14742,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                              const Mpp16bf aValue[4], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aSrc2 fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -14527,7 +14754,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIf_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, MPPCompareOp aCompare, const Mpp16bf aValue[4],
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -14539,7 +14766,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[4],
                                           MPPCompareOp aCompare, const Mpp16bf aValue[4], MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -14551,7 +14778,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                              MPPCompareOp aCompare, const Mpp16bf aValue[4], MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst fulfills aCompare (for floating point checks, e.g. isinf()), aSrcDst
@@ -14563,7 +14790,8 @@ extern "C"
     /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPCompareOp aCompare,
-                                              const Mpp16bf aValue[4], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              const Mpp16bf aValue[4], MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion.<para/>
@@ -14577,7 +14805,7 @@ extern "C"
                                   ConstDevPtrMpp32f aLevels[4], ConstDevPtrMpp32f aValues[4], size_t aLUTSize[4],
                                   ConstDevPtrMpp32s aAccelerator[4], size_t aAcceleratorSize[4],
                                   MPPInterpolationMode aInterpolationMode, MppiSize aSizeROI,
-                                  CPtrMppStreamCtx aStreamCtx);
+                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion - inplace.<para/>
@@ -14590,20 +14818,36 @@ extern "C"
     MPPErrorCode mppciLUT_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32f aLevels[4],
                                    ConstDevPtrMpp32f aValues[4], size_t aLUTSize[4], ConstDevPtrMpp32s aAccelerator[4],
                                    size_t aAcceleratorSize[4], MPPInterpolationMode aInterpolationMode,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrc1 source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the destination image aDst.
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_C4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
+                                           size_t aSrc2Step, const Mpp16bf aColorKey[4], DevPtrMpp16bf aDst,
+                                           size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrcDst source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the same source image (inplace operation).
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_C4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
+                                            size_t aSrc2Step, const Mpp16bf aColorKey[4], MppiSize aSizeROI,
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with mask. Pixels with mask == 0 remain untouched in destination image.
     /// </summary>
     MPPErrorCode mppciCopy_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                      ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -14615,7 +14859,7 @@ extern "C"
     /// <param name="aConstant">Constant value needed in case BorderType::Constant</param>
     MPPErrorCode mppciCopyBorder_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                           size_t aDstStep, const Mpp32s aLowerBorderSize[2], MPPBorderType aBorder,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy image with border.
@@ -14628,7 +14872,7 @@ extern "C"
     MPPErrorCode mppciCopyBorder_16bf_AC4Cb(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                             size_t aDstStep, const Mpp32s aLowerBorderSize[2],
                                             const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Copy subpix.
@@ -14638,467 +14882,467 @@ extern "C"
     /// <param name="aInterpolation">Interpolation mode to use</param>
     MPPErrorCode mppciCopySubpix_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                           size_t aDstStep, const Mpp32f aDelta[2], MPPInterpolationMode aInterpolation,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set all pixels with aMask != 0 to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set channel aChannel of all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetC_16bf_AC4CI(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aConst, Mpp32s aChannel,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Set channel aChannel of all pixels in current ROI to aConst
     /// </summary>
     MPPErrorCode mppciSetDevC_16bf_AC4CI(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                         Mpp32s aChannel, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         Mpp32s aChannel, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                     DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2
     /// </summary>
     MPPErrorCode mppciAdd_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                    size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                    size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                      DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 + aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                         DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAdd_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciAddDevC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                     DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2
     /// </summary>
     MPPErrorCode mppciSub_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                    size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                    size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                      DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 - aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                         DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSub_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst -= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubDevC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInv_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst - aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciSubInvDevC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                     DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2
     /// </summary>
     MPPErrorCode mppciMul_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                    size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc2 for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                    size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                      DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                         DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMul_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst *= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciMulDevC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                    size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                     DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2
     /// </summary>
     MPPErrorCode mppciDiv_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                    size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                     size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask,
-                                    size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                      DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                     MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                     MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 / aConst for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                         DevPtrMpp16bf aDst, size_t aDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aSrc2, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDiv_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                      size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                       ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst /= aConst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivDevC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc2 / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInv_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                          ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aConst / aSrcDst, for all pixels where aMask != 0
     /// </summary>
     MPPErrorCode mppciDivInvDevC_16bf_AC4IM(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_AC4I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
-                                          size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aSrcDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1^2
     /// </summary>
     MPPErrorCode mppciAddSquare_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                           size_t aSrcDstStep, ConstDevPtrMpp8u aMask, size_t aMaskStep,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
     /// </summary>
     MPPErrorCode mppciAddProduct_16bf_AC4I(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst += aSrc1 * aSrc2
@@ -15106,14 +15350,14 @@ extern "C"
     MPPErrorCode mppciAddProduct_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
                                            ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * alpha + aSrc2 * (1 - alpha)
@@ -15121,120 +15365,120 @@ extern "C"
     MPPErrorCode mppciAddWeighted_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha,
                                             ConstDevPtrMpp8u aMask, size_t aMaskStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_AC4I(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                             size_t aSrcDstStep, Mpp16bf aAlpha, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrc1 * alpha + aSrcDst * (1 - alpha)
     /// </summary>
     MPPErrorCode mppciAddWeighted_16bf_AC4IM(DevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aSrcDst,
                                              size_t aSrcDstStep, Mpp16bf aAlpha, ConstDevPtrMpp8u aMask,
-                                             size_t aMaskStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aMaskStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst)
     /// </summary>
     MPPErrorCode mppciAbs_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = abs(aSrc1 - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aSrc2)
     /// </summary>
     MPPErrorCode mppciAbsDiff_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = abs(aSrcDst - aConst)
     /// </summary>
     MPPErrorCode mppciAbsDiffDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = exp(aSrc1) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = exp(aSrcDst) (exponential function)
     /// </summary>
     MPPErrorCode mppciExp_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = log(aSrc1) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                  MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                  MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = log(aSrcDst) (natural logarithm)
     /// </summary>
     MPPErrorCode mppciLn_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = aSrc1 * aSrc1 (aSrc1^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                   MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                   MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = aSrcDst * aSrcDst (aSrcDst^2)
     /// </summary>
     MPPErrorCode mppciSqr_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = Sqrt(aSrc1) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = Sqrt(aSrcDst) (square root function)
     /// </summary>
     MPPErrorCode mppciSqrt_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MppiSize aSizeROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value.
@@ -15245,13 +15489,13 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, Mpp16bf aAlpha,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Premultiplies pixels of an image with constant aAlpha value. aAlpha is expected in value range 0..1
     /// </summary>
     MPPErrorCode mppciAlphaPremulC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, Mpp16bf aAlpha,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Composite two images using constant alpha values.
@@ -15259,23 +15503,23 @@ extern "C"
     MPPErrorCode mppciAlphaCompC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, Mpp16bf aAlpha1,
                                           Mpp16bf aAlpha2, MPPAlphaOp aAlphaOp, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_AC4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               MPPFixedFilter aFilter, MPPMaskSize aMaskSize, const Mpp16bf aConstant[3],
-                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     MPPErrorCode mppciFixedFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MPPFixedFilter aFilter, MPPMaskSize aMaskSize, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -15284,7 +15528,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                   MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                   Mpp32s aFilterCenter, const Mpp16bf aConstant[3],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined seperable filter to the image. Note that the filter parameters must sum up to 1.
@@ -15293,7 +15538,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                 Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -15302,7 +15547,7 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined column wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -15310,7 +15555,7 @@ extern "C"
     MPPErrorCode mppciColumnFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -15320,7 +15565,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                   MppiSize aDstSize, Mpp16bf aScalingValue, Mpp32s aFilterSize,
                                                   Mpp32s aFilterCenter, const Mpp16bf aConstant[3],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a column wise box-filter to the image, i.e. the pixels are summed up along columns with the specified
@@ -15330,7 +15576,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, Mpp16bf aScalingValue, Mpp32s aFilterSize,
                                                 Mpp32s aFilterCenter, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -15339,7 +15585,7 @@ extern "C"
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                             const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined row wise filter to the image. Note that the filter parameters must sum up to 1.
@@ -15347,7 +15593,7 @@ extern "C"
     MPPErrorCode mppciRowFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -15357,7 +15603,7 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                                const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies a row wise box-filter to the image, i.e. the pixels are summed up along rows with the specified
@@ -15366,7 +15612,7 @@ extern "C"
     MPPErrorCode mppciRowWindowSum_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              Mpp16bf aScalingValue, Mpp32s aFilterSize, Mpp32s aFilterCenter,
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -15374,7 +15620,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_AC4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an averaging box-filter to the image.
@@ -15382,7 +15628,7 @@ extern "C"
     MPPErrorCode mppciBoxFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -15390,7 +15636,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_AC4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the maximum pixel value.
@@ -15398,7 +15644,7 @@ extern "C"
     MPPErrorCode mppciMaxFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -15406,7 +15652,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_AC4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
-                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The filter finds in the neighborhood of each pixel defined in aFilterArea the minimum pixel value.
@@ -15414,7 +15660,7 @@ extern "C"
     MPPErrorCode mppciMinFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Median filter (only filter sizes 3x3, 5x5 and 7x7 are implemented).
@@ -15422,7 +15668,7 @@ extern "C"
     MPPErrorCode mppciMedianFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -15431,7 +15677,7 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                MppiFilterArea aFilterArea, const Mpp32f aNoise[3],
                                                const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies Wiener filter to the image.
@@ -15439,7 +15685,7 @@ extern "C"
     MPPErrorCode mppciWienerFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              MppiFilterArea aFilterArea, const Mpp32f aNoise[3], MPPBorderType aBorder,
-                                             MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -15453,7 +15699,7 @@ extern "C"
                                                              const Mpp32f aDelta[3], const Mpp16bf aValGT[3],
                                                              const Mpp16bf aValLE[3], const Mpp16bf aConstant[3],
                                                              MPPBorderType aBorder, MppiRect aSrcROI,
-                                                             CPtrMppStreamCtx aStreamCtx);
+                                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average pixel values of the pixels under a mask.
@@ -15466,7 +15712,7 @@ extern "C"
                                                            MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                            const Mpp32f aDelta[3], const Mpp16bf aValGT[3],
                                                            const Mpp16bf aValLE[3], MPPBorderType aBorder,
-                                                           MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                           MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -15478,7 +15724,7 @@ extern "C"
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          ConstDevPtrMpp32f aFilter, MppiFilterArea aFilterArea,
                                          const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies an user defined filter, the filter parameters should sum up to 1.<para/>
@@ -15489,7 +15735,7 @@ extern "C"
     MPPErrorCode mppciFilter_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                        ConstDevPtrMpp32f aFilter, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -15508,7 +15754,7 @@ extern "C"
                                                        MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                        ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                        MPPNorm aNorm, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Applies the bilateral Gauss filter to the image using pre-computed geometrical distance coefficients obtained
@@ -15527,7 +15773,7 @@ extern "C"
                                                      MppiSize aDstSize, MppiFilterArea aFilterArea,
                                                      ConstDevPtrMpp32f aPreCompGeomDistCoeff, Mpp32f aValSquareSigma,
                                                      MPPNorm aNorm, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -15543,7 +15789,7 @@ extern "C"
                                                 MppiSize aDstSize, ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize,
                                                 Mpp32s aFilterCenter, Mpp32f aWeight, Mpp32f aThreshold,
                                                 const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Smoothes the orginal images using the user defined filter aFilter (coefficients should sum up to 1) and then
@@ -15558,7 +15804,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp32f aFilter, Mpp32s aFilterSize, Mpp32s aFilterCenter,
                                               Mpp32f aWeight, Mpp32f aThreshold, MPPBorderType aBorder,
-                                              MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -15577,7 +15823,7 @@ extern "C"
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
                                              const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from source image to destination image.<para/>
@@ -15595,7 +15841,7 @@ extern "C"
     MPPErrorCode mppciWarpAffine_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -15614,7 +15860,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, const Mpp64f aAffine[2][3],
                                                  MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpAffine, the transformation aAffine defines the mapping from destination image to source image.<para/>
@@ -15633,7 +15880,8 @@ extern "C"
     MPPErrorCode mppciWarpAffineBack_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                const Mpp64f aAffine[2][3], MPPInterpolationMode aInterpolation,
-                                               MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MPPBorderType aBorder, MppiRect aSrcROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -15652,7 +15900,8 @@ extern "C"
                                                   MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                   MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                   MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                                  MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                  MPPBorderType aBorder, MppiRect aSrcROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from source image to destination
@@ -15671,7 +15920,7 @@ extern "C"
                                                 MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                 MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                 MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -15691,7 +15940,7 @@ extern "C"
                                                       MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                       MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
                                                       MPPBorderType aBorder, MppiRect aSrcROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// WarpPerspective, the transformation aPerspective defines the mapping from destination image to source
@@ -15710,7 +15959,7 @@ extern "C"
                                                     MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                     MppiSize aDstSize, const Mpp64f aPerspective[3][3],
                                                     MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                                    MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                    MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -15728,7 +15977,7 @@ extern "C"
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                          const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
                                          const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Rotate, the transformation defines the mapping from source image to destination image with a counter-clock
@@ -15745,7 +15994,7 @@ extern "C"
     MPPErrorCode mppciRotate_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, Mpp64f aAngleInDeg,
                                        const Mpp64f aShift[2], MPPInterpolationMode aInterpolation,
-                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize<para/>
@@ -15758,7 +16007,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciResize_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
                                       MPPInterpolationMode aInterpolation, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -15786,7 +16035,8 @@ extern "C"
                                                  MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                  MppiSize aDstSize, const Mpp64f aScale[2], const Mpp64f aShift[2],
                                                  MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                                 MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                                 MPPBorderType aBorder, MppiRect aSrcROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Resize.<para/>As in ResizeSqrPixel in NPP. When mapping integer pixel coordinates from integer to floating
@@ -15814,21 +16064,21 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                const Mpp64f aScale[2], const Mpp64f aShift[2],
                                                MPPInterpolationMode aInterpolation, MPPBorderType aBorder,
-                                               MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis
     /// </summary>
     MPPErrorCode mppciMirror_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst, size_t aDstStep,
-                                      MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MPPMirrorAxis aAxis, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Mirror<para/>
     /// Mirror an image along the provided axis (inplace operation)
     /// </summary>
     MPPErrorCode mppciMirror_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPMirrorAxis aAxis,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -15846,7 +16096,7 @@ extern "C"
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                           MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -15864,7 +16114,7 @@ extern "C"
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         ConstDevPtrMpp32f aCoordinateMap, size_t aCoordinateMapStep,
                                         MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -15883,7 +16133,7 @@ extern "C"
                                         ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                         ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                         MPPInterpolationMode aInterpolation, const Mpp16bf aConstant[3],
-                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Remap, for each destination image pixel, the coordinate map contains its mapped floating point coordinate in the
@@ -15902,7 +16152,7 @@ extern "C"
                                       ConstDevPtrMpp32f aCoordinateMapX, size_t aCoordinateMapXStep,
                                       ConstDevPtrMpp32f aCoordinateMapY, size_t aCoordinateMapYStep,
                                       MPPInterpolationMode aInterpolation, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -15910,7 +16160,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_AC4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
-                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                           MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the entire mask area defined by aFilterArea (maximum pixel in the neighborhood).
@@ -15918,7 +16168,7 @@ extern "C"
     MPPErrorCode mppciDilation_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -15926,7 +16176,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_AC4RCb(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                           DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                           MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                          MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the entire mask area defined by aFilterArea (minimum pixel in the neighborhood).
@@ -15934,7 +16184,7 @@ extern "C"
     MPPErrorCode mppciErosion_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                         MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -15944,7 +16194,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                               const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs erosion on the mask area defined by aFilterArea and where aMask is != 0 (minimum pixel in the
@@ -15953,7 +16203,7 @@ extern "C"
     MPPErrorCode mppciErosionMask_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -15963,7 +16213,7 @@ extern "C"
                                               DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                               ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
                                               const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-erosion on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -15972,7 +16222,7 @@ extern "C"
     MPPErrorCode mppciErosionGray_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                             DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                             ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                            MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -15982,7 +16232,7 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                                const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs dilation on the mask area defined by aFilterArea and where aMask is != 0 (maximum pixel in the
@@ -15991,7 +16241,7 @@ extern "C"
     MPPErrorCode mppciDilationMask_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea, MPPBorderType aBorder,
-                                             MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -16001,7 +16251,7 @@ extern "C"
                                                DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                                ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
                                                const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Performs gray-scale-dilation on the mask area defined by aFilterArea. The value of aMask is added to the pixel
@@ -16010,7 +16260,7 @@ extern "C"
     MPPErrorCode mppciDilationGray_16bf_AC4R(ConstDevPtrMpp16bf aSrc1BasePtr, size_t aSrc1Step, MppiSize aSrcFullSize,
                                              DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                              ConstDevPtrMpp16bf aMask, MppiFilterArea aFilterArea,
-                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                             MPPBorderType aBorder, MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -16020,7 +16270,7 @@ extern "C"
                                        DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                        MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                       MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies erosion then dilation.<para/>
@@ -16030,7 +16280,7 @@ extern "C"
                                      DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                      DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                      MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                     CPtrMppStreamCtx aStreamCtx);
+                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -16040,7 +16290,7 @@ extern "C"
                                         DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                         DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                         MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                        MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// First applies dilation then erosion.<para/>
@@ -16050,7 +16300,7 @@ extern "C"
                                       DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                       DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                       MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -16060,7 +16310,7 @@ extern "C"
                                          DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                          MppiFilterArea aFilterArea, const Mpp16bf aConstant[3], MPPBorderType aBorder,
-                                         MppiRect aSrcROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiRect aSrcROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the original image minus the result from morphological opening.<para/>
@@ -16070,7 +16320,7 @@ extern "C"
                                        DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                        DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                        MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -16081,7 +16331,7 @@ extern "C"
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize,
                                            ConstDevPtrMpp8u aMask, MppiFilterArea aFilterArea,
                                            const Mpp16bf aConstant[3], MPPBorderType aBorder, MppiRect aSrcROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The result is the result from morphological closing minus the original image.<para/>
@@ -16091,7 +16341,7 @@ extern "C"
                                          DevPtrMpp16bf aTempBasePtr, size_t aTempStep, MppiSize aTempFullSize,
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                          MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -16101,7 +16351,7 @@ extern "C"
                                                      MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                                      MppiFilterArea aFilterArea, const Mpp16bf aConstant[3],
                                                      MPPBorderType aBorder, MppiRect aSrcROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Dilation minus erosion.
@@ -16110,21 +16360,21 @@ extern "C"
                                                    MppiSize aSrcFullSize, DevPtrMpp16bf aDst, size_t aDstStep,
                                                    MppiSize aDstSize, ConstDevPtrMpp8u aMask,
                                                    MppiFilterArea aFilterArea, MPPBorderType aBorder, MppiRect aSrcROI,
-                                                   CPtrMppStreamCtx aStreamCtx);
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageErrorBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx);
+                                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images.<para/>
@@ -16141,7 +16391,7 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average error between two images where only pixels with mask != 0 are used.<para/>
@@ -16159,21 +16409,21 @@ extern "C"
     MPPErrorCode mppciAverageError_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                 ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for AverageRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciAverageRelativeErrorBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx);
+                                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images.<para/>
@@ -16191,7 +16441,7 @@ extern "C"
     MPPErrorCode mppciAverageRelativeError_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the average relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -16211,21 +16461,21 @@ extern "C"
                                                         ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                         DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask,
                                                         size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProduct.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciDotProductBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for DotProductMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciDotProductBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images.<para/>
@@ -16241,7 +16491,7 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the dot product of two images where only pixels with mask != 0 are used.<para/>
@@ -16259,19 +16509,19 @@ extern "C"
     MPPErrorCode mppciDotProduct_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSE.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSEMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSEBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSEBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images.<para/>
@@ -16286,7 +16536,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMSE_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                       size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer,
-                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Mean Square Error of two images where only pixels with mask != 0 are used.<para/>
@@ -16303,21 +16553,21 @@ extern "C"
     MPPErrorCode mppciMSE_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                        ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumErrorBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx);
+                                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images.<para/>
@@ -16335,7 +16585,7 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum error between two images where only pixels with mask != 0 are used.<para/>
@@ -16354,21 +16604,21 @@ extern "C"
     MPPErrorCode mppciMaximumError_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                 size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                 ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                                size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeError.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                              CPtrMppStreamCtx aStreamCtx);
+                                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaximumRelativeErrorMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMaximumRelativeErrorBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                               CPtrMppStreamCtx aStreamCtx);
+                                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images.<para/>
@@ -16386,7 +16636,7 @@ extern "C"
     MPPErrorCode mppciMaximumRelativeError_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                        ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                        DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the maximum relative error between two images where only pixels with mask != 0 are used.<para/>
@@ -16406,21 +16656,21 @@ extern "C"
                                                         ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                         DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask,
                                                         size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffInfBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm of difference of pixels between two images.<para/>
@@ -16436,7 +16686,7 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -16454,21 +16704,21 @@ extern "C"
     MPPErrorCode mppciNormDiffInf_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                                ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL1BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL1BufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm of difference of pixels between two images.<para/>
@@ -16483,7 +16733,7 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -16500,21 +16750,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL1_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL2BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormDiffL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormDiffL2BufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm of difference of pixels between two images.<para/>
@@ -16530,7 +16780,7 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -16548,21 +16798,21 @@ extern "C"
     MPPErrorCode mppciNormDiffL2_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormRelInfBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormRelInfBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative infinity norm of difference of pixels between two images.<para/>
@@ -16578,7 +16828,7 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative infinity norm of difference of pixels between two images where only pixels with mask != 0
@@ -16595,20 +16845,21 @@ extern "C"
     MPPErrorCode mppciNormRelInf_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                               size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                               ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL1BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL1BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormRelL1BufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L1 norm of difference of pixels between two images.<para/>
@@ -16624,7 +16875,7 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L1 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -16642,20 +16893,21 @@ extern "C"
     MPPErrorCode mppciNormRelL1_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormRelL2BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormRelL2BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormRelL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciNormRelL2BufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                    CPtrMppStreamCtx aStreamCtx);
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L2 norm of difference of pixels between two images.<para/>
@@ -16671,7 +16923,7 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                             size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                             DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the relative L2 norm of difference of pixels between two images where only pixels with mask != 0 are
@@ -16689,13 +16941,13 @@ extern "C"
     MPPErrorCode mppciNormRelL2_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                              size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar,
                                              ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for PSNR.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciPSNRBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciPSNRBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the PSNR of two images. <para/> For multi-channel images, the
@@ -16711,19 +16963,21 @@ extern "C"
     MPPErrorCode mppciPSNR_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp32f aDstScalar, Mpp32f aValueRange,
                                        DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInf.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormInfMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormInfBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormInfBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm.<para/>
@@ -16737,7 +16991,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormInf_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the infinity norm where only pixels with mask != 0 are
@@ -16754,19 +17008,21 @@ extern "C"
     MPPErrorCode mppciNormInf_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                            DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                            DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL1Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL1BufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL1BufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm.<para/>
@@ -16780,7 +17036,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL1_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L1 norm where only pixels with mask != 0 are
@@ -16797,19 +17053,21 @@ extern "C"
     MPPErrorCode mppciNormL1_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                           DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for NormL2Masked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciNormL2BufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciNormL2BufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm.<para/>
@@ -16823,7 +17081,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciNormL2_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                          DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the L2 norm where only pixels with mask != 0 are
@@ -16840,21 +17098,23 @@ extern "C"
     MPPErrorCode mppciNormL2_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                           DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                           DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Sum.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SumMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     /// <param name="aDst">Used as output type indicator</param>
-    MPPErrorCode mppciSumBufferSize_16bf32f_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSumBufferSize_16bf32f_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values.<para/>For multi-channel images, the
@@ -16866,7 +17126,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciSum_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                       DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                      MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the sum of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
@@ -16880,19 +17140,19 @@ extern "C"
     MPPErrorCode mppciSum_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                        DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                        DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Mean.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values.<para/>For multi-channel images, the
@@ -16904,7 +17164,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMean_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                        DevPtrMpp32f aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean of pixel values where only pixels with mask != 0 are used.<para/>For multi-channel images, the
@@ -16918,19 +17178,21 @@ extern "C"
     MPPErrorCode mppciMean_16bf32f_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aDst,
                                         DevPtrMpp32f aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                         DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStd.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MeanStdMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMeanStdBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMeanStdBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values.<para/>For multi-channel images, the
@@ -16946,7 +17208,7 @@ extern "C"
     MPPErrorCode mppciMeanStd_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean,
                                        DevPtrMpp32f aStd, DevPtrMpp32f aMeanScalar, DevPtrMpp32f aStdScalar,
                                        DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the mean and standard deviation of pixel values where only pixels with mask != 0 are used.<para/>For
@@ -16964,21 +17226,21 @@ extern "C"
     MPPErrorCode mppciMeanStd_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32f aMean,
                                         DevPtrMpp32f aStd, DevPtrMpp32f aMeanScalar, DevPtrMpp32f aStdScalar,
                                         ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                        size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRange.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for CountInRangeMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciCountInRangeBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                       CPtrMppStreamCtx aStreamCtx);
+                                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range.<para/>For multi-channel images, the
@@ -16993,7 +17255,7 @@ extern "C"
     MPPErrorCode mppciCountInRange_16bf64u_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aLowerLimit[3],
                                                const Mpp16bf aUpperLimit[3], DevPtrMpp64u aDst, DevPtrMpp64u aDstScalar,
                                                DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                               CPtrMppStreamCtx aStreamCtx);
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Counts the pixels in a given value range where only pixels with mask != 0 are used.<para/>For multi-channel
@@ -17010,14 +17272,14 @@ extern "C"
                                                 const Mpp16bf aLowerLimit[3], const Mpp16bf aUpperLimit[3],
                                                 DevPtrMpp64u aDst, DevPtrMpp64u aDstScalar, ConstDevPtrMpp8u aMask,
                                                 size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the image quality index of two images. This implementation is identical to the one in NPP computing a
@@ -17029,14 +17291,14 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciQualityIndex_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer,
-                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for QualityIndexWindow.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciQualityIndexWindowBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                            CPtrMppStreamCtx aStreamCtx);
+                                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the QualityIndex of two images. This function is implemented using a sliding window approach as is done
@@ -17049,13 +17311,13 @@ extern "C"
     MPPErrorCode mppciQualityIndexWindow_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                      ConstDevPtrMpp16bf aSrc2, size_t aSrc2Step, DevPtrMpp32f aDst,
                                                      DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for SSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciSSIMBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciSSIMBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the SSIM of two images.
@@ -17073,13 +17335,14 @@ extern "C"
     MPPErrorCode mppciSSIM_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                        size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                        Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                       CPtrMppStreamCtx aStreamCtx);
+                                       CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MSSSIM.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMSSSIMBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMSSSIMBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the Multi-Scale-SSIM of two images.
@@ -17097,19 +17360,19 @@ extern "C"
     MPPErrorCode mppciMSSSIM_16bf32f_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, DevPtrMpp32f aDst, DevPtrMpp8u aBuffer, size_t aBufferSize,
                                          Mpp32f aDynamicRange, Mpp32f aK1, Mpp32f aK2, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Min.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value.
@@ -17122,7 +17385,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMin_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    DevPtrMpp16bf aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value where only pixels with mask != 0 are used.<para/> For
@@ -17137,19 +17400,19 @@ extern "C"
     MPPErrorCode mppciMin_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                     DevPtrMpp16bf aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                     DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for Max.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value.
@@ -17162,7 +17425,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciMax_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                    DevPtrMpp16bf aDstScalar, DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value where only pixels with mask != 0 are used.<para/> For
@@ -17177,19 +17440,21 @@ extern "C"
     MPPErrorCode mppciMax_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                     DevPtrMpp16bf aDstScalar, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                     DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                    CPtrMppStreamCtx aStreamCtx);
+                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMax.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinMaxBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinMaxBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value.<para/>
@@ -17205,7 +17470,7 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                       DevPtrMpp16bf aDstMax, DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                       DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                      CPtrMppStreamCtx aStreamCtx);
+                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value where only pixels with mask != 0 are used.<para/>
@@ -17222,19 +17487,21 @@ extern "C"
     MPPErrorCode mppciMinMax_16bf_AC4M(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                        DevPtrMpp16bf aDstMax, DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                        ConstDevPtrMpp8u aMask, size_t aMaskStep, DevPtrMpp8u aBuffer,
-                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                       size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMinIndexBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMinIndexBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -17256,7 +17523,7 @@ extern "C"
     MPPErrorCode mppciMinIndex_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMin,
                                         DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMinScalar,
                                         DevPtrMpp32s aDstScalarIdx, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -17281,19 +17548,21 @@ extern "C"
                                          DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMinScalar,
                                          DevPtrMpp32s aDstScalarIdx, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
+                                                  CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
-    MPPErrorCode mppciMaxIndexBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+    MPPErrorCode mppciMaxIndexBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
+                                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index. For multiple occurences of the same value the index with the lowest
@@ -17315,7 +17584,7 @@ extern "C"
     MPPErrorCode mppciMaxIndex_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDstMax,
                                         DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMaxScalar,
                                         DevPtrMpp32s aDstScalarIdx, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Maximum pixel value and its pixel index where only pixels with mask != 0 are used. For multiple occurences of
@@ -17340,21 +17609,21 @@ extern "C"
                                          DevPtrMpp32s aDstIndexX, DevPtrMpp32s aDstIndexY, DevPtrMpp16bf aDstMaxScalar,
                                          DevPtrMpp32s aDstScalarIdx, ConstDevPtrMpp8u aMask, size_t aMaskStep,
                                          DevPtrMpp8u aBuffer, size_t aBufferSize, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndex.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_AC4(size_t *aBufferSize, MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for MinMaxIndexMasked.<para/>
     /// Note: the buffer size differs for varying ROI sizes.
     /// </summary>
     MPPErrorCode mppciMinMaxIndexBufferSize_16bf_AC4M(size_t *aBufferSize, MppiSize aSizeROI,
-                                                      CPtrMppStreamCtx aStreamCtx);
+                                                      CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices. For multiple occurences of the same value the index
@@ -17380,7 +17649,7 @@ extern "C"
                                            DevPtrMpp16bf aDstMax, DevPtrMppiIndexMinMax aDstIdx,
                                            DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                            DevPtrMppiIndexMinMaxChannel aDstScalarIdx, DevPtrMpp8u aBuffer,
-                                           size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Minimum and maximum pixel value and their pixel indices where only pixels with mask != 0 are used. For multiple
@@ -17408,33 +17677,33 @@ extern "C"
                                             DevPtrMpp16bf aDstMinScalar, DevPtrMpp16bf aDstMaxScalar,
                                             DevPtrMppiIndexMinMaxChannel aDstScalarIdx, ConstDevPtrMpp8u aMask,
                                             size_t aMaskStep, DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = min(aSrc1, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = min(aSrcDst, aSrc2) (minimum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMinEvery_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                         size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst = max(aSrc1, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                         size_t aSrc2Step, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                        CPtrMppStreamCtx aStreamCtx);
+                                        CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aSrcDst = max(aSrcDst, aSrc2) (maximum per pixel, per channel)
     /// </summary>
     MPPErrorCode mppciMaxEvery_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
-                                         size_t aSrc2Step, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         size_t aSrc2Step, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramEven.<para/>
@@ -17442,7 +17711,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramEvenBufferSize_16bf_AC4(size_t *aBufferSize, const Mpp32s aNumLevels[3],
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// The aLowerLevel (inclusive) and aUpperLevel (exclusive) define the boundaries of the range,
@@ -17457,7 +17726,7 @@ extern "C"
     MPPErrorCode mppciHistogramEven_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist[3],
                                              const Mpp32f aLowerLevel[3], const Mpp32f aUpperLevel[3],
                                              Mpp32s aNumLevels[3], DevPtrMpp8u aBuffer, size_t aBufferSize,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Returns the required temporary buffer size for HistogramRange.<para/>
@@ -17465,7 +17734,7 @@ extern "C"
     /// </summary>
     /// <param name="aNumLevels">aNumLevels - 1 = number of histogram bins, per channel</param>
     MPPErrorCode mppciHistogramRangeBufferSize_16bf_AC4(size_t *aBufferSize, const Mpp32s aNumLevels[3],
-                                                        MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                        MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Computes the histogram of an image within specified ranges.
@@ -17479,7 +17748,7 @@ extern "C"
     /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciHistogramRange_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp32s aHist[3],
                                               ConstDevPtrMpp32f aLevels[3], Mpp32s aNumLevels[3], DevPtrMpp8u aBuffer,
-                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              size_t aBufferSize, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -17496,7 +17765,7 @@ extern "C"
                                                      DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                      DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                      const Mpp32f aCenter[2], MppiSize aSizeROI,
-                                                     CPtrMppStreamCtx aStreamCtx);
+                                                     CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Radial profile. Circular around provided center point, the center does not have to be on the image.
@@ -17515,7 +17784,7 @@ extern "C"
                                                        DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                        DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
                                                        const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
-                                                       MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -17525,7 +17794,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_AC4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                            size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                           MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                           MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -17535,7 +17804,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_AC4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                             MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                            CPtrMppStreamCtx aStreamCtx);
+                                            CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -17545,7 +17814,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_AC4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                                MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -17555,7 +17824,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_AC4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                                 DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aSrc2 fulfill aCompare, 0 otherwise.<para/>
@@ -17564,7 +17833,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompare_16bf8u_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                         MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                         MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -17573,7 +17842,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareC_16bf8u_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                           MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 and aConst fulfill aCompare, 0 otherwise.<para/>
@@ -17582,7 +17851,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareDevC_16bf8u_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                              MPPCompareOp aCompare, DevPtrMpp8u aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), 0
@@ -17591,28 +17860,29 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciCompareFloat_16bf8u_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                               DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aSrc2) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEps_16bf8u_AC4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                                 size_t aSrc2Step, Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep,
-                                                MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsC_16bf8u_AC4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                                  Mpp16bf aEpsilon, DevPtrMpp8u aDst, size_t aDstStep, MppiSize aSizeROI,
-                                                 CPtrMppStreamCtx aStreamCtx);
+                                                 CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to 255 if all color channels for abs(aSrc1 - aConst) are &lt;= aEpsilon, 0 otherwise.
     /// </summary>
     MPPErrorCode mppciCompareEqEpsDevC_16bf8u_AC4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                     ConstDevPtrMpp16bf aConst, Mpp16bf aEpsilon, DevPtrMpp8u aDst,
-                                                    size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                                    size_t aDstStep, MppiSize aSizeROI,
+                                                    CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -17620,7 +17890,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                          MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -17628,7 +17898,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aThreshold,
                                              MPPCompareOp aCompare, DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -17636,7 +17906,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -17644,7 +17914,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                ConstDevPtrMpp16bf aThreshold, DevPtrMpp16bf aDst, size_t aDstStep,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -17652,7 +17922,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                            DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -17660,28 +17930,29 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step,
                                                ConstDevPtrMpp16bf aThreshold, DevPtrMpp16bf aDst, size_t aDstStep,
-                                               MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThreshold_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                          MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aThreshold,
-                                              MPPCompareOp aCompare, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              MPPCompareOp aCompare, MppiSize aSizeROI,
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLT_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -17689,14 +17960,14 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
                                                 ConstDevPtrMpp16bf aThreshold, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aThreshold, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGT_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                            MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -17704,7 +17975,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep,
                                                 ConstDevPtrMpp16bf aThreshold, MppiSize aSizeROI,
-                                                CPtrMppStreamCtx aStreamCtx);
+                                                CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -17712,7 +17983,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                             const Mpp16bf aValue[3], MPPCompareOp aCompare, DevPtrMpp16bf aDst,
-                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
@@ -17720,7 +17991,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                               const Mpp16bf aValue[3], DevPtrMpp16bf aDst, size_t aDstStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
@@ -17728,7 +17999,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThreshold[3],
                                               const Mpp16bf aValue[3], DevPtrMpp16bf aDst, size_t aDstStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation aCompare the predicate (sourcePixel aCompare nThreshold) is true, the pixel is set
@@ -17736,21 +18007,23 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciThresholdVal_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
                                              const Mpp16bf aValue[3], MPPCompareOp aCompare, MppiSize aSizeROI,
-                                             CPtrMppStreamCtx aStreamCtx);
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation less than the predicate (sourcePixel &lt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdLTVal_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                               const Mpp16bf aValue[3], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               const Mpp16bf aValue[3], MppiSize aSizeROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation greater than the predicate (sourcePixel &gt; nThreshold) is true, the pixel is set
     /// to aValue, otherwise it is set to sourcePixel. (Inplace operation)
     /// </summary>
     MPPErrorCode mppciThresholdGTVal_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThreshold[3],
-                                               const Mpp16bf aValue[3], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               const Mpp16bf aValue[3], MppiSize aSizeROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -17760,7 +18033,7 @@ extern "C"
     MPPErrorCode mppciThresholdLTGT_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aThresholdLT[3],
                                              const Mpp16bf aValueLT[3], const Mpp16bf aThresholdGT[3],
                                              const Mpp16bf aValueGT[3], DevPtrMpp16bf aDst, size_t aDstStep,
-                                             MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// If for a comparison operation sourcePixel is less than aThresholdLT is true, the pixel is set
@@ -17770,7 +18043,7 @@ extern "C"
     MPPErrorCode mppciThresholdLTGT_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aThresholdLT[3],
                                               const Mpp16bf aValueLT[3], const Mpp16bf aThresholdGT[3],
                                               const Mpp16bf aValueGT[3], MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aSrc2 fulfill aCompare, aSrc1 otherwise.<para/>
@@ -17783,7 +18056,7 @@ extern "C"
     MPPErrorCode mppciReplaceIf_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
                                          size_t aSrc2Step, MPPCompareOp aCompare, const Mpp16bf aValue[3],
                                          DevPtrMpp16bf aDst, size_t aDstStep, MppiSize aSizeROI,
-                                         CPtrMppStreamCtx aStreamCtx);
+                                         CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -17795,7 +18068,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, const Mpp16bf aConst[3],
                                           MPPCompareOp aCompare, const Mpp16bf aValue[3], DevPtrMpp16bf aDst,
-                                          size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 and aConst fulfill aCompare, aSrc1 otherwise.<para/>
@@ -17807,7 +18080,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aConst,
                                              MPPCompareOp aCompare, const Mpp16bf aValue[3], DevPtrMpp16bf aDst,
-                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                             size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// aDst pixel is set to aValue if aSrc1 fulfills aCompare (for floating point checks, e.g. isinf()), aSrc1
@@ -17820,7 +18093,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, MPPCompareOp aCompare,
                                               const Mpp16bf aValue[3], DevPtrMpp16bf aDst, size_t aDstStep,
-                                              MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                              MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aSrc2 fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -17832,7 +18105,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIf_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
                                           size_t aSrc2Step, MPPCompareOp aCompare, const Mpp16bf aValue[3],
-                                          MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                          MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -17844,7 +18117,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, const Mpp16bf aConst[3],
                                            MPPCompareOp aCompare, const Mpp16bf aValue[3], MppiSize aSizeROI,
-                                           CPtrMppStreamCtx aStreamCtx);
+                                           CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst and aConst fulfill aCompare, aSrcDst otherwise (inplace operation).<para/>
@@ -17856,7 +18129,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciReplaceIfDevC_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aConst,
                                               MPPCompareOp aCompare, const Mpp16bf aValue[3], MppiSize aSizeROI,
-                                              CPtrMppStreamCtx aStreamCtx);
+                                              CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// A pixel is set to aValue if aSrcDst fulfills aCompare (for floating point checks, e.g. isinf()), aSrcDst
@@ -17868,7 +18141,8 @@ extern "C"
     /// the CompareOp::PerChannel flag, each channel is compared and replaced seperately.
     /// </summary>
     MPPErrorCode mppciReplaceIfFloat_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, MPPCompareOp aCompare,
-                                               const Mpp16bf aValue[3], MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                               const Mpp16bf aValue[3], MppiSize aSizeROI,
+                                               CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// RGB Color to Grayscale Bayer Color Filter Array conversion.<para/>
@@ -17877,7 +18151,7 @@ extern "C"
     /// </summary>
     MPPErrorCode mppciRGBToCFA_16bf_AC4C1(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, DevPtrMpp16bf aDst,
                                           size_t aDstStep, MPPBayerGridPosition aBayerGrid, MppiSize aSizeROI,
-                                          CPtrMppStreamCtx aStreamCtx);
+                                          CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion.<para/>
@@ -17891,7 +18165,7 @@ extern "C"
                                    ConstDevPtrMpp32f aLevels[3], ConstDevPtrMpp32f aValues[3], size_t aLUTSize[3],
                                    ConstDevPtrMpp32s aAccelerator[3], size_t aAcceleratorSize[3],
                                    MPPInterpolationMode aInterpolationMode, MppiSize aSizeROI,
-                                   CPtrMppStreamCtx aStreamCtx);
+                                   CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
     /// Look-up-table color conversion - inplace.<para/>
@@ -17904,7 +18178,23 @@ extern "C"
     MPPErrorCode mppciLUT_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp32f aLevels[3],
                                     ConstDevPtrMpp32f aValues[3], size_t aLUTSize[3], ConstDevPtrMpp32s aAccelerator[3],
                                     size_t aAcceleratorSize[3], MPPInterpolationMode aInterpolationMode,
-                                    MppiSize aSizeROI, CPtrMppStreamCtx aStreamCtx);
+                                    MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrc1 source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the destination image aDst.
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_AC4(ConstDevPtrMpp16bf aSrc1, size_t aSrc1Step, ConstDevPtrMpp16bf aSrc2,
+                                            size_t aSrc2Step, const Mpp16bf aColorKey[3], DevPtrMpp16bf aDst,
+                                            size_t aDstStep, MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
+
+    /// <summary>
+    /// All pixels of the aSrcDst source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the same source image (inplace operation).
+    /// </summary>
+    MPPErrorCode mppciCompColorKey_16bf_AC4I(DevPtrMpp16bf aSrcDst, size_t aSrcDstStep, ConstDevPtrMpp16bf aSrc2,
+                                             size_t aSrc2Step, const Mpp16bf aColorKey[3], MppiSize aSizeROI,
+                                             CPtrMppCudaStreamCtx aStreamCtx);
 
 #ifdef __cplusplus
 }

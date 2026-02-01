@@ -65,7 +65,7 @@ TEST_CASE("8uC4A", "[NPP.ColorConversion.GammaFwd]")
     CHECK(npp_res1A.IsSimilar(cpu_dst1, 1));
 }
 
-TEST_CASE("8uC3", "[NPP.ColorConversion.GammaFwd]")
+TEST_CASE("8uC3", "[NPP.ColorConversion.GammaInv]")
 {
     const uint seed         = Catch::getSeed();
     NppStreamContext nppCtx = nv::Image8uC1::GetStreamContext();
@@ -87,7 +87,7 @@ TEST_CASE("8uC3", "[NPP.ColorConversion.GammaFwd]")
     CHECK(npp_res1.IsSimilar(cpu_dst1, 1));
 }
 
-TEST_CASE("8uC4A", "[NPP.ColorConversion.GammaFwd]")
+TEST_CASE("8uC4A", "[NPP.ColorConversion.GammaInv]")
 {
     const uint seed         = Catch::getSeed();
     NppStreamContext nppCtx = nv::Image8uC1::GetStreamContext();
