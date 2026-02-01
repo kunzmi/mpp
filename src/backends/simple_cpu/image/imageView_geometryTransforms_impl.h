@@ -2422,4 +2422,49 @@ ImageView<T> &ImageView<T>::Copy(ImageView<T> &aDst, const Pixel32fC2 &aDelta, I
     return aDst;
 }
 #pragma endregion
+
+#pragma region FFTShift
+template <PixelType T> ImageView<T> &ImageView<T>::FFTShift(ImageView<T> &aDst) const
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    constexpr RoundingMode roundingMode = RoundingMode::None;
+    using CoordT                        = int;
+
+    const TransformerFftShift<CoordT> fftshift(SizeRoi());
+
+    using BCType = BorderControl<T, BorderType::None>;
+    const BCType bc(PointerRoi(), Pitch(), SizeRoi(), {0});
+
+    using InterpolatorT = Interpolator<T, BCType, CoordT, InterpolationMode::Undefined>;
+    const InterpolatorT interpol(bc);
+    const TransformerFunctor<1, T, CoordT, false, InterpolatorT, TransformerFftShift<CoordT>, roundingMode> functor(
+        interpol, fftshift, SizeRoi());
+
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+template <PixelType T> ImageView<T> &ImageView<T>::IFFTShift(ImageView<T> &aDst) const
+{
+    checkSameSize(ROI(), aDst.ROI());
+
+    constexpr RoundingMode roundingMode = RoundingMode::None;
+    using CoordT                        = int;
+
+    const TransformerIFftShift<CoordT> fftshift(SizeRoi());
+
+    using BCType = BorderControl<T, BorderType::None>;
+    const BCType bc(PointerRoi(), Pitch(), SizeRoi(), {0});
+
+    using InterpolatorT = Interpolator<T, BCType, CoordT, InterpolationMode::Undefined>;
+    const InterpolatorT interpol(bc);
+    const TransformerFunctor<1, T, CoordT, false, InterpolatorT, TransformerIFftShift<CoordT>, roundingMode> functor(
+        interpol, fftshift, SizeRoi());
+
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+#pragma endregion
 } // namespace mpp::image::cpuSimple

@@ -8,7 +8,7 @@
 namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT = default_compute_type_for_t<SrcT>, typename DstT>
-void InvokeMagnitudeSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
-                        const mpp::cuda::StreamCtx &aStreamCtx);
+void InvokeMagnitudeSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSizeSrc,
+                        const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda

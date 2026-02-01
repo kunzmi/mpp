@@ -307,42 +307,42 @@ extern "C"
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciGetMatrixRGBtoYCC(float aTwistMatrix[3][3])
+    MPPErrorCode DLLEXPORT mppciGetMatrixRGBtoYCC_8u(float aTwistMatrix[3][4])
     {
         try
         {
             checkNullptr(aTwistMatrix);
-            std::copy(mpp::image::color::RGBtoYCC.Data(), mpp::image::color::RGBtoYCC.Data() + 9, &aTwistMatrix[0][0]);
+            std::copy(mpp::image::color::RGBtoYCC.Data(), mpp::image::color::RGBtoYCC.Data() + 12, &aTwistMatrix[0][0]);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciGetMatrixBGRtoYCC(float aTwistMatrix[3][3])
+    MPPErrorCode DLLEXPORT mppciGetMatrixBGRtoYCC_8u(float aTwistMatrix[3][4])
     {
         try
         {
             checkNullptr(aTwistMatrix);
-            std::copy(mpp::image::color::BGRtoYCC.Data(), mpp::image::color::BGRtoYCC.Data() + 9, &aTwistMatrix[0][0]);
+            std::copy(mpp::image::color::BGRtoYCC.Data(), mpp::image::color::BGRtoYCC.Data() + 12, &aTwistMatrix[0][0]);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciGetMatrixYCCtoRGB(float aTwistMatrix[3][3])
+    MPPErrorCode DLLEXPORT mppciGetMatrixYCCtoRGB_8u(float aTwistMatrix[3][4])
     {
         try
         {
             checkNullptr(aTwistMatrix);
-            std::copy(mpp::image::color::YCCtoRGB.Data(), mpp::image::color::YCCtoRGB.Data() + 9, &aTwistMatrix[0][0]);
+            std::copy(mpp::image::color::YCCtoRGB.Data(), mpp::image::color::YCCtoRGB.Data() + 12, &aTwistMatrix[0][0]);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }
 
-    MPPErrorCode DLLEXPORT mppciGetMatrixYCCtoBGR(float aTwistMatrix[3][3])
+    MPPErrorCode DLLEXPORT mppciGetMatrixYCCtoBGR_8u(float aTwistMatrix[3][4])
     {
         try
         {
             checkNullptr(aTwistMatrix);
-            std::copy(mpp::image::color::YCCtoBGR.Data(), mpp::image::color::YCCtoBGR.Data() + 9, &aTwistMatrix[0][0]);
+            std::copy(mpp::image::color::YCCtoBGR.Data(), mpp::image::color::YCCtoBGR.Data() + 12, &aTwistMatrix[0][0]);
         }
         CATCH_AND_RETURN_ERRORCODE;
     }

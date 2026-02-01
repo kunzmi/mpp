@@ -401,6 +401,8 @@ template <RealVector SrcT, Norm norm> struct ColorGradientToGray
         {
             aDst += temp.w;
         }
+
+        aDst /= static_cast<remove_vector_t<SrcT>>(vector_active_size_v<SrcT>);
     }
     DEVICE_CODE void operator()(const SrcT &aSrc1, Vector1<remove_vector_t<SrcT>> &aDst) const
         requires(norm == Norm::L2)
@@ -420,6 +422,7 @@ template <RealVector SrcT, Norm norm> struct ColorGradientToGray
         {
             aDst += temp.w;
         }
+        aDst /= static_cast<remove_vector_t<SrcT>>(vector_active_size_v<SrcT>);
         aDst.Sqrt();
     }
 };
@@ -593,6 +596,10 @@ template <RealVector T, bool doNormalize> struct LUVtoRGB
         c.Max({0.0f});
         c.Min({1.0f});
 
+        if constexpr (doNormalize)
+        {
+            c *= NormFactor;
+        }
         return c;
     }
 };
@@ -1033,8 +1040,8 @@ template <RealVector T, bool doNormalize> struct LabtoRGB
         // First convert Lab back to original range then to CIE XYZ
 
         TScalar nP = (c.x + 16.0f) * 0.008621f;                        // / 116.0f
-        TScalar x  = nP * nP * nP;                                     // powf(nP, 3.0f);
-        TScalar y  = CIE_LAB_D65_xn * powf((nP + c.y * 0.002f), 3.0f); // / 500.0f
+        TScalar y  = nP * nP * nP;                                     // powf(nP, 3.0f);
+        TScalar x  = CIE_LAB_D65_xn * powf((nP + c.y * 0.002f), 3.0f); // / 500.0f
         TScalar z  = CIE_LAB_D65_zn * powf((nP - c.z * 0.005f), 3.0f); // / 200.0f
 
         T rgb = color::XYZtoRGB * T(x, y, z);
@@ -1897,6 +1904,24 @@ template <AnyVector T, AnyVector LutType> struct LUTTrilinear
     DEVICE_CODE void operator()(T &aSrcDst) const
     {
         (*this)(aSrcDst, aSrcDst);
+    }
+};
+
+template <AnyVector T> struct CompColorKey
+{
+    T Value;
+
+    CompColorKey(const T &aValue) : Value(aValue)
+    {
+    }
+
+    DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
+    {
+        aDst = aSrc1 == Value ? aSrc2 : aSrc1;
+    }
+    DEVICE_CODE void operator()(const T &aSrc1, T &aSrcDst) const
+    {
+        aSrcDst = aSrcDst == Value ? aSrc1 : aSrcDst;
     }
 };
 } // namespace mpp::image

@@ -347,6 +347,7 @@ add_library(backends.cuda.image.arithmetic32fc OBJECT
 	32fc/imag.cu
 	32fc/ln.cu	
 	32fc/magnitude.cu	
+	32fc/magnitudeLog.cu
 	32fc/magnitudeSqr.cu	
 	32fc/mul.cu
 	32fc/mulMasked.cu

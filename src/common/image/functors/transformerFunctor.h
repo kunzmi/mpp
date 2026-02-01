@@ -23,7 +23,8 @@ namespace mpp::image
 /// Computes an output pixel from src image with geometric coordinate transformation
 /// </summary>
 template <size_t tupelSize, typename DstT, typename CoordTransformerT, bool checkIfInsideROI, typename InterpolatorT,
-          typename TransformerT, RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero>
+          typename TransformerT, RoundingMode roundingMode = RoundingMode::NearestTiesAwayFromZero,
+          typename OperatatorT = voidType>
 struct TransformerFunctor
     : public ImageFunctor<InterpolatorT::border_control_type::border_type == mpp::BorderType::SmoothEdge>
 {
@@ -31,6 +32,7 @@ struct TransformerFunctor
     TransformerT Transformer;
     Vector2<CoordTransformerT> SourceRoi;
 
+    [[no_unique_address]] OperatatorT op;
     [[no_unique_address]] RoundFunctor<roundingMode, typename InterpolatorT::pixel_type> round;
 
 #pragma region Constructors
@@ -39,8 +41,17 @@ struct TransformerFunctor
     }
 
     TransformerFunctor(InterpolatorT aInterpolator, TransformerT aTransformer, const Size2D &aSourceRoi)
+        requires std::same_as<OperatatorT, voidType>
         : Interpolator(aInterpolator), Transformer(aTransformer),
           SourceRoi(Vector2<CoordTransformerT>(aSourceRoi) - static_cast<CoordTransformerT>(0.5))
+    {
+    }
+
+    TransformerFunctor(InterpolatorT aInterpolator, TransformerT aTransformer, const Size2D &aSourceRoi,
+                       const OperatatorT &aOp)
+        requires(!std::same_as<OperatatorT, voidType>)
+        : Interpolator(aInterpolator), Transformer(aTransformer),
+          SourceRoi(Vector2<CoordTransformerT>(aSourceRoi) - static_cast<CoordTransformerT>(0.5)), op(aOp)
     {
     }
 #pragma endregion
@@ -126,12 +137,19 @@ struct TransformerFunctor
             Interpolator(static_cast<InterpolatorT::coordinate_type>(coordTransformed.x),
                          static_cast<InterpolatorT::coordinate_type>(coordTransformed.y));
 
-        if constexpr (RealOrComplexIntVector<DstT>)
+        if constexpr (!std::same_as<OperatatorT, voidType>)
         {
-            round(pixel); // NOP for integer ComputeT
+            op(pixel, aDst);
         }
+        else
+        {
+            if constexpr (RealOrComplexIntVector<DstT>)
+            {
+                round(pixel); // NOP for integer ComputeT
+            }
 
-        aDst = DstT(pixel);
+            aDst = DstT(pixel);
+        }
         return true;
     }
 
@@ -154,12 +172,19 @@ struct TransformerFunctor
             auto pixel = Interpolator(static_cast<InterpolatorT::coordinate_type>(coordTransformed.x),
                                       static_cast<InterpolatorT::coordinate_type>(coordTransformed.y));
 
-            if constexpr (RealOrComplexIntegral<DstT>)
+            if constexpr (!std::same_as<OperatatorT, voidType>)
             {
-                round(pixel); // NOP for integer ComputeT
+                op(pixel, aDst);
             }
+            else
+            {
+                if constexpr (RealOrComplexIntegral<DstT>)
+                {
+                    round(pixel); // NOP for integer ComputeT
+                }
 
-            aDst.value[i] = DstT(pixel);
+                aDst.value[i] = DstT(pixel);
+            }
         }
     }
 #pragma endregion

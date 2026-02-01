@@ -11645,6 +11645,198 @@ ImageView<T> &ImageView<T>::LUTTrilinear(const Vector4A<remove_vector_t<T>> *aLu
 }
 
 #pragma endregion
+
+#pragma region CompColorKey
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::CompColorKey(const ImageView<T> &aSrc2, const T &aColorKey, ImageView<T> &aDst) const
+    requires RealVector<T>
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+    checkSameSize(ROI(), aDst.ROI());
+
+    using SrcT     = T;
+    using DstT     = T;
+    using ComputeT = T;
+
+    constexpr size_t TupelSize = 1;
+
+    using compareSrcSrc = SrcSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::image::CompColorKey<SrcT>,
+                                        RoundingMode::None, voidType, voidType, true>;
+    const mpp::image::CompColorKey<SrcT> op(aColorKey);
+
+    const compareSrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+    forEachPixel(aDst, functor);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::CompColorKey(const ImageView<T> &aSrc2, const T &aColorKey)
+    requires RealVector<T>
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+
+    using SrcT     = T;
+    using DstT     = T;
+    using ComputeT = T;
+
+    constexpr size_t TupelSize = 1;
+
+    using compareInplaceSrc = InplaceSrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::image::CompColorKey<SrcT>,
+                                                RoundingMode::None, voidType, voidType>;
+    const mpp::image::CompColorKey<SrcT> op(aColorKey);
+
+    const compareInplaceSrc functor(aSrc2.PointerRoi(), aSrc2.Pitch(), op);
+    forEachPixel(*this, functor);
+
+    return *this;
+}
+#pragma endregion
+
+#pragma region ConvertSampling422
+template <PixelType T>
+void ImageView<T>::ConvertSampling422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                      ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, bool aSwapLumaChroma) const
+    requires RealVector<T> && (vector_size_v<T> == 2)
+{
+    checkSameSize(*this, aDstLuma);
+    checkSameSize(SizeRoi() / Vec2i(2, 1), aDstChroma.SizeRoi());
+
+    using SrcT     = Vector3<remove_vector_t<T>>;
+    using DstT     = Vector3<remove_vector_t<T>>;
+    using ComputeT = Vector3<remove_vector_t<T>>;
+
+    constexpr size_t TupelSize = 1;
+
+    if (aSwapLumaChroma)
+    {
+        using nopSrc = Src422C2Functor<TupelSize, SrcT, ComputeT, DstT, mpp::image::NOP<ComputeT>,
+                                       Src422C2Layout::CbYCr, RoundingMode::None>;
+
+        const mpp::image::NOP<ComputeT> op;
+
+        const nopSrc functor(PointerRoi(), Pitch(), op);
+        forEachPixel422<SrcT>(aDstLuma, aDstChroma, ChromaSubsamplePos::TopLeft, functor);
+    }
+    else
+    {
+        using nopSrc = Src422C2Functor<TupelSize, SrcT, ComputeT, DstT, mpp::image::NOP<ComputeT>,
+                                       Src422C2Layout::YCbCr, RoundingMode::None>;
+
+        const mpp::image::NOP<ComputeT> op;
+
+        const nopSrc functor(PointerRoi(), Pitch(), op);
+
+        forEachPixel422<SrcT>(aDstLuma, aDstChroma, ChromaSubsamplePos::TopLeft, functor);
+    }
+}
+
+template <PixelType T>
+void ImageView<T>::ConvertSampling422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                      ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                                      ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, bool aSwapLumaChroma) const
+    requires RealVector<T> && (vector_size_v<T> == 2)
+{
+    checkSameSize(*this, aDstLuma);
+    checkSameSize(SizeRoi() / Vec2i(2, 1), aDstChroma1.SizeRoi());
+    checkSameSize(SizeRoi() / Vec2i(2, 1), aDstChroma2.SizeRoi());
+
+    using SrcT     = Vector3<remove_vector_t<T>>;
+    using DstT     = Vector3<remove_vector_t<T>>;
+    using ComputeT = Vector3<remove_vector_t<T>>;
+
+    constexpr size_t TupelSize = 1;
+
+    if (aSwapLumaChroma)
+    {
+        using nopSrc = Src422C2Functor<TupelSize, SrcT, ComputeT, DstT, mpp::image::NOP<ComputeT>,
+                                       Src422C2Layout::CbYCr, RoundingMode::None>;
+
+        const mpp::image::NOP<ComputeT> op;
+
+        const nopSrc functor(PointerRoi(), Pitch(), op);
+        forEachPixel422<SrcT>(aDstLuma, aDstChroma1, aDstChroma2, ChromaSubsamplePos::TopLeft, functor);
+    }
+    else
+    {
+        using nopSrc = Src422C2Functor<TupelSize, SrcT, ComputeT, DstT, mpp::image::NOP<ComputeT>,
+                                       Src422C2Layout::YCbCr, RoundingMode::None>;
+
+        const mpp::image::NOP<ComputeT> op;
+
+        const nopSrc functor(PointerRoi(), Pitch(), op);
+
+        forEachPixel422<SrcT>(aDstLuma, aDstChroma1, aDstChroma2, ChromaSubsamplePos::TopLeft, functor);
+    }
+}
+
+template <PixelType T>
+ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::ConvertSampling422(
+    ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma, ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+    ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, bool aSwapLumaChroma)
+    requires RealVector<T> && (vector_size_v<T> == 3)
+{
+    checkSameSize(aSrcLuma, aDstLumaChroma);
+    checkSameSize(aSrcLuma.SizeRoi() / Vec2i(2, 1), aSrcChroma.SizeRoi());
+    using SrcT     = T;
+    using DstT     = T;
+    using ComputeT = T;
+
+    const Size2D sizeChroma(aSrcLuma.SizeRoi().x / 2, aSrcLuma.SizeRoi().y);
+
+    constexpr size_t TupelSize = 1;
+
+    using nopSrc =
+        Src422Functor<TupelSize, SrcT, ComputeT, DstT, mpp::image::NOP<ComputeT>, ChromaSubsamplePos::TopLeft,
+                      InterpolationMode::NearestNeighbor, false, false, RoundingMode::None>;
+
+    const mpp::image::NOP<ComputeT> op;
+
+    const nopSrc functor(aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(),
+                         sizeChroma, op);
+
+    forEachPixel422<T>(aDstLumaChroma, ChromaSubsamplePos::TopLeft,
+                       aSwapLumaChroma ? Dst422C2Layout::CbYCr : Dst422C2Layout::YCbCr, functor);
+
+    return aDstLumaChroma;
+}
+
+template <PixelType T>
+ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::ConvertSampling422(
+    ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma, ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+    ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+    bool aSwapLumaChroma)
+    requires RealVector<T> && (vector_size_v<T> == 3)
+{
+    checkSameSize(aSrcLuma, aDstLumaChroma);
+    checkSameSize(aSrcLuma.SizeRoi() / Vec2i(2, 1), aSrcChroma1.SizeRoi());
+    checkSameSize(aSrcLuma.SizeRoi() / Vec2i(2, 1), aSrcChroma2.SizeRoi());
+
+    using SrcT     = T;
+    using DstT     = T;
+    using ComputeT = T;
+
+    const Size2D sizeChroma(aSrcLuma.SizeRoi().x / 2, aSrcLuma.SizeRoi().y);
+
+    constexpr size_t TupelSize = 1;
+
+    using nopSrc =
+        Src422Functor<TupelSize, SrcT, ComputeT, DstT, mpp::image::NOP<ComputeT>, ChromaSubsamplePos::TopLeft,
+                      InterpolationMode::NearestNeighbor, false, true, RoundingMode::None>;
+
+    const mpp::image::NOP<ComputeT> op;
+
+    const nopSrc functor(aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma1.PointerRoi(), aSrcChroma1.Pitch(),
+                         aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), sizeChroma, op);
+
+    forEachPixel422<T>(aDstLumaChroma, ChromaSubsamplePos::TopLeft,
+                       aSwapLumaChroma ? Dst422C2Layout::CbYCr : Dst422C2Layout::YCbCr, functor);
+
+    return aDstLumaChroma;
+}
+
+#pragma endregion
 #pragma endregion
 // NOLINTEND(readability-suspicious-call-argument)
 } // namespace mpp::image::cpuSimple

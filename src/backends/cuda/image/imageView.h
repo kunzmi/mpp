@@ -2312,7 +2312,9 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires ComplexVector<T>;
 
     /// <summary>
-    /// aDst = abs(this) (complex magnitude)
+    /// aDst = abs(this) (complex magnitude)<para/>
+    /// If the source image ROI is of size (widthDestination / 2 + 1, heightDestination), the size of a R2C FFT with
+    /// FFTW or CUFFT, then the result corresponds to the full spectrum with 0 frequency in the center.
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Magnitude(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
@@ -2320,10 +2322,24 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
     /// <summary>
-    /// aDst = abs(this)^2 (complex magnitude squared)
+    /// aDst = abs(this)^2 (complex magnitude squared)<para/>
+    /// If the source image ROI is of size (widthDestination / 2 + 1, heightDestination), the size of a R2C FFT with
+    /// FFTW or CUFFT, then the result corresponds to the full spectrum with 0 frequency in the center.
     /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &MagnitudeSqr(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
+
+    /// <summary>
+    /// aDst = log(abs(this) + aOffset) (logarithm of complex magnitude)<para/>
+    /// To avoid -INF in case of 0+0i, an offset is added to the magnitude value.<para/>
+    /// If the source image ROI is of size (widthDestination / 2 + 1, heightDestination), the size of a R2C FFT with
+    /// FFTW or CUFFT, then the result corresponds to the full spectrum with 0 frequency in the center.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &MagnitudeLog(
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
+        complex_basetype_t<remove_vector_t<T>> aOffset,
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
@@ -2377,34 +2393,34 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
 #pragma region Filtering
 #pragma region Fixed Filter
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, const T &aConstant,
                               BorderType aBorder, const Roi &aAllowedReadRoi,
                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
                               const Roi &aAllowedReadRoi,
                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, const T &aConstant,
                               BorderType aBorder,
 
                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
 
                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const;
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
@@ -2412,7 +2428,7 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(has_alternative_filter_output_type_for_v<T>);
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
@@ -2421,7 +2437,7 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires(has_alternative_filter_output_type_for_v<T>);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
@@ -2429,7 +2445,7 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires(has_alternative_filter_output_type_for_v<T>);
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
@@ -13709,6 +13725,66 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
                 (vector_active_size_v<T> >= 3);
+
+#pragma endregion
+
+#pragma region CompColorKey
+    /// <summary>
+    /// All pixels of the this source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the destination image aDst.
+    /// </summary>
+    ImageView<T> &CompColorKey(const ImageView<T> &aSrc2, const T &aColorKey, ImageView<T> &aDst,
+                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// All pixels of the this source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the same source image (inplace operation).
+    /// </summary>
+    ImageView<T> &CompColorKey(const ImageView<T> &aSrc2, const T &aColorKey,
+                               const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region ConvertSampling422
+    /// <summary>
+    /// Converts from packed C2 422 sampling to planar P2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if input is in format YCbCr, true for CbYCr.</param>
+    void ConvertSampling422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                            ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, bool aSwapLumaChroma,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_size_v<T> == 2);
+
+    /// <summary>
+    /// Converts from packed C2 422 sampling to planar P3 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if input is in format YCbCr, true for CbYCr.</param>
+    void ConvertSampling422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, bool aSwapLumaChroma,
+                            const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
+        requires RealVector<T> && (vector_size_v<T> == 2);
+
+    /// <summary>
+    /// Converts from planar P2 422 sampling to packed C2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if output should be in format YCbCr, true for CbYCr.</param>
+    static ImageView<Vector2<remove_vector_t<T>>> &ConvertSampling422(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma, ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+        ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, bool aSwapLumaChroma,
+        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T> && (vector_size_v<T> == 3);
+
+    /// <summary>
+    /// Converts from planar P3 422 sampling to packed C2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if output should be in format YCbCr, true for CbYCr.</param>
+    static ImageView<Vector2<remove_vector_t<T>>> &ConvertSampling422(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma, ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+        bool aSwapLumaChroma, const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get())
+        requires RealVector<T> && (vector_size_v<T> == 3);
 
 #pragma endregion
 #pragma endregion

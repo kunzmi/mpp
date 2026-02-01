@@ -1,4 +1,5 @@
 add_subdirectory(arithmetic)
+add_subdirectory(colorConversion)
 add_subdirectory(dataExchangeAndInit)
 add_subdirectory(filtering)
 add_subdirectory(geometricTransforms)

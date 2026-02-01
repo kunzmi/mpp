@@ -178,6 +178,22 @@ template <ComplexVector T> struct MagnitudeSqr
     }
 };
 
+template <ComplexVector T> struct MagnitudeLog
+{
+    const complex_basetype_t<remove_vector_t<T>> Offset;
+
+    MagnitudeLog(complex_basetype_t<remove_vector_t<T>> aOffset) : Offset(aOffset)
+    {
+    }
+
+    DEVICE_CODE void operator()(
+        const T &aSrc1, same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>> &aDst) const
+    {
+        aDst = aSrc1.Magnitude() + Offset;
+        aDst.Ln();
+    }
+};
+
 template <ComplexVector T> struct Conj
 {
     DEVICE_CODE void operator()(const T &aSrc1, T &aDst) const

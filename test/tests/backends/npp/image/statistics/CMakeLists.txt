@@ -32,6 +32,7 @@ addCatchTest(test_normRelL1.cpp "common;common.fileIO;backends.cuda;backends.npp
 addCatchTest(test_normRelL2.cpp "common;common.fileIO;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Statistics_NormRelL2")
 addCatchTest(test_psnr.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Statistics_PSNR")
 addCatchTest(test_qualityIndex.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Statistics_QualityIndex")
+addCatchTest(test_radialProfile.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Statistics_RadialProfile")
 addCatchTest(test_rectStdDev.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Statistics_RectStdDev")
 addCatchTest(test_sqrDistance.cpp "common;common.fileIO;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Statistics_SqrDistance")
 addCatchTest(test_sqrIntegral.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Statistics_SqrIntegral")

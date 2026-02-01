@@ -645,146 +645,6 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         }
     }
 
-    // #if MPP_ENABLE_CUDA_BACKEND
-    //     /// <summary>
-    //     /// Copy from host to device memory
-    //     /// </summary>
-    //     /// <param name="aDeviceDst">Destination</param>
-    //     void CopyToDevice(cuda::ImageView<T> &aDeviceDst) const
-    //     {
-    //         if (mSizeAlloc != aDeviceDst.SizeAlloc())
-    //         {
-    //             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source
-    //             size "
-    //                                << mSizeAlloc << ", Destination size: " << aDeviceDst.SizeAlloc());
-    //         }
-    //
-    //         aDeviceDst.CopyToDevice(mPtr, mPitch);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy from device to host memory
-    //     /// </summary>
-    //     /// <param name="aDeviceSrc">Source</param>
-    //     void CopyToHost(const cuda::ImageView<T> &aDeviceSrc)
-    //     {
-    //         if (mSizeAlloc != aDeviceSrc.SizeAlloc())
-    //         {
-    //             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source
-    //             size "
-    //                                << aDeviceSrc.SizeAlloc() << ", Destination size: " << mSizeAlloc);
-    //         }
-    //
-    //         aDeviceSrc.CopyToHost(mPtr, mPitch);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy from host to device memory
-    //     /// </summary>
-    //     void operator>>(cuda::ImageView<T> &aDest) const
-    //     {
-    //         CopyToDevice(aDest);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy from device to host memory
-    //     /// </summary>
-    //     void operator<<(const cuda::ImageView<T> &aDeviceSrc)
-    //     {
-    //         CopyToHost(aDeviceSrc);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy data from host to device memory only in ROI
-    //     /// </summary>
-    //     /// <param name="aDeviceDst">Device destination view</param>
-    //     void CopyToDeviceRoi(cuda::ImageView<T> &aDeviceDst) const
-    //     {
-    //         // the callee will move the ptr to the first roi pixel
-    //         aDeviceDst.CopyToDeviceRoi(mPtr, mPitch, mRoi);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy data from device to device memory
-    //     /// </summary>
-    //     /// <param name="aDeviceSrc">Device source view</param>
-    //     void CopyToHostRoi(const cuda::ImageView<T> &aDeviceSrc)
-    //     {
-    //         // the callee will move the ptr to the first roi pixel
-    //         aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
-    //     }
-    // #endif // MPP_ENABLE_CUDA_BACKEND
-
-    // #if MPP_ENABLE_NPP_BACKEND
-    //     /// <summary>
-    //     /// Copy from host to device memory
-    //     /// </summary>
-    //     /// <param name="aDeviceDst">Destination</param>
-    //     void CopyToDevice(npp::ImageView<T> &aDeviceDst) const
-    //     {
-    //         if (mSizeAlloc != aDeviceDst.SizeAlloc())
-    //         {
-    //             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source
-    //             size "
-    //                                << mSizeAlloc << ", Destination size: " << aDeviceDst.SizeAlloc());
-    //         }
-    //
-    //         aDeviceDst.CopyToDevice(mPtr, mPitch);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy from device to host memory
-    //     /// </summary>
-    //     /// <param name="aDeviceSrc">Source</param>
-    //     void CopyToHost(const npp::ImageView<T> &aDeviceSrc)
-    //     {
-    //         if (mSizeAlloc != aDeviceSrc.SizeAlloc())
-    //         {
-    //             throw ROIEXCEPTION("The source image does not have the same size as the destination image. Source
-    //             size "
-    //                                << aDeviceSrc.SizeAlloc() << ", Destination size: " << mSizeAlloc);
-    //         }
-    //
-    //         aDeviceSrc.CopyToHost(mPtr, mPitch);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy from host to device memory
-    //     /// </summary>
-    //     void operator>>(npp::ImageView<T> &aDest) const
-    //     {
-    //         CopyToDevice(aDest);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy from device to host memory
-    //     /// </summary>
-    //     void operator<<(const npp::ImageView<T> &aDeviceSrc)
-    //     {
-    //         CopyToHost(aDeviceSrc);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy data from host to device memory only in ROI
-    //     /// </summary>
-    //     /// <param name="aDeviceDst">Device destination view</param>
-    //     void CopyToDeviceRoi(npp::ImageView<T> &aDeviceDst) const
-    //     {
-    //         // the callee will move the ptr to the first roi pixel
-    //         aDeviceDst.CopyToDeviceRoi(mPtr, mPitch, mRoi);
-    //     }
-    //
-    //     /// <summary>
-    //     /// Copy data from device to device memory
-    //     /// </summary>
-    //     /// <param name="aDeviceSrc">Device source view</param>
-    //     void CopyToHostRoi(const npp::ImageView<T> &aDeviceSrc)
-    //     {
-    //         // the callee will move the ptr to the first roi pixel
-    //         aDeviceSrc.CopyToHostRoi(mPtr, mPitch, mRoi);
-    //     }
-    // #endif // MPP_ENABLE_NPP_BACKEND
-
     /// <summary>
     /// Returns true, if size and pixel content is identical (inside the ROI). Returns false if ROI size differs.
     /// </summary>
@@ -1126,6 +986,18 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
     /// <param name="aInterpolation">Interpolation mode to use</param>
     ImageView<T> &Copy(ImageView<T> &aDst, const Pixel32fC2 &aDelta, InterpolationMode aInterpolation) const;
 
+    /// <summary>
+    /// Shift zero-frequency component to center of spectrum - same as fftshift operation in Matlab/Octave
+    /// </summary>
+    /// <param name="aDst">Destination image</param>
+    ImageView<T> &FFTShift(ImageView<T> &aDst) const;
+
+    /// <summary>
+    /// Inverse of FFTShift - same as ifftshift operation in Matlab/Octave
+    /// </summary>
+    /// <param name="aDst">Destination image</param>
+    ImageView<T> &IFFTShift(ImageView<T> &aDst) const;
+
 #pragma endregion
 #pragma region Dup
     /// <summary>
@@ -1209,10 +1081,19 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
 
 #pragma endregion
 #pragma region Set
+    /// <summary>
+    /// Set all pixels in current ROI to aConst
+    /// </summary>
     ImageView<T> &Set(const T &aConst);
 
+    /// <summary>
+    /// Set all pixels with aMask != 0 to aConst
+    /// </summary>
     ImageView<T> &SetMasked(const T &aConst, const ImageView<Pixel8uC1> &aMask);
 
+    /// <summary>
+    /// Set channel aChannel of all pixels in current ROI to aConst
+    /// </summary>
     ImageView<T> &Set(remove_vector_t<T> aConst, Channel aChannel);
 #pragma endregion
 #pragma region Swap Channel
@@ -1768,42 +1649,90 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
 #pragma endregion
 
 #pragma region Complex
+    /// <summary>
+    /// aDst = this * conj(aSrc2) (complex conjugate multiplication)
+    /// </summary>
     ImageView<T> &ConjMul(const ImageView<T> &aSrc2, ImageView<T> &aDst) const
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// this = this * conj(aSrc2) (complex conjugate multiplication)
+    /// </summary>
     ImageView<T> &ConjMul(const ImageView<T> &aSrc2)
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// aDst = conj(this) (complex conjugate)
+    /// </summary>
     ImageView<T> &Conj(ImageView<T> &aDst) const
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// this = conj(this) (complex conjugate)
+    /// </summary>
     ImageView<T> &Conj()
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// aDst = abs(this) (complex magnitude)<para/>
+    /// If the source image ROI is of size (widthDestination / 2 + 1, heightDestination), the size of a R2C FFT with
+    /// FFTW or CUFFT, then the result corresponds to the full spectrum with 0 frequency in the center.
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Magnitude(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
+    /// <summary>
+    /// aDst = abs(this)^2 (complex magnitude squared)<para/>
+    /// If the source image ROI is of size (widthDestination / 2 + 1, heightDestination), the size of a R2C FFT with
+    /// FFTW or CUFFT, then the result corresponds to the full spectrum with 0 frequency in the center.
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &MagnitudeSqr(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
+    /// <summary>
+    /// aDst = log(abs(this) + aOffset) (logarithm of complex magnitude)<para/>
+    /// To avoid -INF in case of 0+0i, an offset is added to the magnitude value.<para/>
+    /// If the source image ROI is of size (widthDestination / 2 + 1, heightDestination), the size of a R2C FFT with
+    /// FFTW or CUFFT, then the result corresponds to the full spectrum with 0 frequency in the center.
+    /// </summary>
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &MagnitudeLog(
+        ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
+        complex_basetype_t<remove_vector_t<T>> aOffset) const
+        requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
+
+    /// <summary>
+    /// aDst = angle(this) (complex angle, atan2(imag, real))
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Angle(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>;
 
+    /// <summary>
+    /// aDst = this.real (real component of complex value)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Real(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// aDst = this.imag (imaginary component of complex value)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &Imag(
         ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
         requires ComplexVector<T>;
 
+    /// <summary>
+    /// aDst.real = this, aDst.imag = 0 (converts real valued image to complex with imaginary part = 0)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
         ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst) const
         requires RealSignedVector<T> && (!FourChannelAlpha<T>);
 
+    /// <summary>
+    /// aDst.real = this, aDst.imag = aSrcImag (converts two real valued images to one complex image)
+    /// </summary>
     ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &MakeComplex(
         const ImageView<T> &aSrcImag,
         ImageView<same_vector_size_different_type_t<T, make_complex_t<remove_vector_t<T>>>> &aDst) const
@@ -1814,36 +1743,36 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
 #pragma region Filtering
 #pragma region Fixed Filter
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, const T &aConstant,
                               BorderType aBorder, const Roi &aAllowedReadRoi) const;
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, BorderType aBorder,
                               const Roi &aAllowedReadRoi) const;
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize, const T &aConstant,
                               BorderType aBorder) const;
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<T> &FixedFilter(ImageView<T> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
                               BorderType aBorder) const;
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
         const T &aConstant, BorderType aBorder, const Roi &aAllowedReadRoi) const
         requires(has_alternative_filter_output_type_for_v<T>);
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
@@ -1851,14 +1780,14 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         requires(has_alternative_filter_output_type_for_v<T>);
 
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
         const T &aConstant, BorderType aBorder) const
         requires(has_alternative_filter_output_type_for_v<T>);
     /// <summary>
-    /// Applies an mpp::FixedFilter to the source image.
+    /// Applies a mpp::FixedFilter to the source image.
     /// </summary>
     ImageView<alternative_filter_output_type_for_t<T>> &FixedFilter(
         ImageView<alternative_filter_output_type_for_t<T>> &aDst, mpp::FixedFilter aFilter, MaskSize aMaskSize,
@@ -8774,6 +8703,7 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         requires(std::same_as<Pixel16uC1, T>);
 
 #pragma endregion
+
 #pragma region LUT
     /// <summary>
     /// Precomputes LUT indices in aAccelerator for an equispaced value range with aAcceleratorSize values.<para/>
@@ -8837,6 +8767,7 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         requires(RealFloatingPoint<remove_vector_t<T>>) && (vector_active_size_v<T> > 1);
 
 #pragma endregion
+
 #pragma region Lut3D
     /// <summary>
     /// Look-up-table color conversion using a 3D LUT and tri-linear interpolation.<para/>
@@ -8893,6 +8824,61 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         requires(std::same_as<byte, remove_vector_t<T>> || std::same_as<ushort, remove_vector_t<T>> ||
                  std::same_as<short, remove_vector_t<T>> || std::same_as<float, remove_vector_t<T>>) &&
                 (vector_active_size_v<T> >= 3);
+
+#pragma endregion
+
+#pragma region CompColorKey
+    /// <summary>
+    /// All pixels of the this source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the destination image aDst.
+    /// </summary>
+    ImageView<T> &CompColorKey(const ImageView<T> &aSrc2, const T &aColorKey, ImageView<T> &aDst) const
+        requires RealVector<T>;
+
+    /// <summary>
+    /// All pixels of the this source image equal to the specified key color aColorKey are replaced with the
+    /// corresponding pixel of the background image aSrc2 and stored in the same source image (inplace operation).
+    /// </summary>
+    ImageView<T> &CompColorKey(const ImageView<T> &aSrc2, const T &aColorKey)
+        requires RealVector<T>;
+#pragma endregion
+
+#pragma region ConvertSampling422
+    /// <summary>
+    /// Converts from packed C2 422 sampling to planar P2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if input is in format YCbCr, true for CbYCr.</param>
+    void ConvertSampling422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                            ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, bool aSwapLumaChroma) const
+        requires RealVector<T> && (vector_size_v<T> == 2);
+
+    /// <summary>
+    /// Converts from packed C2 422 sampling to planar P3 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if input is in format YCbCr, true for CbYCr.</param>
+    void ConvertSampling422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                            ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, bool aSwapLumaChroma) const
+        requires RealVector<T> && (vector_size_v<T> == 2);
+
+    /// <summary>
+    /// Converts from planar P2 422 sampling to packed C2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if output should be in format YCbCr, true for CbYCr.</param>
+    static ImageView<Vector2<remove_vector_t<T>>> &ConvertSampling422(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma, ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+        ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, bool aSwapLumaChroma)
+        requires RealVector<T> && (vector_size_v<T> == 3);
+
+    /// <summary>
+    /// Converts from planar P3 422 sampling to packed C2 422 sampling.
+    /// </summary>
+    /// <param name="aSwapLumaChroma">Set to false if output should be in format YCbCr, true for CbYCr.</param>
+    static ImageView<Vector2<remove_vector_t<T>>> &ConvertSampling422(
+        ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma, ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+        ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+        bool aSwapLumaChroma)
+        requires RealVector<T> && (vector_size_v<T> == 3);
 
 #pragma endregion
 #pragma endregion

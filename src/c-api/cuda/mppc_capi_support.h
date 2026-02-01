@@ -163,37 +163,45 @@ extern "C"
     /// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for RGB to PhotoYCC colorspace
     /// conversion.<para/>
     /// Gives the same results as NPP's RGBToYCC.<para/>
-    /// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html
+    /// Values as in
+    /// https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html<para/>
+    /// Values are specific for 8-bit unsigned integer types.
     /// </summary>
     /// <param name="aTwistMatrix">Output for use in ColorTwist function</param>
-    MPPErrorCode mppciGetMatrixRGBtoYCC(float aTwistMatrix[3][3]);
+    MPPErrorCode mppciGetMatrixRGBtoYCC_8u(float aTwistMatrix[3][4]);
 
     /// <summary>
     /// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for BGR to PhotoYCC colorspace
     /// conversion.<para/>
     /// Gives the same results as NPP's RGBToYCC but adjusted for BGR channel order in source image.<para/>
-    /// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html
+    /// Values as in
+    /// https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html<para/>
+    /// Values are specific for 8-bit unsigned integer types.
     /// </summary>
     /// <param name="aTwistMatrix">Output for use in ColorTwist function</param>
-    MPPErrorCode mppciGetMatrixBGRtoYCC(float aTwistMatrix[3][3]);
+    MPPErrorCode mppciGetMatrixBGRtoYCC_8u(float aTwistMatrix[3][4]);
 
     /// <summary>
     /// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for PhotoYCC to RGB colorspace
     /// conversion.<para/>
     /// Gives the same results as NPP's RGBToYCC.<para/>
-    /// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html
+    /// Values as in
+    /// https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html, scaled
+    /// by 1.3847 to match the actual output.<para/> Values are specific for 8-bit unsigned integer types.
     /// </summary>
     /// <param name="aTwistMatrix">Output for use in ColorTwist function</param>
-    MPPErrorCode mppciGetMatrixYCCtoRGB(float aTwistMatrix[3][3]);
+    MPPErrorCode mppciGetMatrixYCCtoRGB_8u(float aTwistMatrix[3][4]);
 
     /// <summary>
     /// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for PhotoYCC to RGB colorspace
     /// conversion.<para/>
     /// Gives the same results as NPP's RGBToYCC but adjusted for BGR channel order in destination image.<para/>
-    /// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html
+    /// Values as in
+    /// https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html, scaled
+    /// by 1.3847 to match the actual output.<para/> Values are specific for 8-bit unsigned integer types.
     /// </summary>
     /// <param name="aTwistMatrix">Output for use in ColorTwist function</param>
-    MPPErrorCode mppciGetMatrixYCCtoBGR(float aTwistMatrix[3][3]);
+    MPPErrorCode mppciGetMatrixYCCtoBGR_8u(float aTwistMatrix[3][4]);
 
     /// <summary>
     /// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist3x4 function for RGB to YUV colorspace

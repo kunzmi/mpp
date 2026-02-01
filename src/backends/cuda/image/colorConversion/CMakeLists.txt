@@ -1,6 +1,14 @@
-
+add_library(backends.cuda.image.colorConversion8s OBJECT 
+	8s/colorCompKey.cu	
+	8s/samplingConversion422.cu
+)
+	
+target_include_directories(backends.cuda.image.colorConversion8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.colorConversion8s PRIVATE project_options)
 	
 add_library(backends.cuda.image.colorConversion8u OBJECT 
+	8u/colorCompKey.cu
+
 	8u/hls.cu
 	8u/hsv.cu
 	8u/lab.cu
@@ -19,12 +27,16 @@ add_library(backends.cuda.image.colorConversion8u OBJECT
 	8u/rgbToCfa.cu
 
 	8u/lut.cu
+	
+	8u/samplingConversion422.cu
 )
 	
 target_include_directories(backends.cuda.image.colorConversion8u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image.colorConversion8u PRIVATE project_options)
 
 add_library(backends.cuda.image.colorConversion16u OBJECT 
+	16u/colorCompKey.cu
+
 	16u/hls.cu
 	16u/hsv.cu
 	16u/lab.cu
@@ -43,12 +55,16 @@ add_library(backends.cuda.image.colorConversion16u OBJECT
 	16u/rgbToCfa.cu
 
 	16u/lut.cu
+	
+	16u/samplingConversion422.cu
 )
 	
 target_include_directories(backends.cuda.image.colorConversion16u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image.colorConversion16u PRIVATE project_options)
 
 add_library(backends.cuda.image.colorConversion16s OBJECT 
+	16s/colorCompKey.cu
+
 	16s/colorTwist3x3.cu
 	16s/colorTwist3x4.cu
 	16s/colorTwist4x4.cu
@@ -62,12 +78,16 @@ add_library(backends.cuda.image.colorConversion16s OBJECT
 	16s/rgbToCfa.cu
 
 	16s/lut.cu
+	
+	16s/samplingConversion422.cu
 )
 	
 target_include_directories(backends.cuda.image.colorConversion16s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image.colorConversion16s PRIVATE project_options)
 
 add_library(backends.cuda.image.colorConversion16f OBJECT 
+	16f/colorCompKey.cu
+
 	16f/hls.cu
 	16f/hsv.cu
 	16f/lab.cu
@@ -86,12 +106,16 @@ add_library(backends.cuda.image.colorConversion16f OBJECT
 	16f/rgbToCfa.cu
 
 	16f/lut.cu
+	
+	16f/samplingConversion422.cu
 )
 	
 target_include_directories(backends.cuda.image.colorConversion16f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image.colorConversion16f PRIVATE project_options)
 
 add_library(backends.cuda.image.colorConversion32f OBJECT 
+	32f/colorCompKey.cu
+
 	32f/hls.cu
 	32f/hsv.cu
 	32f/lab.cu
@@ -110,6 +134,8 @@ add_library(backends.cuda.image.colorConversion32f OBJECT
 	32f/rgbToCfa.cu
 
 	32f/lut.cu
+	
+	32f/samplingConversion422.cu
 )
 	
 target_include_directories(backends.cuda.image.colorConversion32f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
@@ -118,27 +144,47 @@ target_link_libraries(backends.cuda.image.colorConversion32f PRIVATE project_opt
 
 
 add_library(backends.cuda.image.colorConversion16bf OBJECT 
+	16bf/colorCompKey.cu
+
 	16bf/cfaToRgb.cu
 	16bf/rgbToCfa.cu
 
 	16bf/lut.cu
+	
+	16bf/samplingConversion422.cu
 )
 	
 target_include_directories(backends.cuda.image.colorConversion16bf PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image.colorConversion16bf PRIVATE project_options)
 
 add_library(backends.cuda.image.colorConversion32s OBJECT 
+	32s/colorCompKey.cu
+
 	32s/cfaToRgb.cu
 	32s/rgbToCfa.cu
+	
+	32s/samplingConversion422.cu
 )
 	
 target_include_directories(backends.cuda.image.colorConversion32s PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image.colorConversion32s PRIVATE project_options)
 
 add_library(backends.cuda.image.colorConversion32u OBJECT 
+	32u/colorCompKey.cu
+
 	32u/cfaToRgb.cu
 	32u/rgbToCfa.cu
+	
+	32u/samplingConversion422.cu
 )
 	
 target_include_directories(backends.cuda.image.colorConversion32u PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
 target_link_libraries(backends.cuda.image.colorConversion32u PRIVATE project_options)
+
+add_library(backends.cuda.image.colorConversion64f OBJECT 
+	64f/colorCompKey.cu	
+	64f/samplingConversion422.cu
+)
+	
+target_include_directories(backends.cuda.image.colorConversion64f PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.cuda.image.colorConversion64f PRIVATE project_options)

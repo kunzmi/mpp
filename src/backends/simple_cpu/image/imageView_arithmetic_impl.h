@@ -10,6 +10,7 @@
 #include <common/defines.h>
 #include <common/exception.h>
 #include <common/image/border.h>
+#include <common/image/functors/borderControl.h>
 #include <common/image/functors/constantFunctor.h>
 #include <common/image/functors/inplaceConstantFunctor.h>
 #include <common/image/functors/inplaceConstantScaleFunctor.h>
@@ -19,6 +20,7 @@
 #include <common/image/functors/inplaceSrcFunctor.h>
 #include <common/image/functors/inplaceSrcScaleFunctor.h>
 #include <common/image/functors/inplaceSrcSrcFunctor.h>
+#include <common/image/functors/interpolator.h>
 #include <common/image/functors/srcConstantFunctor.h>
 #include <common/image/functors/srcConstantScaleFunctor.h>
 #include <common/image/functors/srcDevConstantFunctor.h>
@@ -26,6 +28,8 @@
 #include <common/image/functors/srcFunctor.h>
 #include <common/image/functors/srcSrcFunctor.h>
 #include <common/image/functors/srcSrcScaleFunctor.h>
+#include <common/image/functors/transformer.h>
+#include <common/image/functors/transformerFunctor.h>
 #include <common/image/gotoPtr.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/roi.h>
@@ -5260,18 +5264,44 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
     requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    Size2D sizeDst = aDst.SizeRoi();
+    sizeDst.x      = sizeDst.x / 2 + 1;
+
     using SrcT     = T;
     using ComputeT = default_compute_type_for_t<T>;
     using DstT     = same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>;
 
-    using magnitudeSrc = SrcFunctor<1, SrcT, ComputeT, DstT, mpp::Magnitude<ComputeT>, RoundingMode::NearestTiesToEven>;
+    if (SizeRoi() == sizeDst)
+    {
+        constexpr RoundingMode roundingMode = RoundingMode::None;
+        using CoordT                        = int;
 
-    const mpp::Magnitude<ComputeT> op;
+        const TransformerPStoFFTW<CoordT> ps2fftw(aDst.SizeRoi());
 
-    const magnitudeSrc functor(PointerRoi(), Pitch(), op);
+        using BCType = BorderControl<T, BorderType::None>;
+        const BCType bc(PointerRoi(), Pitch(), SizeRoi(), {0});
 
-    forEachPixel(aDst, functor);
+        const mpp::Magnitude<ComputeT> op;
+        using InterpolatorT = Interpolator<T, BCType, CoordT, InterpolationMode::Undefined>;
+        const InterpolatorT interpol(bc);
+        const TransformerFunctor<1, DstT, CoordT, false, InterpolatorT, TransformerPStoFFTW<CoordT>, roundingMode,
+                                 mpp::Magnitude<ComputeT>>
+            functor(interpol, ps2fftw, aDst.SizeRoi(), op);
+
+        forEachPixel(aDst, functor);
+    }
+    else
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        using magnitudeSrc =
+            SrcFunctor<1, SrcT, ComputeT, DstT, mpp::Magnitude<ComputeT>, RoundingMode::NearestTiesToEven>;
+
+        const mpp::Magnitude<ComputeT> op;
+        const magnitudeSrc functor(PointerRoi(), Pitch(), op);
+
+        forEachPixel(aDst, functor);
+    }
     return aDst;
 }
 
@@ -5280,19 +5310,90 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
     ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst) const
     requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
 {
-    checkSameSize(ROI(), aDst.ROI());
+    Size2D sizeDst = aDst.SizeRoi();
+    sizeDst.x      = sizeDst.x / 2 + 1;
     using SrcT     = T;
     using ComputeT = default_compute_type_for_t<T>;
     using DstT     = same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>;
 
-    using magnitudeSqrSrc =
-        SrcFunctor<1, SrcT, ComputeT, DstT, mpp::MagnitudeSqr<ComputeT>, RoundingMode::NearestTiesToEven>;
+    if (SizeRoi() == sizeDst)
+    {
+        constexpr RoundingMode roundingMode = RoundingMode::None;
+        using CoordT                        = int;
 
-    const mpp::MagnitudeSqr<ComputeT> op;
+        const TransformerPStoFFTW<CoordT> ps2fftw(aDst.SizeRoi());
 
-    const magnitudeSqrSrc functor(PointerRoi(), Pitch(), op);
+        using BCType = BorderControl<T, BorderType::None>;
+        const BCType bc(PointerRoi(), Pitch(), SizeRoi(), {0});
 
-    forEachPixel(aDst, functor);
+        const mpp::MagnitudeSqr<ComputeT> op;
+        using InterpolatorT = Interpolator<T, BCType, CoordT, InterpolationMode::Undefined>;
+        const InterpolatorT interpol(bc);
+        const TransformerFunctor<1, DstT, CoordT, false, InterpolatorT, TransformerPStoFFTW<CoordT>, roundingMode,
+                                 mpp::MagnitudeSqr<ComputeT>>
+            functor(interpol, ps2fftw, aDst.SizeRoi(), op);
+
+        forEachPixel(aDst, functor);
+    }
+    else
+    {
+        checkSameSize(ROI(), aDst.ROI());
+        using magnitudeSqrSrc =
+            SrcFunctor<1, SrcT, ComputeT, DstT, mpp::MagnitudeSqr<ComputeT>, RoundingMode::NearestTiesToEven>;
+
+        const mpp::MagnitudeSqr<ComputeT> op;
+
+        const magnitudeSqrSrc functor(PointerRoi(), Pitch(), op);
+
+        forEachPixel(aDst, functor);
+    }
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::MagnitudeLog(
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
+    complex_basetype_t<remove_vector_t<T>> aOffset) const
+    requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
+{
+    Size2D sizeDst = aDst.SizeRoi();
+    sizeDst.x      = sizeDst.x / 2 + 1;
+
+    using SrcT     = T;
+    using ComputeT = default_compute_type_for_t<T>;
+    using DstT     = same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>;
+
+    if (SizeRoi() == sizeDst)
+    {
+        constexpr RoundingMode roundingMode = RoundingMode::None;
+        using CoordT                        = int;
+
+        const TransformerPStoFFTW<CoordT> ps2fftw(aDst.SizeRoi());
+
+        using BCType = BorderControl<T, BorderType::None>;
+        const BCType bc(PointerRoi(), Pitch(), SizeRoi(), {0});
+
+        const mpp::MagnitudeLog<ComputeT> op(aOffset);
+        using InterpolatorT = Interpolator<T, BCType, CoordT, InterpolationMode::Undefined>;
+        const InterpolatorT interpol(bc);
+        const TransformerFunctor<1, DstT, CoordT, false, InterpolatorT, TransformerPStoFFTW<CoordT>, roundingMode,
+                                 mpp::MagnitudeLog<ComputeT>>
+            functor(interpol, ps2fftw, aDst.SizeRoi(), op);
+
+        forEachPixel(aDst, functor);
+    }
+    else
+    {
+        checkSameSize(ROI(), aDst.ROI());
+
+        using magnitudeSrc =
+            SrcFunctor<1, SrcT, ComputeT, DstT, mpp::MagnitudeLog<ComputeT>, RoundingMode::NearestTiesToEven>;
+
+        const mpp::MagnitudeLog<ComputeT> op(aOffset);
+        const magnitudeSrc functor(PointerRoi(), Pitch(), op);
+
+        forEachPixel(aDst, functor);
+    }
     return aDst;
 }
 

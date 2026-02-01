@@ -29,6 +29,7 @@ addCatchTest(test_sumWindowRowFilter.cpp "common;backends.cuda;backends.npp;back
 addCatchTest(test_sharpenFilter.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Filtering_SharpenFilter")
 addCatchTest(test_maxFilter.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Filtering_MaxFilter")
 addCatchTest(test_minFilter.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Filtering_MinFilter")
+addCatchTest(test_medianFilter.cpp "common;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Filtering_MedianFilter")
 addCatchTest(test_unsharpFilter.cpp "common;common.fileIO;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Filtering_UnsharpFilter")
 addCatchTest(test_thresholdAdaptiveBoxFilter.cpp "common;common.fileIO;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Filtering_ThresholdAdaptiveBoxFilter")
 addCatchTest(test_wienerFilter.cpp "common;common.fileIO;backends.cuda;backends.npp;backends.simple_cpu" "NPP_Filtering_WienerFilter")

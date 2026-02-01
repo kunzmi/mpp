@@ -150,9 +150,9 @@ DEVICE_ONLY_CODE constexpr Matrix<float> XYZtoBGR = Swap1_3 * XYZtoRGB;
 /// Gives the same results as NPP's RGBToYCC.<para/>
 /// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html
 /// </summary>
-DEVICE_ONLY_CODE constexpr Matrix<float> RGBtoYCC(0.213f, 0.419f, 0.081f,   //
-                                                  -0.131f, -0.256f, 0.387f, //
-                                                  0.373f, -0.312f, -0.061f);
+DEVICE_ONLY_CODE constexpr Matrix<float> RGBtoYCCcoeffs(0.213f, 0.419f, 0.081f,   //
+                                                        -0.131f, -0.256f, 0.387f, //
+                                                        0.373f, -0.312f, -0.061f);
 
 /// <summary>
 /// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for PhotoYCC to RGB colorspace
@@ -160,25 +160,55 @@ DEVICE_ONLY_CODE constexpr Matrix<float> RGBtoYCC(0.213f, 0.419f, 0.081f,   //
 /// Gives the same results as NPP's RGBToYCC.<para/>
 /// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html
 /// </summary>
-DEVICE_ONLY_CODE constexpr Matrix<float> YCCtoRGB(0.981f, 0.0f, 1.315f,     //
-                                                  0.981f, -0.311f, -0.669f, //
-                                                  0.981f, 1.601f, 0.0f);
+DEVICE_ONLY_CODE constexpr Matrix<float> YCCtoRGBcoeffs(0.981f, 0.0f, 1.315f,     //
+                                                        0.981f, -0.311f, -0.669f, //
+                                                        0.981f, 1.601f, 0.0f);
+/// <summary>
+/// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for PhotoYCC to RGB colorspace
+/// conversion.<para/>
+/// Gives the same results as NPP's RGBToYCC.<para/>
+/// Values as in
+/// https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html<para/> Values
+/// are specific for 8-bit unsigned integer types.
+/// </summary>
+DEVICE_ONLY_CODE constexpr Matrix3x4 RGBtoYCC(RGBtoYCCcoeffs, Vec3f(0, 0.612f * 255.0f, 0.537f * 255.0f));
+
+/// <summary>
+/// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for PhotoYCC to RGB colorspace
+/// conversion.<para/>
+/// Gives the same results as NPP's RGBToYCC.<para/>
+/// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html,
+/// scaled by 1.3847 to match the actual output.<para/>
+/// Values are specific for 8-bit unsigned integer types.
+/// </summary>
+DEVICE_ONLY_CODE constexpr Matrix3x4 YCCtoRGB(YCCtoRGBcoeffs *Matrix<float>(1.3847f, 0, 0, 0, 1.3847f, 0, 0, 0,
+                                                                            1.3847f),
+                                              YCCtoRGBcoeffs *Vec3f(0, 1.3847f * 255.0f * -0.612f,
+                                                                    1.3847f * 255.0f * -0.537f));
 
 /// <summary>
 /// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for BGR to PhotoYCC colorspace
 /// conversion.<para/>
 /// Gives the same results as NPP's RGBToYCC but adjusted for BGR channel order in source image.<para/>
-/// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html
+/// Values as in
+/// https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html<para/> Values
+/// are specific for 8-bit unsigned integer types.
 /// </summary>
-DEVICE_ONLY_CODE constexpr Matrix<float> BGRtoYCC = RGBtoYCC * Swap1_3;
+DEVICE_ONLY_CODE constexpr Matrix3x4 BGRtoYCC(RGBtoYCCcoeffs *Swap1_3,
+                                              Swap1_3 *Vec3f(0, 0.612f * 255.0f, 0.537f * 255.0f));
 
 /// <summary>
 /// Returns in aTwistMatrix the matrix coefficients to be used in ColorTwist function for PhotoYCC to RGB colorspace
 /// conversion.<para/>
 /// Gives the same results as NPP's RGBToYCC but adjusted for BGR channel order in destination image.<para/>
-/// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html
+/// Values as in https://www.intel.com/content/www/us/en/docs/ipp/developer-guide-reference/2022-1/color-models.html,
+/// scaled by 1.3847 to match the actual output.<para/>
+/// Values are specific for 8-bit unsigned integer types.
 /// </summary>
-DEVICE_ONLY_CODE constexpr Matrix<float> YCCtoBGR = Swap1_3 * YCCtoRGB;
+DEVICE_ONLY_CODE constexpr Matrix3x4 YCCtoBGR(YCCtoRGBcoeffs *Swap1_3 *Matrix<float>(1.3847f, 0, 0, 0, 1.3847f, 0, 0, 0,
+                                                                                     1.3847f),
+                                              Swap1_3 *YCCtoRGBcoeffs *Vec3f(0, 1.3847f * 255.0f * -0.612f,
+                                                                             1.3847f * 255.0f * -0.537f));
 #pragma endregion
 #pragma region RGB to YUV
 

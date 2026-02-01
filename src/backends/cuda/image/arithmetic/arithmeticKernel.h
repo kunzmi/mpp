@@ -24,6 +24,7 @@
 #include "ln.h"
 #include "lshift.h"
 #include "magnitude.h"
+#include "magnitudeLog.h"
 #include "magnitudeSqr.h"
 #include "makeComplex.h"
 #include "mul.h"

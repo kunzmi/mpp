@@ -6065,6 +6065,121 @@ ImageView<T> &ImageView<T>::LUTTrilinear(const mpp::cuda::DevVarView<Vector4A<re
 }
 
 #pragma endregion
+
+#pragma region CompColorKey
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::CompColorKey(const ImageView<T> &aSrc2, const T &aColorKey, ImageView<T> &aDst,
+                                         const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T>
+{
+    validateImage(*this);
+    validateImage(aSrc2);
+    validateImage(aDst);
+    checkSameSize(*this, aSrc2);
+    checkSameSize(*this, aDst);
+
+    InvokeColorCompKeySrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aColorKey, aDst.PointerRoi(),
+                             aDst.Pitch(), SizeRoi(), aStreamCtx);
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<T> &ImageView<T>::CompColorKey(const ImageView<T> &aSrc2, const T &aColorKey,
+                                         const mpp::cuda::StreamCtx &aStreamCtx)
+    requires RealVector<T>
+{
+    validateImage(*this);
+    validateImage(aSrc2);
+    checkSameSize(*this, aSrc2);
+
+    InvokeColorCompKeyInplaceSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), aColorKey, SizeRoi(),
+                                    aStreamCtx);
+
+    return *this;
+}
+#pragma endregion
+
+#pragma region ConvertSampling422
+template <PixelType T>
+void ImageView<T>::ConvertSampling422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                      ImageView<Vector2<remove_vector_t<T>>> &aDstChroma, bool aSwapLumaChroma,
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T> && (vector_size_v<T> == 2)
+{
+    validateImage(aDstLuma);
+    validateImage(aDstChroma);
+    checkSameSize(*this, aDstLuma);
+    checkSameSize(SizeRoi() / Vec2i(2, 1), aDstChroma.SizeRoi());
+
+    InvokeSampling422ConversionC2P2Src<Vector3<remove_vector_t<T>>>(
+        PointerRoi(), Pitch(), aSwapLumaChroma, aDstLuma.PointerRoi(), aDstLuma.Pitch(), aDstChroma.PointerRoi(),
+        aDstChroma.Pitch(), SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+void ImageView<T>::ConvertSampling422(ImageView<Vector1<remove_vector_t<T>>> &aDstLuma,
+                                      ImageView<Vector1<remove_vector_t<T>>> &aDstChroma1,
+                                      ImageView<Vector1<remove_vector_t<T>>> &aDstChroma2, bool aSwapLumaChroma,
+                                      const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires RealVector<T> && (vector_size_v<T> == 2)
+{
+    validateImage(aDstLuma);
+    validateImage(aDstChroma1);
+    validateImage(aDstChroma2);
+    checkSameSize(*this, aDstLuma);
+    checkSameSize(SizeRoi() / Vec2i(2, 1), aDstChroma1.SizeRoi());
+    checkSameSize(SizeRoi() / Vec2i(2, 1), aDstChroma2.SizeRoi());
+
+    InvokeSampling422ConversionC2P3Src<Vector3<remove_vector_t<T>>>(
+        PointerRoi(), Pitch(), aSwapLumaChroma, aDstLuma.PointerRoi(), aDstLuma.Pitch(), aDstChroma1.PointerRoi(),
+        aDstChroma1.Pitch(), aDstChroma2.PointerRoi(), aDstChroma2.Pitch(), SizeRoi(), aStreamCtx);
+}
+
+template <PixelType T>
+ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::ConvertSampling422(
+    ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma, ImageView<Vector2<remove_vector_t<T>>> &aSrcChroma,
+    ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma, bool aSwapLumaChroma,
+    const mpp::cuda::StreamCtx &aStreamCtx)
+    requires RealVector<T> && (vector_size_v<T> == 3)
+{
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma);
+    validateImage(aDstLumaChroma);
+    checkSameSize(aSrcLuma, aDstLumaChroma);
+    checkSameSize(aSrcLuma.SizeRoi() / Vec2i(2, 1), aSrcChroma.SizeRoi());
+
+    InvokeSampling422ConversionP2C2Src<Vector3<remove_vector_t<T>>>(
+        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma.PointerRoi(), aSrcChroma.Pitch(),
+        aDstLumaChroma.PointerRoi(), aDstLumaChroma.Pitch(), aSwapLumaChroma, aSrcLuma.SizeRoi(), aStreamCtx);
+
+    return aDstLumaChroma;
+}
+
+template <PixelType T>
+ImageView<Vector2<remove_vector_t<T>>> &ImageView<T>::ConvertSampling422(
+    ImageView<Vector1<remove_vector_t<T>>> &aSrcLuma, ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma1,
+    ImageView<Vector1<remove_vector_t<T>>> &aSrcChroma2, ImageView<Vector2<remove_vector_t<T>>> &aDstLumaChroma,
+    bool aSwapLumaChroma, const mpp::cuda::StreamCtx &aStreamCtx)
+    requires RealVector<T> && (vector_size_v<T> == 3)
+{
+    validateImage(aSrcLuma);
+    validateImage(aSrcChroma1);
+    validateImage(aSrcChroma2);
+    validateImage(aDstLumaChroma);
+    checkSameSize(aSrcLuma, aDstLumaChroma);
+    checkSameSize(aSrcLuma.SizeRoi() / Vec2i(2, 1), aSrcChroma1.SizeRoi());
+    checkSameSize(aSrcLuma.SizeRoi() / Vec2i(2, 1), aSrcChroma2.SizeRoi());
+
+    InvokeSampling422ConversionP3C2Src<Vector3<remove_vector_t<T>>>(
+        aSrcLuma.PointerRoi(), aSrcLuma.Pitch(), aSrcChroma1.PointerRoi(), aSrcChroma1.Pitch(),
+        aSrcChroma2.PointerRoi(), aSrcChroma2.Pitch(), aDstLumaChroma.PointerRoi(), aDstLumaChroma.Pitch(),
+        aSwapLumaChroma, aSrcLuma.SizeRoi(), aStreamCtx);
+
+    return aDstLumaChroma;
+}
+
+#pragma endregion
 #pragma endregion
 
 } // namespace mpp::image::cuda

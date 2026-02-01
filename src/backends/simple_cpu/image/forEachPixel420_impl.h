@@ -33,7 +33,7 @@ void forEachPixel420(ImageView<Vector1<remove_vector_t<DstT>>> &aDst1, ImageView
         const int pixelX       = elem.Pixel.x * subSampleSize;
         const int pixelXChroma = elem.Pixel.x;
         const int pixelY       = elem.Pixel.y * subSampleSize;
-        const int pixelYChroma = elem.Pixel.x;
+        const int pixelYChroma = elem.Pixel.y;
 
         DstT res[subSampleSize * subSampleSize];
         DstPlaneLumaT *pixelOutLuma1    = gotoPtr(aDst1.PointerRoi(), aDst1.Pitch(), pixelX, pixelY);
@@ -124,7 +124,7 @@ void forEachPixel420(ImageView<Vector1<remove_vector_t<DstT>>> &aDst1, ImageView
         const int pixelX       = elem.Pixel.x * subSampleSize;
         const int pixelXChroma = elem.Pixel.x;
         const int pixelY       = elem.Pixel.y * subSampleSize;
-        const int pixelYChroma = elem.Pixel.x;
+        const int pixelYChroma = elem.Pixel.y;
 
         DstT res[subSampleSize * subSampleSize];
         DstPlane *pixelOutLuma1   = gotoPtr(aDst1.PointerRoi(), aDst1.Pitch(), pixelX, pixelY);

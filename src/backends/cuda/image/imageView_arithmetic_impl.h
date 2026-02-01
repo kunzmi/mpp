@@ -3056,9 +3056,20 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 {
     validateImage(*this);
     validateImage(aDst);
-    checkSameSize(*this, aDst);
 
-    InvokeMagnitudeSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+    Size2D sizeFFTR2C = aDst.SizeRoi();
+    sizeFFTR2C.x      = sizeFFTR2C.x / 2 + 1;
+    if (SizeRoi() != aDst.SizeRoi() && SizeRoi() != sizeFFTR2C)
+    {
+        std::stringstream ss;
+        ss << "ROI sizes of input and output image must be either equal or the source image must be of dimension as "
+              "from a R2C-FFT transform (widthFFT_R2C = widthReal / 2 + 1). The provided sizes are for the source "
+              "image: "
+           << SizeRoi() << " and for the destination image: " << aDst.SizeRoi() << ".";
+        throw ROIEXCEPTION(ss.str());
+    }
+
+    InvokeMagnitudeSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aDst.SizeRoi(), aStreamCtx);
 
     return aDst;
 }
@@ -3071,9 +3082,48 @@ ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_
 {
     validateImage(*this);
     validateImage(aDst);
-    checkSameSize(*this, aDst);
 
-    InvokeMagnitudeSqrSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aStreamCtx);
+    Size2D sizeFFTR2C = aDst.SizeRoi();
+    sizeFFTR2C.x      = sizeFFTR2C.x / 2 + 1;
+    if (SizeRoi() != aDst.SizeRoi() && SizeRoi() != sizeFFTR2C)
+    {
+        std::stringstream ss;
+        ss << "ROI sizes of input and output image must be either equal or the source image must be of dimension as "
+              "from a R2C-FFT transform (widthFFT_R2C = widthReal / 2 + 1). The provided sizes are for the source "
+              "image: "
+           << SizeRoi() << " and for the destination image: " << aDst.SizeRoi() << ".";
+        throw ROIEXCEPTION(ss.str());
+    }
+
+    InvokeMagnitudeSqrSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), SizeRoi(), aDst.SizeRoi(),
+                          aStreamCtx);
+
+    return aDst;
+}
+
+template <PixelType T>
+ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &ImageView<T>::MagnitudeLog(
+    ImageView<same_vector_size_different_type_t<T, complex_basetype_t<remove_vector_t<T>>>> &aDst,
+    complex_basetype_t<remove_vector_t<T>> aOffset, const mpp::cuda::StreamCtx &aStreamCtx) const
+    requires ComplexVector<T> && ComplexFloatingPoint<remove_vector_t<T>>
+{
+    validateImage(*this);
+    validateImage(aDst);
+
+    Size2D sizeFFTR2C = aDst.SizeRoi();
+    sizeFFTR2C.x      = sizeFFTR2C.x / 2 + 1;
+    if (SizeRoi() != aDst.SizeRoi() && SizeRoi() != sizeFFTR2C)
+    {
+        std::stringstream ss;
+        ss << "ROI sizes of input and output image must be either equal or the source image must be of dimension as "
+              "from a R2C-FFT transform (widthFFT_R2C = widthReal / 2 + 1). The provided sizes are for the source "
+              "image: "
+           << SizeRoi() << " and for the destination image: " << aDst.SizeRoi() << ".";
+        throw ROIEXCEPTION(ss.str());
+    }
+
+    InvokeMagnitudeLogSrc(PointerRoi(), Pitch(), aDst.PointerRoi(), aDst.Pitch(), aOffset, SizeRoi(), aDst.SizeRoi(),
+                          aStreamCtx);
 
     return aDst;
 }

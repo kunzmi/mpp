@@ -55,6 +55,7 @@ target_include_directories(backends.cuda.image8s PUBLIC ${CMAKE_CUDA_TOOLKIT_INC
 target_link_libraries(backends.cuda.image8s PRIVATE project_options)
 target_link_libraries(backends.cuda.image8s PUBLIC  
 						backends.cuda.image.arithmetic8s
+						backends.cuda.image.colorConversion8s
 						backends.cuda.image.dataExchangeAndInit8s 
 						backends.cuda.image.filtering8s 
 						backends.cuda.image.geometryTransforms8s 
@@ -359,6 +360,7 @@ target_include_directories(backends.cuda.image64f PUBLIC ${CMAKE_CUDA_TOOLKIT_IN
 target_link_libraries(backends.cuda.image64f PRIVATE project_options)
 target_link_libraries(backends.cuda.image64f PUBLIC  
 						backends.cuda.image.arithmetic64f
+						backends.cuda.image.colorConversion64f
 						backends.cuda.image.dataExchangeAndInit64f 
 						backends.cuda.image.filtering64f 
 						backends.cuda.image.geometryTransforms64f 

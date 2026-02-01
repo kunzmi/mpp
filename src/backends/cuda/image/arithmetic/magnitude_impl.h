@@ -6,7 +6,11 @@
 #include <backends/cuda/templateRegistry.h>
 #include <common/arithmetic/unary_operators.h>
 #include <common/defines.h>
+#include <common/image/functors/borderControl.h>
+#include <common/image/functors/interpolator.h>
 #include <common/image/functors/srcFunctor.h>
+#include <common/image/functors/transformer.h>
+#include <common/image/functors/transformerFunctor.h>
 #include <common/image/pixelTypes.h>
 #include <common/image/size2D.h>
 #include <common/image/threadSplit.h>
@@ -21,29 +25,55 @@ using namespace mpp::cuda;
 namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
-void InvokeMagnitudeSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSize,
-                        const StreamCtx &aStreamCtx)
+void InvokeMagnitudeSrc(const SrcT *aSrc1, size_t aPitchSrc1, DstT *aDst, size_t aPitchDst, const Size2D &aSizeSrc,
+                        const Size2D &aSize, const StreamCtx &aStreamCtx)
 {
     MPP_CUDA_REGISTER_TEMPALTE;
 
-    constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+    Size2D sizeDst = aSize;
+    sizeDst.x      = sizeDst.x / 2 + 1;
 
-    using magnitudeSrc =
-        SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Magnitude<ComputeT>, RoundingMode::NearestTiesToEven>;
+    if (aSizeSrc == sizeDst)
+    {
+        constexpr RoundingMode roundingMode = RoundingMode::None;
+        using CoordT                        = int;
 
-    const mpp::Magnitude<ComputeT> op;
+        const TransformerPStoFFTW<CoordT> ps2fftw(aSize);
 
-    const magnitudeSrc functor(aSrc1, aPitchSrc1, op);
+        using BCType = BorderControl<SrcT, BorderType::None>;
+        const BCType bc(aSrc1, aPitchSrc1, aSizeSrc, {0});
 
-    InvokeForEachPixelKernelDefault<DstT, TupelSize, magnitudeSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+        const mpp::Magnitude<ComputeT> op;
+        using InterpolatorT = Interpolator<SrcT, BCType, CoordT, InterpolationMode::Undefined>;
+        const InterpolatorT interpol(bc);
+
+        using transformerT = TransformerFunctor<1, DstT, CoordT, false, InterpolatorT, TransformerPStoFFTW<CoordT>,
+                                                roundingMode, mpp::Magnitude<ComputeT>>;
+        const transformerT functor(interpol, ps2fftw, aSize, op);
+
+        InvokeForEachPixelKernelDefault<DstT, 1, transformerT>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    }
+    else
+    {
+        constexpr size_t TupelSize = ConfigTupelSize<"Default", sizeof(DstT)>::value;
+
+        using magnitudeSrc =
+            SrcFunctor<TupelSize, SrcT, ComputeT, DstT, mpp::Magnitude<ComputeT>, RoundingMode::NearestTiesToEven>;
+
+        const mpp::Magnitude<ComputeT> op;
+
+        const magnitudeSrc functor(aSrc1, aPitchSrc1, op);
+
+        InvokeForEachPixelKernelDefault<DstT, TupelSize, magnitudeSrc>(aDst, aPitchDst, aSize, aStreamCtx, functor);
+    }
 }
 
 #pragma region Instantiate
 // using default_compute_type_for_t for computeT
 #define Instantiate_For(typeSrc, typeDst)                                                                              \
     template void InvokeMagnitudeSrc<typeSrc, default_compute_type_for_t<typeSrc>, typeDst>(                           \
-        const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst, size_t aPitchDst, const Size2D &aSize,                 \
-        const StreamCtx &aStreamCtx);
+        const typeSrc *aSrc1, size_t aPitchSrc1, typeDst *aDst, size_t aPitchDst, const Size2D &aSizeSrc,              \
+        const Size2D &aSize, const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlpha(typeSrc, typeDst)                                                                        \
     Instantiate_For(Pixel##typeSrc##C1, Pixel##typeDst##C1);                                                           \

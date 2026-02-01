@@ -163,6 +163,80 @@ template <typename CoordT> struct TransformerShift
         return Vector2<CoordT>(aPixelX, aPixelY) - Shift;
     }
 };
+
+template <typename CoordT> struct TransformerFftShift
+{
+    const Size2D roiSize;
+
+#pragma region Constructors
+    TransformerFftShift(const Size2D &aRoiSize) : roiSize(aRoiSize)
+    {
+    }
+#pragma endregion
+
+    DEVICE_CODE Vector2<CoordT> operator()(int aPixelX, int aPixelY) const
+    {
+        aPixelX += (roiSize.x + 1) / 2; // round up for uneven sizes
+        aPixelY += (roiSize.y + 1) / 2;
+        aPixelX = aPixelX % roiSize.x;
+        aPixelY = aPixelY % roiSize.y;
+        return Vector2<CoordT>(aPixelX, aPixelY);
+    }
+};
+
+template <typename CoordT> struct TransformerIFftShift
+{
+    const Size2D roiSize;
+
+#pragma region Constructors
+    TransformerIFftShift(const Size2D &aRoiSize) : roiSize(aRoiSize)
+    {
+    }
+#pragma endregion
+
+    DEVICE_CODE Vector2<CoordT> operator()(int aPixelX, int aPixelY) const
+    {
+        aPixelX += (roiSize.x) / 2; // round down for uneven sizes
+        aPixelY += (roiSize.y) / 2;
+        aPixelX = aPixelX % roiSize.x;
+        aPixelY = aPixelY % roiSize.y;
+        return Vector2<CoordT>(aPixelX, aPixelY);
+    }
+};
+
+template <typename CoordT> struct TransformerPStoFFTW
+{
+    const Size2D roiSize;
+
+#pragma region Constructors
+    TransformerPStoFFTW(const Size2D &aRoiSize) : roiSize(aRoiSize)
+    {
+    }
+#pragma endregion
+
+    DEVICE_CODE Vector2<CoordT> operator()(int aPixelX, int aPixelY) const
+    {
+        aPixelX -= roiSize.x / 2;
+        aPixelY -= roiSize.y / 2;
+
+        int xFFTW = abs(aPixelX);
+        int yFFTW = aPixelY;
+
+        if (yFFTW < 0)
+        {
+            yFFTW = yFFTW + roiSize.y;
+        }
+        if (aPixelX < 0)
+        {
+            yFFTW = roiSize.y - yFFTW;
+            if (yFFTW == roiSize.y)
+            {
+                yFFTW = 0;
+            }
+        }
+        return Vector2<CoordT>(xFFTW, yFFTW);
+    }
+};
 } // namespace mpp::image
 
 #undef STD
