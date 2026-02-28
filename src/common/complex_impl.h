@@ -529,6 +529,26 @@ template <RealSignedNumber T> DEVICE_CODE Complex<T> Complex<T>::operator+(const
 }
 
 /// <summary>
+/// Complex addition SIMD
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> Complex<T>::operator+(const Complex &aOther) const
+    requires IsShort<T> && CUDA_ONLY<T>
+{
+    return FromUint(__vaddss2(*this, aOther));
+}
+
+/// <summary>
+/// Complex addition SIMD
+/// </summary>
+template <RealSignedNumber T>
+DEVICE_CODE Complex<T> Complex<T>::operator+(const Complex &aOther) const
+    requires Is16BitFloat<T> && CUDA_ONLY<T>
+{
+    return FromNV16BitFloat(__hadd2(*this, aOther));
+}
+
+/// <summary>
 /// Complex subtraction (only real part)
 /// </summary>
 template <RealSignedNumber T> DEVICE_CODE Complex<T> &Complex<T>::operator-=(T aOther)

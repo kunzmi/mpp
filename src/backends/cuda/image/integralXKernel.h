@@ -442,6 +442,18 @@ __global__ void integralXKernel(const SrcT *__restrict__ aSrc, size_t aPitchSrc,
                 }
 
                 previousWarp.x = __shfl_sync(0xFFFFFFFF, tupelDst.value[TupelSize - 1].x, warpSize - 1);
+                if constexpr (vector_active_size_v<SrcT> > 1)
+                {
+                    previousWarp.y = __shfl_sync(0xFFFFFFFF, tupelDst.value[TupelSize - 1].y, warpSize - 1);
+                }
+                if constexpr (vector_active_size_v<SrcT> > 2)
+                {
+                    previousWarp.z = __shfl_sync(0xFFFFFFFF, tupelDst.value[TupelSize - 1].z, warpSize - 1);
+                }
+                if constexpr (vector_active_size_v<SrcT> > 3)
+                {
+                    previousWarp.w = __shfl_sync(0xFFFFFFFF, tupelDst.value[TupelSize - 1].w, warpSize - 1);
+                }
             }
             else
             {

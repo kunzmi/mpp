@@ -132,12 +132,11 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, short> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
 {
-    short ret; // NOLINT
-#ifdef IS_HOST_COMPILER
-    if (aValue == 0)
-    { // make clang tidy happy
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for double
     }
-#endif
+    short ret; // NOLINT
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.s16.f64 %0, %1;" : "=h"(ret) : "d"(aValue));
 #endif
@@ -148,12 +147,11 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, ushort> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
 {
-    ushort ret; // NOLINT
-#ifdef IS_HOST_COMPILER
-    if (aValue == 0)
-    { // make clang tidy happy
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for double
     }
-#endif
+    ushort ret; // NOLINT
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.u16.f64 %0, %1;" : "=h"(ret) : "d"(aValue));
 #endif
@@ -164,12 +162,11 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, sbyte> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
 {
-    short ret; // NOLINT there are no 8-bit registers...
-#ifdef IS_HOST_COMPILER
-    if (aValue == 0)
-    { // make clang tidy happy
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for double
     }
-#endif
+    short ret; // NOLINT there are no 8-bit registers...
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.s8.f64 %0, %1;" : "=h"(ret) : "d"(aValue));
 #endif
@@ -180,14 +177,103 @@ template <typename TFrom, typename TTo>
 DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
     requires std::same_as<TTo, byte> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
 {
-    ushort ret; // NOLINT there are no 8-bit registers...
-#ifdef IS_HOST_COMPILER
-    if (aValue == 0)
-    { // make clang tidy happy
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for double
     }
-#endif
+    ushort ret; // NOLINT there are no 8-bit registers...
 #ifdef IS_CUDA_COMPILER
     asm("cvt.rzi.u8.f64 %0, %1;" : "=h"(ret) : "d"(aValue));
+#endif
+    return ret;
+}
+
+template <typename TFrom, typename TTo>
+DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
+    requires std::same_as<TTo, int> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
+{
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for double
+    }
+    int ret; // NOLINT
+#ifdef IS_CUDA_COMPILER
+    asm("cvt.rzi.s32.f64 %0, %1;" : "=r"(ret) : "d"(aValue));
+#endif
+    return ret;
+}
+
+template <typename TFrom, typename TTo>
+DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
+    requires std::same_as<TTo, uint> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
+{
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for double
+    }
+    uint ret; // NOLINT
+#ifdef IS_CUDA_COMPILER
+    asm("cvt.rzi.u32.f64 %0, %1;" : "=r"(ret) : "d"(aValue));
+#endif
+    return ret;
+}
+
+template <typename TFrom, typename TTo>
+DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
+    requires std::same_as<TTo, long64> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
+{
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for double
+    }
+    long64 ret; // NOLINT
+#ifdef IS_CUDA_COMPILER
+    asm("cvt.rzi.s64.f64 %0, %1;" : "=l"(ret) : "d"(aValue));
+#endif
+    return ret;
+}
+
+template <typename TFrom, typename TTo>
+DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
+    requires std::same_as<TTo, ulong64> && std::same_as<TFrom, double> && CUDA_ONLY<TTo>
+{
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for double
+    }
+    ulong64 ret; // NOLINT
+#ifdef IS_CUDA_COMPILER
+    asm("cvt.rzi.u64.f64 %0, %1;" : "=l"(ret) : "d"(aValue));
+#endif
+    return ret;
+}
+
+template <typename TFrom, typename TTo>
+DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
+    requires std::same_as<TTo, long64> && std::same_as<TFrom, float> && CUDA_ONLY<TTo>
+{
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for float to int64
+    }
+    long64 ret; // NOLINT
+#ifdef IS_CUDA_COMPILER
+    asm("cvt.rzi.s64.f32 %0, %1;" : "=l"(ret) : "f"(aValue));
+#endif
+    return ret;
+}
+
+template <typename TFrom, typename TTo>
+DEVICE_ONLY_CODE TTo StaticCast(TFrom aValue)
+    requires std::same_as<TTo, ulong64> && std::same_as<TFrom, float> && CUDA_ONLY<TTo>
+{
+    if (isnan(aValue))
+    {
+        return 0; // flush NAN to 0, not default for float to uint64
+    }
+    ulong64 ret; // NOLINT
+#ifdef IS_CUDA_COMPILER
+    asm("cvt.rzi.u64.f32 %0, %1;" : "=l"(ret) : "f"(aValue));
 #endif
     return ret;
 }

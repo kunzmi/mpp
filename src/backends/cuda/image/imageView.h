@@ -9807,12 +9807,13 @@ template <PixelType T> class MPPEXPORT_CUDAI ImageView : public ImageViewBase<T>
     /// aProfileSum, can be nullptr.</param>
     /// <param name="aCenter">The center of the circular average.</param>
     /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
-    /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
-    /// vertical.</param> <param name="aStreamCtx"></param>
+    /// <param name="aAngleInDeg">Orientation of the ellipse's orthogonal axis, clockwise in degrees with 0.0 being
+    /// vertical.</param>
+    /// <param name="aStreamCtx"></param>
     void RadialProfile(mpp::cuda::DevVarView<int> &aProfileCount,
                        mpp::cuda::DevVarView<same_vector_size_different_type_t<T, float>> &aProfileSum,
                        mpp::cuda::DevVarView<same_vector_size_different_type_t<T, float>> &aProfileSumSqr,
-                       const Vec2f &aCenter, float aRadiusRatio, float aAngleInRad,
+                       const Vec2f &aCenter, float aRadiusRatio, float aAngleInDeg,
                        const mpp::cuda::StreamCtx &aStreamCtx = mpp::cuda::StreamCtxSingleton::Get()) const
         requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>);
 #pragma endregion

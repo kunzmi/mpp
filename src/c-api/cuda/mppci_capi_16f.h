@@ -2883,12 +2883,13 @@ extern "C"
     /// aProfileSum, can be nullptr.</param>
     /// <param name="aCenter">The center of the circular average.</param>
     /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
-    /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
-    /// vertical.</param> <param name="aStreamCtx"></param>
+    /// <param name="aAngleInDeg">Orientation of the ellipse's orthogonal axis, clockwise in degrees with 0.0 being
+    /// vertical.</param>
+    /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciEllipticalRadialProfile_16f_C1(ConstDevPtrMpp16f aSrc1, size_t aSrc1Step,
                                                      DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                      DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
-                                                     const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
+                                                     const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInDeg,
                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
@@ -6710,12 +6711,13 @@ extern "C"
     /// aProfileSum, can be nullptr.</param>
     /// <param name="aCenter">The center of the circular average.</param>
     /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
-    /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
-    /// vertical.</param> <param name="aStreamCtx"></param>
+    /// <param name="aAngleInDeg">Orientation of the ellipse's orthogonal axis, clockwise in degrees with 0.0 being
+    /// vertical.</param>
+    /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciEllipticalRadialProfile_16f_C2(ConstDevPtrMpp16f aSrc1, size_t aSrc1Step,
                                                      DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                      DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
-                                                     const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
+                                                     const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInDeg,
                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
@@ -10692,12 +10694,13 @@ extern "C"
     /// aProfileSum, can be nullptr.</param>
     /// <param name="aCenter">The center of the circular average.</param>
     /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
-    /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
-    /// vertical.</param> <param name="aStreamCtx"></param>
+    /// <param name="aAngleInDeg">Orientation of the ellipse's orthogonal axis, clockwise in degrees with 0.0 being
+    /// vertical.</param>
+    /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciEllipticalRadialProfile_16f_C3(ConstDevPtrMpp16f aSrc1, size_t aSrc1Step,
                                                      DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                      DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
-                                                     const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
+                                                     const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInDeg,
                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
@@ -16328,12 +16331,13 @@ extern "C"
     /// aProfileSum, can be nullptr.</param>
     /// <param name="aCenter">The center of the circular average.</param>
     /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
-    /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
-    /// vertical.</param> <param name="aStreamCtx"></param>
+    /// <param name="aAngleInDeg">Orientation of the ellipse's orthogonal axis, clockwise in degrees with 0.0 being
+    /// vertical.</param>
+    /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciEllipticalRadialProfile_16f_C4(ConstDevPtrMpp16f aSrc1, size_t aSrc1Step,
                                                      DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                      DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
-                                                     const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
+                                                     const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInDeg,
                                                      MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>
@@ -20338,12 +20342,13 @@ extern "C"
     /// aProfileSum, can be nullptr.</param>
     /// <param name="aCenter">The center of the circular average.</param>
     /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
-    /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
-    /// vertical.</param> <param name="aStreamCtx"></param>
+    /// <param name="aAngleInDeg">Orientation of the ellipse's orthogonal axis, clockwise in degrees with 0.0 being
+    /// vertical.</param>
+    /// <param name="aStreamCtx"></param>
     MPPErrorCode mppciEllipticalRadialProfile_16f_AC4(ConstDevPtrMpp16f aSrc1, size_t aSrc1Step,
                                                       DevPtrMpp32s aProfileCount, DevPtrMpp32f aProfileSum,
                                                       DevPtrMpp32f aProfileSumSqr, size_t aProfileSize,
-                                                      const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInRad,
+                                                      const Mpp32f aCenter[2], Mpp32f aRadiusRatio, Mpp32f aAngleInDeg,
                                                       MppiSize aSizeROI, CPtrMppCudaStreamCtx aStreamCtx);
 
     /// <summary>

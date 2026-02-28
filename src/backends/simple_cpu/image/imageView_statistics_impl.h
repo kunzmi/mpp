@@ -612,8 +612,6 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
 
     aDst = DstT(reduction_init_value_v<ReductionInitValue::Zero, DstT>);
 
-    reduction(aMask, SizeRoi(), aDst, functor);
-
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
     const mpp::DivPostOp<DstT> postOp(static_cast<remove_vector_t<DstT>>(maskpixels));
@@ -723,8 +721,6 @@ void ImageView<T>::MSEMasked(const ImageView<T> &aSrc2, same_vector_size_differe
     const normL2SrcSrc functor(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), op);
 
     aDst = DstT(reduction_init_value_v<ReductionInitValue::Zero, DstT>);
-
-    reduction(aMask, SizeRoi(), aDst, functor);
 
     const size_t maskpixels = reduction(aMask, SizeRoi(), aDst, functor);
 
@@ -2867,6 +2863,46 @@ void ImageView<T>::QualityIndex(const ImageView<T> &aSrc2, same_vector_size_diff
 
     postOp(dst1, dst2, dst3, dst4, dst5, aDst);
 }
+
+template <PixelType T>
+void ImageView<T>::QualityIndexWindow(const ImageView<T> &aSrc2,
+                                      same_vector_size_different_type_t<T, double> &aDst) const
+    requires RealVector<T>
+{
+    checkSameSize(ROI(), aSrc2.ROI());
+
+    using SrcT                  = T;
+    using ComputeT              = same_vector_size_different_type_t<T, double>;
+    using DstT                  = same_vector_size_different_type_t<T, double>;
+    constexpr size_t FilterSize = 11;
+
+    const mpp::QualityIndexWindow<DstT> postOp;
+    std::vector<double> ssimFilter(FilterSize * FilterSize, 0);
+
+    for (size_t y = 0; y < FilterSize; y++)
+    {
+        for (size_t x = 0; x < FilterSize; x++)
+        {
+            const size_t idx = y * FilterSize + x;
+            ssimFilter[idx]  = to_double(FixedFilterKernelSSIM::ValuesSeparable[x]) * // NOLINT
+                              to_double(FixedFilterKernelSSIM::ValuesSeparable[y]);   // NOLINT
+        }
+    }
+
+    Image<DstT> localSSIM(SizeRoi());
+    ssimEachPixel<SrcT, ComputeT, DstT, double, mpp::QualityIndexWindow<DstT>>(
+        *this, aSrc2, localSSIM, ssimFilter.data(), FilterSize, BorderType::Replicate, ROI(), aSrc2.ROI(), postOp);
+
+    if constexpr (vector_active_size_v<T> > 1)
+    {
+        double unused = 0;
+        localSSIM.Mean(aDst, unused);
+    }
+    else
+    {
+        localSSIM.Mean(aDst);
+    }
+}
 #pragma endregion
 
 #pragma region SSIM
@@ -3443,7 +3479,7 @@ void ImageView<T>::MinIndex(T &aDstMin, same_vector_size_different_type_t<T, int
     }
 
     SrcT resultMinY(reduction_init_value_v<ReductionInitValue::Max, SrcT>);
-    idxT resultMinIdxY(-1);
+    idxT resultMinIdxY(INT_MAX);
     for (int pixelY = 0; pixelY < SizeRoi().y; pixelY++)
     {
         const SrcT pxMin = tempVal[to_size_t(pixelY)];
@@ -3536,7 +3572,7 @@ void ImageView<T>::MinIndexMasked(T &aDstMin, same_vector_size_different_type_t<
     }
 
     SrcT resultMinY(reduction_init_value_v<ReductionInitValue::Max, SrcT>);
-    idxT resultMinIdxY(-1);
+    idxT resultMinIdxY(INT_MAX);
     for (int pixelY = 0; pixelY < SizeRoi().y; pixelY++)
     {
         const SrcT pxMin = tempVal[to_size_t(pixelY)];
@@ -3625,7 +3661,7 @@ void ImageView<T>::MinIndex(T &aDstMin, same_vector_size_different_type_t<T, int
     }
 
     SrcT resultMinY(reduction_init_value_v<ReductionInitValue::Max, SrcT>);
-    idxT resultMinIdxY(-1);
+    idxT resultMinIdxY(INT_MAX);
     for (int pixelY = 0; pixelY < SizeRoi().y; pixelY++)
     {
         const SrcT pxMin = tempVal[to_size_t(pixelY)];
@@ -3674,7 +3710,7 @@ void ImageView<T>::MinIndexMasked(T &aDstMin, same_vector_size_different_type_t<
     }
 
     SrcT resultMinY(reduction_init_value_v<ReductionInitValue::Max, SrcT>);
-    idxT resultMinIdxY(-1);
+    idxT resultMinIdxY(INT_MAX);
     for (int pixelY = 0; pixelY < SizeRoi().y; pixelY++)
     {
         const SrcT pxMin = tempVal[to_size_t(pixelY)];
@@ -3722,7 +3758,7 @@ void ImageView<T>::MaxIndex(T &aDstMax, same_vector_size_different_type_t<T, int
     }
 
     SrcT resultMaxY(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
-    idxT resultMaxIdxY(-1);
+    idxT resultMaxIdxY(INT_MAX);
     for (int pixelY = 0; pixelY < SizeRoi().y; pixelY++)
     {
         const SrcT pxMax = tempVal[to_size_t(pixelY)];
@@ -3815,7 +3851,7 @@ void ImageView<T>::MaxIndexMasked(T &aDstMax, same_vector_size_different_type_t<
     }
 
     SrcT resultMaxY(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
-    idxT resultMaxIdxY(-1);
+    idxT resultMaxIdxY(INT_MAX);
     for (int pixelY = 0; pixelY < SizeRoi().y; pixelY++)
     {
         const SrcT pxMax = tempVal[to_size_t(pixelY)];
@@ -3904,7 +3940,7 @@ void ImageView<T>::MaxIndex(T &aDstMax, same_vector_size_different_type_t<T, int
     }
 
     SrcT resultMaxY(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
-    idxT resultMaxIdxY(-1);
+    idxT resultMaxIdxY(INT_MAX);
     for (int pixelY = 0; pixelY < SizeRoi().y; pixelY++)
     {
         const SrcT pxMax = tempVal[to_size_t(pixelY)];
@@ -3953,7 +3989,7 @@ void ImageView<T>::MaxIndexMasked(T &aDstMax, same_vector_size_different_type_t<
     }
 
     SrcT resultMaxY(reduction_init_value_v<ReductionInitValue::Min, SrcT>);
-    idxT resultMaxIdxY(-1);
+    idxT resultMaxIdxY(INT_MAX);
     for (int pixelY = 0; pixelY < SizeRoi().y; pixelY++)
     {
         const SrcT pxMax = tempVal[to_size_t(pixelY)];
@@ -4908,11 +4944,11 @@ template <PixelType T>
 void ImageView<T>::RadialProfile(int *aProfileCount, same_vector_size_different_type_t<T, float> *aProfileSum,
                                  same_vector_size_different_type_t<T, float> *aProfileSumSqr,
                                  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-                                 int aProfileSize, const Vec2f &aCenter, float aRadiusRatio, float aAngleInRad) const
+                                 int aProfileSize, const Vec2f &aCenter, float aRadiusRatio, float aAngleInDeg) const
     requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>)
 {
     const AffineTransformation<float> shiftCenter = AffineTransformation<float>::GetTranslation(-aCenter);
-    const AffineTransformation<float> rot         = AffineTransformation<float>::GetTranslation(-aAngleInRad);
+    const AffineTransformation<float> rot         = AffineTransformation<float>::GetRotation(-aAngleInDeg);
     const AffineTransformation<float> scale  = AffineTransformation<float>::GetScale(Vec2f(1.0f, 1.0f / aRadiusRatio));
     const AffineTransformation<float> affine = scale * rot * shiftCenter;
 

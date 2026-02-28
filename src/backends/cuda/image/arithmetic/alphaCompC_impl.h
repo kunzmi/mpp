@@ -1,4 +1,4 @@
-#include "alphaComp.h"
+#include "alphaCompC.h"
 #include <backends/cuda/image/configurations.h>
 #include <backends/cuda/image/forEachPixelKernel.h>
 #include <backends/cuda/streamCtx.h>
@@ -21,8 +21,9 @@ namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
-                            size_t aPitchDst, remove_vector_t<SrcT> aAlpha1, remove_vector_t<SrcT> aAlpha2,
-                            AlphaCompositionOp aAlphaOp, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx)
+                            size_t aPitchDst, const remove_vector_t<SrcT> &aAlpha1,
+                            const remove_vector_t<SrcT> &aAlpha2, AlphaCompositionOp aAlphaOp, const Size2D &aSize,
+                            const mpp::cuda::StreamCtx &aStreamCtx)
 {
     MPP_CUDA_REGISTER_TEMPALTE;
 
@@ -170,8 +171,8 @@ void InvokeAlphaCompCSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aS
     template void                                                                                                      \
     InvokeAlphaCompCSrcSrc<typeSrcIsTypeDst, default_floating_compute_type_for_t<typeSrcIsTypeDst>, typeSrcIsTypeDst>( \
         const typeSrcIsTypeDst *aSrc1, size_t aPitchSrc1, const typeSrcIsTypeDst *aSrc2, size_t aPitchSrc2,            \
-        typeSrcIsTypeDst *aDst, size_t aPitchDst, remove_vector_t<typeSrcIsTypeDst> aAlpha1,                           \
-        remove_vector_t<typeSrcIsTypeDst> aAlpha2, AlphaCompositionOp aAlphaOp, const Size2D &aSize,                   \
+        typeSrcIsTypeDst *aDst, size_t aPitchDst, const remove_vector_t<typeSrcIsTypeDst> &aAlpha1,                    \
+        const remove_vector_t<typeSrcIsTypeDst> &aAlpha2, AlphaCompositionOp aAlphaOp, const Size2D &aSize,            \
         const mpp::cuda::StreamCtx &aStreamCtx);
 
 #define ForAllChannelsWithAlpha(type)                                                                                  \

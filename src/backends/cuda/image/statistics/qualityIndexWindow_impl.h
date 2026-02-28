@@ -43,7 +43,7 @@ struct pixel_block_size_y<T>
 
 template <typename SrcT, typename DstT>
 void InvokeQIWSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aTempBuffer,
-                     DstT *aTempBufferAvg, DstT *aDst, const Size2D &aAllowedReadRoiSize1,
+                     size_t aPitchTempBuffer, DstT *aTempBufferAvg, DstT *aDst, const Size2D &aAllowedReadRoiSize1,
                      const Vector2<int> &aOffsetToActualRoi1, const Size2D &aAllowedReadRoiSize2,
                      const Vector2<int> &aOffsetToActualRoi2, const Size2D &aSize,
                      const mpp::cuda::StreamCtx &aStreamCtx)
@@ -64,14 +64,14 @@ void InvokeQIWSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
     const mpp::QualityIndexWindow<DstT> postOp;
 
     InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
-                                  mpp::QualityIndexWindow<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp,
-                                                                 aSize, aStreamCtx);
+                                  mpp::QualityIndexWindow<DstT>>(bc1, bc2, aTempBuffer, aPitchTempBuffer, postOp, aSize,
+                                                                 aStreamCtx);
 
     using sumSrc = SrcReductionFunctor<TupelSize, ComputeT, ComputeT, mpp::Sum<ComputeT, ComputeT>>;
 
     const mpp::Sum<ComputeT, ComputeT> op;
 
-    const sumSrc functor(aTempBuffer, aSize.x * sizeof(DstT), op);
+    const sumSrc functor(aTempBuffer, aPitchTempBuffer, op);
 
     InvokeReductionAlongXKernelDefault<ComputeT, ComputeT, TupelSize, sumSrc, mpp::Sum<ComputeT, ComputeT>,
                                        ReductionInitValue::Zero>(aTempBuffer, aTempBufferAvg, aSize, aStreamCtx,
@@ -90,7 +90,7 @@ void InvokeQIWSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, si
 #define Instantiate_For(typeSrc)                                                                                       \
     template void InvokeQIWSrcSrc<typeSrc, qiw_types_for_rt<typeSrc>>(                                                 \
         const typeSrc *aSrc1, size_t aPitchSrc1, const typeSrc *aSrc2, size_t aPitchSrc2,                              \
-        qiw_types_for_rt<typeSrc> *aTempBuffer, qiw_types_for_rt<typeSrc> *aTempBufferAvg,                             \
+        qiw_types_for_rt<typeSrc> *aTempBuffer, size_t aPitchTempBuffer, qiw_types_for_rt<typeSrc> *aTempBufferAvg,    \
         qiw_types_for_rt<typeSrc> *aDst, const Size2D &aAllowedReadRoiSize1, const Vector2<int> &aOffsetToActualRoi1,  \
         const Size2D &aAllowedReadRoiSize2, const Vector2<int> &aOffsetToActualRoi2, const Size2D &aSize,              \
         const StreamCtx &aStreamCtx);

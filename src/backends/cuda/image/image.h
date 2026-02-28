@@ -36,7 +36,9 @@ template <PixelType T> class Image : public ImageView<T>
     {
         if (ImageView<T>::PointerRef() != nullptr)
         {
-            cudaSafeCall(cudaFree(ImageView<T>::PointerRef()));
+            // ignore if failing, as the destructor is also called after an cuda-exception and
+            // the cuda-context might already be invalid
+            cudaFree(ImageView<T>::PointerRef());
         }
         ImageView<T>::PointerRef()    = nullptr;
         ImageView<T>::PointerRoiRef() = nullptr;

@@ -116,9 +116,12 @@ __global__ void reductionMaxIdxAlongYKernel(
                  resultMax.w, resultMaxIdx.w);
     }
 
-    // write intermediate threadBlock sums to shared memory for result 1:
-    bufferMaxVal[batchId] = resultMax;
-    bufferMaxIdx[batchId] = resultMaxIdx;
+    if (warpLaneId == 0)
+    {
+        // write intermediate threadBlock sums to shared memory for result 1:
+        bufferMaxVal[batchId] = resultMax;
+        bufferMaxIdx[batchId] = resultMaxIdx;
+    }
 
     __syncthreads();
 
@@ -217,10 +220,8 @@ void InvokeReductionMaxIdxAlongYKernel(const dim3 &aBlockSize, uint aSharedMemor
 {
     dim3 blocksPerGrid(1, 1, 1);
 
-    const int size = DIV_UP(aSize, ConfigBlockSize<"DefaultReductionX">::value.y);
-
     reductionMaxIdxAlongYKernel<SrcT><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(
-        aSrcMax, aSrcMaxIdxX, aDstMax, aDstMaxIdxX, aDstMaxIdxY, aDstScalarMax, aDstScalarIdxMax, size);
+        aSrcMax, aSrcMaxIdxX, aDstMax, aDstMaxIdxX, aDstMaxIdxY, aDstScalarMax, aDstScalarIdxMax, aSize);
 
     peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream);

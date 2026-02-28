@@ -116,9 +116,12 @@ __global__ void reductionMinIdxAlongYKernel(
                  resultMin.w, resultMinIdx.w);
     }
 
-    // write intermediate threadBlock sums to shared memory for result 1:
-    bufferMinVal[batchId] = resultMin;
-    bufferMinIdx[batchId] = resultMinIdx;
+    if (warpLaneId == 0)
+    {
+        // write intermediate threadBlock sums to shared memory for result 1:
+        bufferMinVal[batchId] = resultMin;
+        bufferMinIdx[batchId] = resultMinIdx;
+    }
 
     __syncthreads();
 
@@ -215,10 +218,8 @@ void InvokeReductionMinIdxAlongYKernel(const dim3 &aBlockSize, uint aSharedMemor
 {
     dim3 blocksPerGrid(1, 1, 1);
 
-    const int size = DIV_UP(aSize, ConfigBlockSize<"DefaultReductionX">::value.y);
-
     reductionMinIdxAlongYKernel<SrcT><<<blocksPerGrid, aBlockSize, aSharedMemory, aStream>>>(
-        aSrcMin, aSrcMinIdxX, aDstMin, aDstMinIdxX, aDstMinIdxY, aDstScalarMin, aDstScalarIdxMin, size);
+        aSrcMin, aSrcMinIdxX, aDstMin, aDstMinIdxX, aDstMinIdxY, aDstScalarMin, aDstScalarIdxMin, aSize);
 
     peekAndCheckLastCudaError("Block size: " << aBlockSize << " Grid size: " << blocksPerGrid
                                              << " SharedMemory: " << aSharedMemory << " Stream: " << aStream);

@@ -59,7 +59,7 @@ __global__ void reductionAlongYKernel(const SrcT *__restrict__ aSrc, DstT *__res
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp(buffer[i][warpLaneId], result);
         }

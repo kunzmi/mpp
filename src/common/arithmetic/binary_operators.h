@@ -1024,9 +1024,13 @@ template <RealVector T, AlphaCompositionOp alphaOp> struct AlphaComposition
 };
 
 // For integer types with scaling alpha to float in value range 0..1
-template <RealVector T, remove_vector_t<T> alphaMax, remove_vector_t<T> alphaMaxInv, AlphaCompositionOp alphaOp>
+template <RealVector T, RealVector SrcT, AlphaCompositionOp alphaOp>
 struct AlphaCompositionScale : public AlphaComposition<T, alphaOp>
 {
+    static constexpr remove_vector_t<T> alphaMax =
+        static_cast<remove_vector_t<T>>(numeric_limits<remove_vector_t<SrcT>>::max());
+    static constexpr remove_vector_t<T> alphaMaxInv = static_cast<remove_vector_t<T>>(1) / alphaMax;
+
     DEVICE_CODE void operator()(const T &aSrc1, const T &aSrc2, T &aDst) const
         requires(vector_size_v<T> == 1)
     {

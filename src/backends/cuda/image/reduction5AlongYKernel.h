@@ -81,7 +81,7 @@ __global__ void reduction5AlongYKernel(const SrcT1 *__restrict__ aSrc1, const Sr
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp1(buffer1[i][warpLaneId], result1);
         }
@@ -101,7 +101,7 @@ __global__ void reduction5AlongYKernel(const SrcT1 *__restrict__ aSrc1, const Sr
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp2(buffer2[i][warpLaneId], result2);
         }
@@ -121,7 +121,7 @@ __global__ void reduction5AlongYKernel(const SrcT1 *__restrict__ aSrc1, const Sr
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp3(buffer3[i][warpLaneId], result3);
         }
@@ -141,7 +141,7 @@ __global__ void reduction5AlongYKernel(const SrcT1 *__restrict__ aSrc1, const Sr
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp4(buffer4[i][warpLaneId], result4);
         }
@@ -161,7 +161,7 @@ __global__ void reduction5AlongYKernel(const SrcT1 *__restrict__ aSrc1, const Sr
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp5(buffer5[i][warpLaneId], result5);
         }
@@ -235,13 +235,13 @@ void InvokeReduction5AlongYKernelDefault(const SrcT1 *aSrc1, const SrcT2 *aSrc2,
         static_assert(sizeof(ComputeT5) <= sizeof(DstT),
                       "expected type size of ComputeT5 smaller or equal to size of DstT");
 
-        dim3 BlockSize    = ConfigBlockSize<"DefaultReductionY">::value;
+        dim3 BlockSize    = ConfigBlockSize<"DefaultReductionYLarge">::value;
         uint SharedMemory = sizeof(DstT) * BlockSize.x * BlockSize.y * BlockSize.z;
 
         if (SharedMemory > aStreamCtx.SharedMemPerBlock)
         {
             // use a block config of half the size:
-            BlockSize    = ConfigBlockSize<"DefaultReductionYLarge">::value;
+            BlockSize.y /= 2;
             SharedMemory = sizeof(DstT) * BlockSize.x * BlockSize.y * BlockSize.z;
         }
 

@@ -62,7 +62,7 @@ __global__ void reductionMaskedCountingAlongYKernel(const ulong64 *__restrict__ 
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp(buffer[i][warpLaneId], result);
         }
@@ -178,8 +178,7 @@ __global__ void reductionMaskedCountingAlongYKernel(const ulong64 *__restrict__ 
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y;
-             i++) // i = 0 is already stored in maskCounter
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in maskCounter
         {
             maskCounter += bufferMask[i][warpLaneId];
         }
@@ -254,7 +253,7 @@ void InvokeReductionMaskedCountingAlongYKernelDefault(const ulong64 *aMaskCounte
             BlockSize                   = ConfigBlockSize<"DefaultReductionYLarge">::value;
             const uint SharedMemoryData = sizeof(DstT) * BlockSize.x * BlockSize.y * BlockSize.z;
             const uint SharedMemoryMask = sizeof(ulong64) * BlockSize.x * BlockSize.y * BlockSize.z;
-            uint SharedMemory           = std::max(SharedMemoryData, SharedMemoryMask);
+            SharedMemory                = std::max(SharedMemoryData, SharedMemoryMask);
         }
 
         InvokeReductionMaskedCountingAlongYKernel<SrcT, DstT, reductionOp, NeutralValue, postOp, postOpScalar>(

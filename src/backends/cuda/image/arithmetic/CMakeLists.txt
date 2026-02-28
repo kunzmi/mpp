@@ -88,6 +88,14 @@ add_library(backends.cuda.image.arithmetic16s OBJECT
 	16s/sub.cu
 	16s/subMasked.cu
 	16s/xor.cu)
+set_source_files_properties(16s/addProduct.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16s/addProductMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16s/addSquare.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16s/addSquareMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16s/addWeighted.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16s/addWeightedMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16s/alphaCompC.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16s/alphaComp.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic16u OBJECT 
 	16u/absDiff.cu
@@ -118,6 +126,14 @@ add_library(backends.cuda.image.arithmetic16u OBJECT
 	16u/sub.cu
 	16u/subMasked.cu
 	16u/xor.cu)
+set_source_files_properties(16u/addProduct.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16u/addProductMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16u/addSquare.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16u/addSquareMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16u/addWeighted.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16u/addWeightedMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16u/alphaCompC.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16u/alphaComp.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic32s OBJECT 
 	32s/abs.cu
@@ -149,6 +165,14 @@ add_library(backends.cuda.image.arithmetic32s OBJECT
 	32s/sub.cu
 	32s/subMasked.cu
 	32s/xor.cu)
+set_source_files_properties(32s/addProduct.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32s/addProductMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32s/addSquare.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32s/addSquareMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32s/addWeighted.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32s/addWeightedMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32s/alphaCompC.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32s/alphaComp.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic32u OBJECT 
 	32u/absDiff.cu
@@ -179,6 +203,14 @@ add_library(backends.cuda.image.arithmetic32u OBJECT
 	32u/sub.cu
 	32u/subMasked.cu
 	32u/xor.cu)
+set_source_files_properties(32u/addProduct.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32u/addProductMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32u/addSquare.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32u/addSquareMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32u/addWeighted.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32u/addWeightedMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32u/alphaCompC.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32u/alphaComp.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic16f OBJECT 
 	16f/abs.cu
@@ -204,6 +236,8 @@ add_library(backends.cuda.image.arithmetic16f OBJECT
 	16f/sqrt.cu
 	16f/sub.cu
 	16f/subMasked.cu)
+set_source_files_properties(16f/alphaCompC.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16f/alphaComp.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic16bf OBJECT 
 	16bf/abs.cu
@@ -255,6 +289,8 @@ add_library(backends.cuda.image.arithmetic32f OBJECT
 	32f/sqrt.cu
 	32f/sub.cu
 	32f/subMasked.cu)
+set_source_files_properties(32f/alphaCompC.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32f/alphaComp.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic64f OBJECT 
 	64f/abs.cu
@@ -280,6 +316,8 @@ add_library(backends.cuda.image.arithmetic64f OBJECT
 	64f/sqrt.cu
 	64f/sub.cu
 	64f/subMasked.cu)
+set_source_files_properties(64f/alphaCompC.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(64f/alphaComp.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic16sc OBJECT 
 	16sc/add.cu
@@ -304,6 +342,16 @@ add_library(backends.cuda.image.arithmetic16sc OBJECT
 	16sc/sqrt.cu
 	16sc/sub.cu
 	16sc/subMasked.cu)
+#we use c_float as computeType in the sqr() and sqrt() kernel, using fusedMultiplyAdd in the complex
+#multiplication leads to slightly wrong results for large numbers, so disable it:
+set_source_files_properties(16sc/sqr.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16sc/sqrt.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16sc/addProduct.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16sc/addProductMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16sc/addSquare.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16sc/addSquareMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16sc/addWeighted.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(16sc/addWeightedMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic32sc OBJECT 
 	32sc/add.cu
@@ -328,6 +376,14 @@ add_library(backends.cuda.image.arithmetic32sc OBJECT
 	32sc/sqrt.cu
 	32sc/sub.cu
 	32sc/subMasked.cu)
+set_source_files_properties(32sc/sqr.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32sc/sqrt.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32sc/addProduct.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32sc/addProductMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32sc/addSquare.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32sc/addSquareMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32sc/addWeighted.cu PROPERTIES COMPILE_FLAGS --fmad=false)
+set_source_files_properties(32sc/addWeightedMasked.cu PROPERTIES COMPILE_FLAGS --fmad=false)
 	
 add_library(backends.cuda.image.arithmetic32fc OBJECT
 	32fc/add.cu

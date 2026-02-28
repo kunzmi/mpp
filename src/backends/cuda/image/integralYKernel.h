@@ -47,10 +47,34 @@ __global__ void integralYKernel(SrcDstT *__restrict__ aSrcDst, size_t aPitchSrcD
             }
 
             doShuffleUp(warpLaneID, resVal.x);
+            if constexpr (vector_active_size_v<SrcDstT> > 1)
+            {
+                doShuffleUp(warpLaneID, resVal.y);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 2)
+            {
+                doShuffleUp(warpLaneID, resVal.z);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 3)
+            {
+                doShuffleUp(warpLaneID, resVal.w);
+            }
 
             resVal += previousWarp;
 
             previousWarp.x = __shfl_sync(0xFFFFFFFF, resVal.x, warpSize - 1);
+            if constexpr (vector_active_size_v<SrcDstT> > 1)
+            {
+                previousWarp.y = __shfl_sync(0xFFFFFFFF, resVal.y, warpSize - 1);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 2)
+            {
+                previousWarp.z = __shfl_sync(0xFFFFFFFF, resVal.z, warpSize - 1);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 3)
+            {
+                previousWarp.w = __shfl_sync(0xFFFFFFFF, resVal.w, warpSize - 1);
+            }
 
             if (pixelX < aSize.x)
             {
@@ -73,10 +97,34 @@ __global__ void integralYKernel(SrcDstT *__restrict__ aSrcDst, size_t aPitchSrcD
             }
 
             doShuffleUp(warpLaneID, resVal.x);
+            if constexpr (vector_active_size_v<SrcDstT> > 1)
+            {
+                doShuffleUp(warpLaneID, resVal.y);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 2)
+            {
+                doShuffleUp(warpLaneID, resVal.z);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 3)
+            {
+                doShuffleUp(warpLaneID, resVal.w);
+            }
 
             resVal += previousWarp;
 
             previousWarp.x = __shfl_sync(0xFFFFFFFF, resVal.x, warpSize - 1);
+            if constexpr (vector_active_size_v<SrcDstT> > 1)
+            {
+                previousWarp.y = __shfl_sync(0xFFFFFFFF, resVal.y, warpSize - 1);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 2)
+            {
+                previousWarp.z = __shfl_sync(0xFFFFFFFF, resVal.z, warpSize - 1);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 3)
+            {
+                previousWarp.w = __shfl_sync(0xFFFFFFFF, resVal.w, warpSize - 1);
+            }
 
             if (pixelX < aSize.x)
             {
@@ -112,6 +160,18 @@ __global__ void integralYKernel(SrcDstT *__restrict__ aSrcDst, size_t aPitchSrcD
             }
 
             previousWarp.x = __shfl_sync(0xFFFFFFFF, tupelDst.value[TupelSize - 1].x, warpSize - 1);
+            if constexpr (vector_active_size_v<SrcDstT> > 1)
+            {
+                previousWarp.y = __shfl_sync(0xFFFFFFFF, tupelDst.value[TupelSize - 1].y, warpSize - 1);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 2)
+            {
+                previousWarp.z = __shfl_sync(0xFFFFFFFF, tupelDst.value[TupelSize - 1].z, warpSize - 1);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 3)
+            {
+                previousWarp.w = __shfl_sync(0xFFFFFFFF, tupelDst.value[TupelSize - 1].w, warpSize - 1);
+            }
 
             Tupel<SrcDstT, TupelSize>::StoreAligned(tupelDst, pixelSrcDst);
         }
@@ -129,10 +189,34 @@ __global__ void integralYKernel(SrcDstT *__restrict__ aSrcDst, size_t aPitchSrcD
             }
 
             doShuffleUp(warpLaneID, resVal.x);
+            if constexpr (vector_active_size_v<SrcDstT> > 1)
+            {
+                doShuffleUp(warpLaneID, resVal.y);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 2)
+            {
+                doShuffleUp(warpLaneID, resVal.z);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 3)
+            {
+                doShuffleUp(warpLaneID, resVal.w);
+            }
 
             resVal += previousWarp;
 
             previousWarp.x = __shfl_sync(0xFFFFFFFF, resVal.x, warpSize - 1);
+            if constexpr (vector_active_size_v<SrcDstT> > 1)
+            {
+                previousWarp.y = __shfl_sync(0xFFFFFFFF, resVal.y, warpSize - 1);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 2)
+            {
+                previousWarp.z = __shfl_sync(0xFFFFFFFF, resVal.z, warpSize - 1);
+            }
+            if constexpr (vector_active_size_v<SrcDstT> > 3)
+            {
+                previousWarp.w = __shfl_sync(0xFFFFFFFF, resVal.w, warpSize - 1);
+            }
 
             if (pixelX < aSize.x)
             {

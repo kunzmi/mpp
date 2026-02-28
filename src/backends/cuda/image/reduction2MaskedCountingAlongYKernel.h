@@ -68,7 +68,7 @@ __global__ void reduction2MaskedCountingAlongYKernel(const ulong64 *__restrict__
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp1(buffer[i][warpLaneId], result1);
         }
@@ -184,7 +184,7 @@ __global__ void reduction2MaskedCountingAlongYKernel(const ulong64 *__restrict__
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y; i++) // i = 0 is already stored in result
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in result
         {
             redOp2(buffer[i][warpLaneId], result2);
         }
@@ -300,8 +300,7 @@ __global__ void reduction2MaskedCountingAlongYKernel(const ulong64 *__restrict__
     {
         // reduce over Y the entire thread block:
 #pragma unroll
-        for (int i = 1; i < ConfigBlockSize<"DefaultReductionY">::value.y;
-             i++) // i = 0 is already stored in maskCounter
+        for (int i = 1; i < blockDim.y; i++) // i = 0 is already stored in maskCounter
         {
             maskCounter += bufferMask[i][warpLaneId];
         }
@@ -386,14 +385,20 @@ void InvokeReduction2MaskedCountingAlongYKernelDefault(const ulong64 *aMaskCount
 {
     if (aStreamCtx.ComputeCapabilityMajor < INT_MAX)
     {
-        dim3 BlockSize    = ConfigBlockSize<"DefaultReductionY">::value;
-        uint SharedMemory = sizeof(DstT1) * BlockSize.x * BlockSize.y * BlockSize.z;
+        dim3 BlockSize     = ConfigBlockSize<"DefaultReductionY">::value;
+        uint SharedMemory1 = sizeof(DstT1) * BlockSize.x * BlockSize.y * BlockSize.z;
+        uint SharedMemory2 = sizeof(DstT2) * BlockSize.x * BlockSize.y * BlockSize.z;
+        uint SharedMemory3 = sizeof(ulong64) * BlockSize.x * BlockSize.y * BlockSize.z;
+        uint SharedMemory  = std::max(SharedMemory1, std::max(SharedMemory2, SharedMemory3));
 
         if (SharedMemory > aStreamCtx.SharedMemPerBlock)
         {
             // use a block config of half the size:
-            BlockSize    = ConfigBlockSize<"DefaultReductionYLarge">::value;
-            SharedMemory = sizeof(DstT1) * BlockSize.x * BlockSize.y * BlockSize.z;
+            BlockSize     = ConfigBlockSize<"DefaultReductionYLarge">::value;
+            SharedMemory1 = sizeof(DstT1) * BlockSize.x * BlockSize.y * BlockSize.z;
+            SharedMemory2 = sizeof(DstT2) * BlockSize.x * BlockSize.y * BlockSize.z;
+            SharedMemory3 = sizeof(ulong64) * BlockSize.x * BlockSize.y * BlockSize.z;
+            SharedMemory  = std::max(SharedMemory1, std::max(SharedMemory2, SharedMemory3));
         }
 
         InvokeReduction2MaskedCountingAlongYKernel<SrcT1, SrcT2, DstT1, DstT2, reductionOp1, reductionOp2,

@@ -43,8 +43,8 @@ struct pixel_block_size_y<T>
 
 template <typename SrcT, typename DstT>
 void InvokeSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aTempBuffer,
-                      DstT *aTempBufferAvg, DstT *aDst, remove_vector_t<DstT> aDynamicRange, remove_vector_t<DstT> aK1,
-                      remove_vector_t<DstT> aK2, const Size2D &aAllowedReadRoiSize1,
+                      size_t aPitchTempBuffer, DstT *aTempBufferAvg, DstT *aDst, remove_vector_t<DstT> aDynamicRange,
+                      remove_vector_t<DstT> aK1, remove_vector_t<DstT> aK2, const Size2D &aAllowedReadRoiSize1,
                       const Vector2<int> &aOffsetToActualRoi1, const Size2D &aAllowedReadRoiSize2,
                       const Vector2<int> &aOffsetToActualRoi2, const Size2D &aSize,
                       const mpp::cuda::StreamCtx &aStreamCtx)
@@ -65,14 +65,13 @@ void InvokeSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, s
     const mpp::SSIM<DstT> postOp(aDynamicRange, aK1, aK2);
 
     InvokeSSIMFilterKernelDefault<ComputeT, DstT, TupelSize, filterSize, pixelBlockSizeY, BCType, FilterT,
-                                  mpp::SSIM<DstT>>(bc1, bc2, aTempBuffer, aSize.x * sizeof(DstT), postOp, aSize,
-                                                   aStreamCtx);
+                                  mpp::SSIM<DstT>>(bc1, bc2, aTempBuffer, aPitchTempBuffer, postOp, aSize, aStreamCtx);
 
     using sumSrc = SrcReductionFunctor<TupelSize, ComputeT, ComputeT, mpp::Sum<ComputeT, ComputeT>>;
 
     const mpp::Sum<ComputeT, ComputeT> op;
 
-    const sumSrc functor(aTempBuffer, aSize.x * sizeof(DstT), op);
+    const sumSrc functor(aTempBuffer, aPitchTempBuffer, op);
 
     InvokeReductionAlongXKernelDefault<ComputeT, ComputeT, TupelSize, sumSrc, mpp::Sum<ComputeT, ComputeT>,
                                        ReductionInitValue::Zero>(aTempBuffer, aTempBufferAvg, aSize, aStreamCtx,
@@ -103,7 +102,7 @@ void InvokeSSIMSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, s
 #define Instantiate_For(typeSrc)                                                                                       \
     template void InvokeSSIMSrcSrc<typeSrc, ssim_types_for_rt<typeSrc>>(                                               \
         const typeSrc *aSrc1, size_t aPitchSrc1, const typeSrc *aSrc2, size_t aPitchSrc2,                              \
-        ssim_types_for_rt<typeSrc> *aTempBuffer, ssim_types_for_rt<typeSrc> *aTempBufferAvg,                           \
+        ssim_types_for_rt<typeSrc> *aTempBuffer, size_t aPitchTempBuffer, ssim_types_for_rt<typeSrc> *aTempBufferAvg,  \
         ssim_types_for_rt<typeSrc> *aDst, remove_vector_t<ssim_types_for_rt<typeSrc>> aDynamicRange,                   \
         remove_vector_t<ssim_types_for_rt<typeSrc>> aK1, remove_vector_t<ssim_types_for_rt<typeSrc>> aK2,              \
         const Size2D &aAllowedReadRoiSize1, const Vector2<int> &aOffsetToActualRoi1,                                   \

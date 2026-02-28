@@ -38,6 +38,12 @@ target_include_directories(backends.simple_cpu32s  PUBLIC ${CMAKE_CUDA_TOOLKIT_I
 target_link_libraries(backends.simple_cpu32s PRIVATE project_options project_warnings)
 target_link_libraries(backends.simple_cpu32s PUBLIC common)
 
+add_library(backends.simple_cpu64s SHARED image/imageView64s.cpp)
+target_compile_definitions(backends.simple_cpu64s PRIVATE -DMPP_SIMPLECPU)	
+target_include_directories(backends.simple_cpu64s  PUBLIC ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/src)
+target_link_libraries(backends.simple_cpu64s PRIVATE project_options project_warnings)
+target_link_libraries(backends.simple_cpu64s PUBLIC common)
+
 
 add_library(backends.simple_cpu16bf SHARED image/imageView16bf.cpp)
 target_compile_definitions(backends.simple_cpu16bf PRIVATE -DMPP_SIMPLECPU)	
@@ -89,6 +95,7 @@ set_target_properties(backends.simple_cpu16u PROPERTIES OUTPUT_NAME mppi-simplec
 set_target_properties(backends.simple_cpu16s PROPERTIES OUTPUT_NAME mppi-simplecpu-16s)
 set_target_properties(backends.simple_cpu32u PROPERTIES OUTPUT_NAME mppi-simplecpu-32u)
 set_target_properties(backends.simple_cpu32s PROPERTIES OUTPUT_NAME mppi-simplecpu-32s)
+set_target_properties(backends.simple_cpu64s PROPERTIES OUTPUT_NAME mppi-simplecpu-64s)
 set_target_properties(backends.simple_cpu16f PROPERTIES OUTPUT_NAME mppi-simplecpu-16f)
 set_target_properties(backends.simple_cpu16bf PROPERTIES OUTPUT_NAME mppi-simplecpu-16bf)
 set_target_properties(backends.simple_cpu32f PROPERTIES OUTPUT_NAME mppi-simplecpu-32f)
@@ -105,6 +112,7 @@ target_link_libraries(backends.simple_cpu INTERFACE
 		backends.simple_cpu16s
 		backends.simple_cpu32u
 		backends.simple_cpu32s
+		backends.simple_cpu64s
 		
 		backends.simple_cpu16bf
 		backends.simple_cpu16f

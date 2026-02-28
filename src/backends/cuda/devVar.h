@@ -32,7 +32,9 @@ template <typename T> class DevVar : public DevVarView<T>
     {
         if (DevVarView<T>::PointerRef() != nullptr)
         {
-            cudaSafeCall(cudaFree(DevVarView<T>::PointerRef()));
+            // ignore if failing, as the destructor is also called after an cuda-exception and
+            // the cuda-context might already be invalid
+            cudaFree(DevVarView<T>::PointerRef());
         }
         DevVarView<T>::PointerRef() = nullptr;
         DevVarView<T>::SizeRef()    = 0;

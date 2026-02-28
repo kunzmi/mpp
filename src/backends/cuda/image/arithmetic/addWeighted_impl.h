@@ -23,7 +23,7 @@ namespace mpp::image::cuda
 {
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddWeightedSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst,
-                             size_t aPitchDst, remove_vector_t<ComputeT> aAlpha, const Size2D &aSize,
+                             size_t aPitchDst, const remove_vector_t<ComputeT> &aAlpha, const Size2D &aSize,
                              const mpp::cuda::StreamCtx &aStreamCtx)
 {
     MPP_CUDA_REGISTER_TEMPALTE;
@@ -45,8 +45,9 @@ void InvokeAddWeightedSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *a
 #define InstantiateInvokeAddWeightedSrcSrc_For(typeSrc)                                                                \
     template void InvokeAddWeightedSrcSrc<typeSrc, add_spw_output_for_t<typeSrc>, add_spw_output_for_t<typeSrc>>(      \
         const typeSrc *aSrc1, size_t aPitchSrc1, const typeSrc *aSrc2, size_t aPitchSrc2,                              \
-        add_spw_output_for_t<typeSrc> *aDst, size_t aPitchDst, remove_vector_t<add_spw_output_for_t<typeSrc>> aAlpha,  \
-        const Size2D &aSize, const StreamCtx &aStreamCtx);
+        add_spw_output_for_t<typeSrc> *aDst, size_t aPitchDst,                                                         \
+        const remove_vector_t<add_spw_output_for_t<typeSrc>> &aAlpha, const Size2D &aSize,                             \
+        const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeAddWeightedSrcSrc(type)                                                             \
     InstantiateInvokeAddWeightedSrcSrc_For(Pixel##type##C1);                                                           \
@@ -65,7 +66,7 @@ void InvokeAddWeightedSrcSrc(const SrcT *aSrc1, size_t aPitchSrc1, const SrcT *a
 
 template <typename SrcT, typename ComputeT, typename DstT>
 void InvokeAddWeightedInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT *aSrc2, size_t aPitchSrc2,
-                                 remove_vector_t<ComputeT> aAlpha, const Size2D &aSize,
+                                 const remove_vector_t<ComputeT> &aAlpha, const Size2D &aSize,
                                  const mpp::cuda::StreamCtx &aStreamCtx)
 {
     MPP_CUDA_REGISTER_TEMPALTE;
@@ -88,7 +89,8 @@ void InvokeAddWeightedInplaceSrc(DstT *aSrcDst, size_t aPitchSrcDst, const SrcT 
 #define InstantiateInvokeAddWeightedInplaceSrc_For(typeSrc)                                                            \
     template void InvokeAddWeightedInplaceSrc<typeSrc, add_spw_output_for_t<typeSrc>, add_spw_output_for_t<typeSrc>>(  \
         add_spw_output_for_t<typeSrc> * aSrcDst, size_t aPitchSrcDst, const typeSrc *aSrc2, size_t aPitchSrc2,         \
-        remove_vector_t<add_spw_output_for_t<typeSrc>> aAlpha, const Size2D &aSize, const StreamCtx &aStreamCtx);
+        const remove_vector_t<add_spw_output_for_t<typeSrc>> &aAlpha, const Size2D &aSize,                             \
+        const StreamCtx &aStreamCtx);
 
 #define ForAllChannelsNoAlphaInvokeAddWeightedInplaceSrc(type)                                                         \
     InstantiateInvokeAddWeightedInplaceSrc_For(Pixel##type##C1);                                                       \

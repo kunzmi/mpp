@@ -386,3 +386,23 @@ set_target_properties(backends.cuda.image64f PROPERTIES OUTPUT_NAME mppci-cpp-64
 set_target_properties(backends.cuda.image16sc PROPERTIES OUTPUT_NAME mppci-cpp-16sc)
 set_target_properties(backends.cuda.image32sc PROPERTIES OUTPUT_NAME mppci-cpp-32sc)
 set_target_properties(backends.cuda.image32fc PROPERTIES OUTPUT_NAME mppci-cpp-32fc)
+
+
+add_library(backends.cuda.image INTERFACE)
+target_link_libraries(backends.cuda.image INTERFACE 
+		backends.cuda.image8u
+		backends.cuda.image8s
+		backends.cuda.image16u 
+		backends.cuda.image16s 
+		backends.cuda.image32u 
+		backends.cuda.image32s 
+
+		backends.cuda.image16f 
+		backends.cuda.image16bf
+		backends.cuda.image32f 
+		backends.cuda.image64f 
+
+		backends.cuda.image16sc
+		backends.cuda.image32sc
+		backends.cuda.image32fc
+)

@@ -12,12 +12,12 @@ namespace mpp::image::cuda
 template <typename SrcT, typename ComputeT = add_spw_output_for_t<SrcT>, typename DstT = add_spw_output_for_t<SrcT>>
 void InvokeAddWeightedSrcSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, const SrcT *aSrc1, size_t aPitchSrc1,
                                  const SrcT *aSrc2, size_t aPitchSrc2, DstT *aDst, size_t aPitchDst,
-                                 remove_vector_t<ComputeT> aAlpha, const Size2D &aSize,
+                                 const remove_vector_t<ComputeT> &aAlpha, const Size2D &aSize,
                                  const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcT, typename ComputeT = add_spw_output_for_t<SrcT>, typename DstT = add_spw_output_for_t<SrcT>>
 void InvokeAddWeightedInplaceSrcMask(const Pixel8uC1 *aMask, size_t aPitchMask, DstT *aSrcDst, size_t aPitchSrcDst,
-                                     const SrcT *aSrc2, size_t aPitchSrc2, remove_vector_t<ComputeT> aAlpha,
+                                     const SrcT *aSrc2, size_t aPitchSrc2, const remove_vector_t<ComputeT> &aAlpha,
                                      const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda

@@ -550,6 +550,12 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         {
             aDstView.CopyFrom(*this);
         }
+        else if (aDstView.MemoryType() == ImageViewBase<T>::MemoryType_enum::HostDefault)
+        {
+            // NOLINTNEXTLINE(bugprone-undefined-memory-manipulation)
+            std::memcpy(reinterpret_cast<void *>(aDstView.Pointer()), reinterpret_cast<const void *>(Pointer()),
+                        Pitch() * static_cast<size_t>(Height()));
+        }
         else
         {
             throw INVALIDARGUMENT(
@@ -573,6 +579,12 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
         if (aSrcView.MemoryType() == ImageViewBase<T>::MemoryType_enum::CudaDefault)
         {
             aSrcView.CopyTo(*this);
+        }
+        else if (aSrcView.MemoryType() == ImageViewBase<T>::MemoryType_enum::HostDefault)
+        {
+            // NOLINTNEXTLINE(bugprone-undefined-memory-manipulation)
+            std::memcpy(reinterpret_cast<void *>(Pointer()), reinterpret_cast<const void *>(aSrcView.Pointer()),
+                        Pitch() * static_cast<size_t>(Height()));
         }
         else
         {
@@ -5005,6 +5017,9 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
 #pragma region QualityIndex
     void QualityIndex(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
         requires RealVector<T>;
+
+    void QualityIndexWindow(const ImageView<T> &aSrc2, same_vector_size_different_type_t<T, double> &aDst) const
+        requires RealVector<T>;
 #pragma endregion
 
 #pragma region SSIM
@@ -5418,12 +5433,12 @@ template <PixelType T> class MPPEXPORT_SIMPLECPU ImageView : public ImageViewBas
     /// aProfileSum, can be nullptr.</param>
     /// <param name="aCenter">The center of the circular average.</param>
     /// <param name="aRadiusRatio">Ratio of orientation axis to orthogonal axis. (i.e. 1.5 means stretched 1.5x)</param>
-    /// <param name="aAngleInRad">Orientation of the ellipse's orthogonal axis, clockwise in radians with 0.0 being
+    /// <param name="aAngleInDeg">Orientation of the ellipse's orthogonal axis, clockwise in degrees with 0.0 being
     /// vertical.</param>
     /// <param name="aStreamCtx"></param>
     void RadialProfile(int *aProfileCount, same_vector_size_different_type_t<T, float> *aProfileSum,
                        same_vector_size_different_type_t<T, float> *aProfileSumSqr, int aProfileSize,
-                       const Vec2f &aCenter, float aRadiusRatio, float aAngleInRad) const
+                       const Vec2f &aCenter, float aRadiusRatio, float aAngleInDeg) const
         requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>);
 #pragma endregion
 #pragma endregion

@@ -1779,7 +1779,7 @@ size_t ImageView<T>::QualityIndexWindowBufferSize(const mpp::cuda::StreamCtx & /
 {
     using DstT = qiw_types_for_rt<T>;
 
-    ScratchBuffer<DstT, DstT> buffers(nullptr, BufferSizes{SizeRoi().TotalSize(), SizeRoi().y});
+    ScratchBuffer<DstT, DstT> buffers(nullptr, BufferSizes{SizeRoi(), SizeRoi().y});
     return buffers.GetTotalBufferSize();
 }
 
@@ -1799,12 +1799,12 @@ void ImageView<T>::QualityIndexWindow(const ImageView<T> &aSrc2, mpp::cuda::DevV
 
     const Vector2<int> roiOffset(0, 0);
 
-    ScratchBuffer<DstT, DstT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().TotalSize(), SizeRoi().y});
+    ScratchBuffer<DstT, DstT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi(), SizeRoi().y});
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
     InvokeQIWSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), buffers.template Get<0>(),
-                    buffers.template Get<1>(), aDst.Pointer(), SizeRoi(), roiOffset, SizeRoi(), roiOffset, SizeRoi(),
-                    aStreamCtx);
+                    buffers.GetSubBufferPitch(0), buffers.template Get<1>(), aDst.Pointer(), SizeRoi(), roiOffset,
+                    SizeRoi(), roiOffset, SizeRoi(), aStreamCtx);
 }
 #pragma endregion
 
@@ -1821,12 +1821,11 @@ size_t ImageView<T>::SSIMBufferSize(const mpp::cuda::StreamCtx & /*aStreamCtx*/)
     {
         const Size2D scaledRoi = SizeRoi() / to_int(scaleFactor);
 
-        ScratchBuffer<T, T, DstT, DstT> buffers(nullptr,
-                                                BufferSizes{scaledRoi, scaledRoi, scaledRoi.TotalSize(), scaledRoi.y});
+        ScratchBuffer<T, T, DstT, DstT> buffers(nullptr, BufferSizes{scaledRoi, scaledRoi, scaledRoi, scaledRoi.y});
         return buffers.GetTotalBufferSize();
     }
 
-    ScratchBuffer<DstT, DstT> buffers(nullptr, BufferSizes{SizeRoi().TotalSize(), SizeRoi().y});
+    ScratchBuffer<DstT, DstT> buffers(nullptr, BufferSizes{SizeRoi(), SizeRoi().y});
     return buffers.GetTotalBufferSize();
 }
 
@@ -1854,7 +1853,7 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ssim_ty
         const Size2D scaledRoi = SizeRoi() / to_int(scaleFactor);
 
         ScratchBuffer<T, T, DstT, DstT> buffers(aBuffer.Pointer(),
-                                                BufferSizes{scaledRoi, scaledRoi, scaledRoi.TotalSize(), scaledRoi.y});
+                                                BufferSizes{scaledRoi, scaledRoi, scaledRoi, scaledRoi.y});
 
         CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
         assert(buffers.GetSubBufferPitch(0) == buffers.GetSubBufferPitch(1));
@@ -1868,28 +1867,29 @@ void ImageView<T>::SSIM(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ssim_ty
         {
             using twoChannel = ImageView<Vector2<remove_vector_t<T>>>;
             twoChannel::Resize(*this, aSrc2, resizeSrc1, resizeSrc2, 1.0 / to_double(scaleFactor), 0,
-                               InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+                               InterpolationMode::Super, BorderType::Replicate, ROI(), aStreamCtx);
         }
         else
         {
             this->Resize(resizeSrc1, 1.0 / to_double(scaleFactor), 0, InterpolationMode::Super, BorderType::Replicate,
-                         Roi(), aStreamCtx);
+                         ROI(), aStreamCtx);
             aSrc2.Resize(resizeSrc2, 1.0 / to_double(scaleFactor), 0, InterpolationMode::Super, BorderType::Replicate,
-                         Roi(), aStreamCtx);
+                         ROI(), aStreamCtx);
         }
 
         InvokeSSIMSrcSrc(resizeSrc1.PointerRoi(), resizeSrc1.Pitch(), resizeSrc2.PointerRoi(), resizeSrc2.Pitch(),
-                         buffers.template Get<2>(), buffers.template Get<3>(), aDst.Pointer(), aDynamicRange, aK1, aK2,
-                         scaledRoi, roiOffset, scaledRoi, roiOffset, scaledRoi, aStreamCtx);
+                         buffers.template Get<2>(), buffers.GetSubBufferPitch(2), buffers.template Get<3>(),
+                         aDst.Pointer(), aDynamicRange, aK1, aK2, scaledRoi, roiOffset, scaledRoi, roiOffset, scaledRoi,
+                         aStreamCtx);
     }
     else
     {
-        ScratchBuffer<DstT, DstT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().TotalSize(), SizeRoi().y});
+        ScratchBuffer<DstT, DstT> buffers(aBuffer.Pointer(), BufferSizes{SizeRoi(), SizeRoi().y});
         CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
         InvokeSSIMSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), buffers.template Get<0>(),
-                         buffers.template Get<1>(), aDst.Pointer(), aDynamicRange, aK1, aK2, SizeRoi(), roiOffset,
-                         SizeRoi(), roiOffset, SizeRoi(), aStreamCtx);
+                         buffers.GetSubBufferPitch(0), buffers.template Get<1>(), aDst.Pointer(), aDynamicRange, aK1,
+                         aK2, SizeRoi(), roiOffset, SizeRoi(), roiOffset, SizeRoi(), aStreamCtx);
     }
 }
 #pragma endregion
@@ -1905,7 +1905,7 @@ size_t ImageView<T>::MSSSIMBufferSize(const mpp::cuda::StreamCtx & /*aStreamCtx*
     const Size2D scaledRoi2 = scaledRoi1 / 2;
 
     ScratchBuffer<T, T, T, T, DstT, DstT> buffers(
-        nullptr, BufferSizes{scaledRoi1, scaledRoi1, scaledRoi2, scaledRoi2, SizeRoi().TotalSize(), SizeRoi().y});
+        nullptr, BufferSizes{scaledRoi1, scaledRoi1, scaledRoi2, scaledRoi2, SizeRoi(), SizeRoi().y});
     return buffers.GetTotalBufferSize();
 }
 
@@ -1931,8 +1931,7 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ssim_
     const Size2D scaledRoi2 = scaledRoi1 / 2;
 
     ScratchBuffer<T, T, T, T, DstT, DstT> buffers(
-        aBuffer.Pointer(),
-        BufferSizes{scaledRoi1, scaledRoi1, scaledRoi2, scaledRoi2, SizeRoi().TotalSize(), SizeRoi().y});
+        aBuffer.Pointer(), BufferSizes{scaledRoi1, scaledRoi1, scaledRoi2, scaledRoi2, SizeRoi(), SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -1945,42 +1944,44 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ssim_
 
     int level = 0;
     InvokeMSSSIMSrcSrc(PointerRoi(), Pitch(), aSrc2.PointerRoi(), aSrc2.Pitch(), buffers.template Get<4>(),
-                       buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1, aK2, SizeRoi(), roiOffset,
-                       SizeRoi(), roiOffset, SizeRoi(), aStreamCtx);
+                       buffers.GetSubBufferPitch(4), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange,
+                       aK1, aK2, SizeRoi(), roiOffset, SizeRoi(), roiOffset, SizeRoi(), aStreamCtx);
 
     resizedRoiSize /= 2;
     if constexpr (SingleChannel<T>)
     {
         twoChannel::Resize(*this, aSrc2, resizeSrc11, resizeSrc12, 0.5, 0, InterpolationMode::Super,
-                           BorderType::Replicate, Roi(), aStreamCtx);
+                           BorderType::Replicate, aStreamCtx);
     }
     else
     {
-        this->Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
-        aSrc2.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        this->Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, aStreamCtx);
+        aSrc2.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, aStreamCtx);
     }
 
     level = 1;
     InvokeMSSSIMSrcSrc(resizeSrc11.PointerRoi(), resizeSrc11.Pitch(), resizeSrc12.PointerRoi(), resizeSrc12.Pitch(),
-                       buffers.template Get<4>(), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1,
-                       aK2, resizedRoiSize, roiOffset, resizedRoiSize, roiOffset, resizedRoiSize, aStreamCtx);
+                       buffers.template Get<4>(), buffers.GetSubBufferPitch(4), buffers.template Get<5>(),
+                       aDst.Pointer(), level, aDynamicRange, aK1, aK2, resizedRoiSize, roiOffset, resizedRoiSize,
+                       roiOffset, resizedRoiSize, aStreamCtx);
 
     resizedRoiSize /= 2;
     if constexpr (SingleChannel<T>)
     {
         twoChannel::Resize(resizeSrc11, resizeSrc12, resizeSrc21, resizeSrc22, 0.5, 0, InterpolationMode::Super,
-                           BorderType::Replicate, Roi(), aStreamCtx);
+                           BorderType::Replicate, aStreamCtx);
     }
     else
     {
-        resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
-        resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, aStreamCtx);
+        resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, aStreamCtx);
     }
 
     level = 2;
     InvokeMSSSIMSrcSrc(resizeSrc21.PointerRoi(), resizeSrc21.Pitch(), resizeSrc22.PointerRoi(), resizeSrc22.Pitch(),
-                       buffers.template Get<4>(), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1,
-                       aK2, resizedRoiSize, roiOffset, resizedRoiSize, roiOffset, resizedRoiSize, aStreamCtx);
+                       buffers.template Get<4>(), buffers.GetSubBufferPitch(4), buffers.template Get<5>(),
+                       aDst.Pointer(), level, aDynamicRange, aK1, aK2, resizedRoiSize, roiOffset, resizedRoiSize,
+                       roiOffset, resizedRoiSize, aStreamCtx);
 
     resizedRoiSize /= 2;
     resizeSrc11.SetRoi(Roi({0}, resizedRoiSize));
@@ -1988,18 +1989,19 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ssim_
     if constexpr (SingleChannel<T>)
     {
         twoChannel::Resize(resizeSrc21, resizeSrc22, resizeSrc11, resizeSrc12, 0.5, 0, InterpolationMode::Super,
-                           BorderType::Replicate, Roi(), aStreamCtx);
+                           BorderType::Replicate, aStreamCtx);
     }
     else
     {
-        resizeSrc21.Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
-        resizeSrc22.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        resizeSrc21.Resize(resizeSrc11, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, aStreamCtx);
+        resizeSrc22.Resize(resizeSrc12, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, aStreamCtx);
     }
 
     level = 3;
     InvokeMSSSIMSrcSrc(resizeSrc11.PointerRoi(), resizeSrc11.Pitch(), resizeSrc12.PointerRoi(), resizeSrc12.Pitch(),
-                       buffers.template Get<4>(), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1,
-                       aK2, resizedRoiSize, roiOffset, resizedRoiSize, roiOffset, resizedRoiSize, aStreamCtx);
+                       buffers.template Get<4>(), buffers.GetSubBufferPitch(4), buffers.template Get<5>(),
+                       aDst.Pointer(), level, aDynamicRange, aK1, aK2, resizedRoiSize, roiOffset, resizedRoiSize,
+                       roiOffset, resizedRoiSize, aStreamCtx);
 
     resizedRoiSize /= 2;
     resizeSrc21.SetRoi(Roi({0}, resizedRoiSize));
@@ -2007,18 +2009,19 @@ void ImageView<T>::MSSSIM(const ImageView<T> &aSrc2, mpp::cuda::DevVarView<ssim_
     if constexpr (SingleChannel<T>)
     {
         twoChannel::Resize(resizeSrc11, resizeSrc12, resizeSrc21, resizeSrc22, 0.5, 0, InterpolationMode::Super,
-                           BorderType::Replicate, Roi(), aStreamCtx);
+                           BorderType::Replicate, aStreamCtx);
     }
     else
     {
-        resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
-        resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, Roi(), aStreamCtx);
+        resizeSrc11.Resize(resizeSrc21, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, aStreamCtx);
+        resizeSrc12.Resize(resizeSrc22, 0.5, 0, InterpolationMode::Super, BorderType::Replicate, aStreamCtx);
     }
 
     level = 4;
     InvokeMSSSIMSrcSrc(resizeSrc21.PointerRoi(), resizeSrc21.Pitch(), resizeSrc22.PointerRoi(), resizeSrc22.Pitch(),
-                       buffers.template Get<4>(), buffers.template Get<5>(), aDst.Pointer(), level, aDynamicRange, aK1,
-                       aK2, resizedRoiSize, roiOffset, resizedRoiSize, roiOffset, resizedRoiSize, aStreamCtx);
+                       buffers.template Get<4>(), buffers.GetSubBufferPitch(4), buffers.template Get<5>(),
+                       aDst.Pointer(), level, aDynamicRange, aK1, aK2, resizedRoiSize, roiOffset, resizedRoiSize,
+                       roiOffset, resizedRoiSize, aStreamCtx);
 }
 #pragma endregion
 
@@ -3457,19 +3460,13 @@ void ImageView<T>::MinMaxMasked(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::De
 #pragma endregion
 #pragma region MinIndex
 template <PixelType T>
-size_t ImageView<T>::MinIndexBufferSize(const mpp::cuda::StreamCtx &aStreamCtx) const
+size_t ImageView<T>::MinIndexBufferSize(const mpp::cuda::StreamCtx & /*aStreamCtx*/) const
     requires RealVector<T>
 {
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr,
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3494,14 +3491,8 @@ void ImageView<T>::MinIndex(mpp::cuda::DevVarView<T> &aDstMin,
     checkNullptr(aBuffer);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(aBuffer.Pointer(),
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3525,14 +3516,8 @@ void ImageView<T>::MinIndexMasked(mpp::cuda::DevVarView<T> &aDstMin,
     checkSameSize(*this, aMask);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(aBuffer.Pointer(),
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3555,14 +3540,8 @@ void ImageView<T>::MinIndex(mpp::cuda::DevVarView<T> &aDstMin,
     checkNullptr(aBuffer);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(aBuffer.Pointer(),
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3587,14 +3566,8 @@ void ImageView<T>::MinIndexMasked(mpp::cuda::DevVarView<T> &aDstMin,
     checkSameSize(*this, aMask);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(aBuffer.Pointer(),
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3605,19 +3578,13 @@ void ImageView<T>::MinIndexMasked(mpp::cuda::DevVarView<T> &aDstMin,
 #pragma endregion
 #pragma region MaxIndex
 template <PixelType T>
-size_t ImageView<T>::MaxIndexBufferSize(const mpp::cuda::StreamCtx &aStreamCtx) const
+size_t ImageView<T>::MaxIndexBufferSize(const mpp::cuda::StreamCtx & /*aStreamCtx*/) const
     requires RealVector<T>
 {
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(nullptr,
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3642,14 +3609,8 @@ void ImageView<T>::MaxIndex(mpp::cuda::DevVarView<T> &aDstMax,
     checkNullptr(aBuffer);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(aBuffer.Pointer(),
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3673,14 +3634,8 @@ void ImageView<T>::MaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMax,
     checkSameSize(*this, aMask);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(aBuffer.Pointer(),
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3703,14 +3658,8 @@ void ImageView<T>::MaxIndex(mpp::cuda::DevVarView<T> &aDstMax,
     checkNullptr(aBuffer);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(aBuffer.Pointer(),
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3735,14 +3684,8 @@ void ImageView<T>::MaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMax,
     checkSameSize(*this, aMask);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
-    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(
-        aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor});
+    ScratchBuffer<ComputeT, same_vector_size_different_type_t<T, int>> buffers(aBuffer.Pointer(),
+                                                                               BufferSizes{SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3753,21 +3696,14 @@ void ImageView<T>::MaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMax,
 #pragma endregion
 #pragma region MinMaxIndex
 template <PixelType T>
-size_t ImageView<T>::MinMaxIndexBufferSize(const mpp::cuda::StreamCtx &aStreamCtx) const
+size_t ImageView<T>::MinMaxIndexBufferSize(const mpp::cuda::StreamCtx & /*aStreamCtx*/) const
     requires RealVector<T>
 {
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(nullptr, BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
-                                     SizeRoi().y / divisor});
+        buffers(nullptr, BufferSizes{SizeRoi().y, SizeRoi().y, SizeRoi().y, SizeRoi().y});
 
     return buffers.GetTotalBufferSize();
 }
@@ -3792,16 +3728,9 @@ void ImageView<T>::MinMaxIndex(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::Dev
     checkNullptr(aBuffer);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
-                                               SizeRoi().y / divisor});
+        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y, SizeRoi().y, SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3827,16 +3756,9 @@ void ImageView<T>::MinMaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMin, mpp::cud
     checkSameSize(*this, aMask);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
-                                               SizeRoi().y / divisor});
+        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y, SizeRoi().y, SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3859,16 +3781,9 @@ void ImageView<T>::MinMaxIndex(mpp::cuda::DevVarView<T> &aDstMin, mpp::cuda::Dev
     checkNullptr(aBuffer);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
-                                               SizeRoi().y / divisor});
+        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y, SizeRoi().y, SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -3892,16 +3807,9 @@ void ImageView<T>::MinMaxIndexMasked(mpp::cuda::DevVarView<T> &aDstMin, mpp::cud
     checkSameSize(*this, aMask);
     using ComputeT = T;
 
-    int divisor = 1;
-    if (aStreamCtx.ComputeCapabilityMajor < std::numeric_limits<int>::max())
-    {
-        divisor = ConfigBlockSize<"DefaultReductionX">::value.y;
-    }
-
     ScratchBuffer<ComputeT, ComputeT, same_vector_size_different_type_t<T, int>,
                   same_vector_size_different_type_t<T, int>>
-        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y / divisor, SizeRoi().y / divisor, SizeRoi().y / divisor,
-                                               SizeRoi().y / divisor});
+        buffers(aBuffer.Pointer(), BufferSizes{SizeRoi().y, SizeRoi().y, SizeRoi().y, SizeRoi().y});
 
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
@@ -4040,7 +3948,7 @@ ImageView<same_vector_size_different_type_t<T, int>> &ImageView<T>::Integral(
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
     InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0), aDst.Pointer(),
-                      aDst.Pitch(), aVal, SizeRoi(), aStreamCtx);
+                      aDst.Pitch(), aVal, SizeRoi() + 1, aStreamCtx);
 
     return aDst;
 }
@@ -4069,7 +3977,7 @@ ImageView<same_vector_size_different_type_t<T, float>> &ImageView<T>::Integral(
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
     InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0), aDst.Pointer(),
-                      aDst.Pitch(), aVal, SizeRoi(), aStreamCtx);
+                      aDst.Pitch(), aVal, SizeRoi() + 1, aStreamCtx);
 
     return aDst;
 }
@@ -4101,7 +4009,7 @@ ImageView<same_vector_size_different_type_t<T, long64>> &ImageView<T>::Integral(
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
     InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0), aDst.Pointer(),
-                      aDst.Pitch(), aVal, SizeRoi(), aStreamCtx);
+                      aDst.Pitch(), aVal, SizeRoi() + 1, aStreamCtx);
 
     return aDst;
 }
@@ -4133,7 +4041,7 @@ ImageView<same_vector_size_different_type_t<T, double>> &ImageView<T>::Integral(
     CHECK_BUFFER_SIZE(buffers, aBuffer.SizeInBytes());
 
     InvokeIntegralSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0), aDst.Pointer(),
-                      aDst.Pitch(), aVal, SizeRoi(), aStreamCtx);
+                      aDst.Pitch(), aVal, SizeRoi() + 1, aStreamCtx);
 
     return aDst;
 }
@@ -4172,7 +4080,7 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
 
     InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0),
                          buffers.template Get<1>(), buffers.GetSubBufferPitch(1), aDst.Pointer(), aDst.Pitch(),
-                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi(), aStreamCtx);
+                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi() + 1, aStreamCtx);
 }
 
 template <PixelType T>
@@ -4209,7 +4117,7 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, in
 
     InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0),
                          buffers.template Get<1>(), buffers.GetSubBufferPitch(1), aDst.Pointer(), aDst.Pitch(),
-                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi(), aStreamCtx);
+                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi() + 1, aStreamCtx);
 }
 
 template <PixelType T>
@@ -4246,7 +4154,7 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, fl
 
     InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0),
                          buffers.template Get<1>(), buffers.GetSubBufferPitch(1), aDst.Pointer(), aDst.Pitch(),
-                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi(), aStreamCtx);
+                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi() + 1, aStreamCtx);
 }
 
 template <PixelType T>
@@ -4283,7 +4191,7 @@ void ImageView<T>::SqrIntegral(ImageView<same_vector_size_different_type_t<T, do
 
     InvokeIntegralSqrSrc(PointerRoi(), Pitch(), buffers.template Get<0>(), buffers.GetSubBufferPitch(0),
                          buffers.template Get<1>(), buffers.GetSubBufferPitch(1), aDst.Pointer(), aDst.Pitch(),
-                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi(), aStreamCtx);
+                         aSqr.Pointer(), aSqr.Pitch(), aVal, aValSqr, SizeRoi() + 1, aStreamCtx);
 }
 
 template <PixelType T>
@@ -4921,7 +4829,7 @@ void ImageView<T>::RadialProfile(mpp::cuda::DevVarView<int> &aProfileCount,
                                  mpp::cuda::DevVarView<same_vector_size_different_type_t<T, float>> &aProfileSum,
                                  mpp::cuda::DevVarView<same_vector_size_different_type_t<T, float>> &aProfileSumSqr,
                                  // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-                                 const Vec2f &aCenter, float aRadiusRatio, float aAngleInRad,
+                                 const Vec2f &aCenter, float aRadiusRatio, float aAngleInDeg,
                                  const mpp::cuda::StreamCtx &aStreamCtx) const
     requires RealVector<T> && (!std::same_as<remove_vector_t<T>, double>)
 {
@@ -4944,7 +4852,7 @@ void ImageView<T>::RadialProfile(mpp::cuda::DevVarView<int> &aProfileCount,
     }
 
     const AffineTransformation<float> shiftCenter = AffineTransformation<float>::GetTranslation(-aCenter);
-    const AffineTransformation<float> rot         = AffineTransformation<float>::GetTranslation(-aAngleInRad);
+    const AffineTransformation<float> rot         = AffineTransformation<float>::GetRotation(-aAngleInDeg);
     const AffineTransformation<float> scale  = AffineTransformation<float>::GetScale(Vec2f(1.0f, 1.0f / aRadiusRatio));
     const AffineTransformation<float> affine = scale * rot * shiftCenter;
 

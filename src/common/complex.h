@@ -337,6 +337,18 @@ template <RealSignedNumber T> struct alignas(2 * sizeof(T)) MPPEXPORT_COMMON Com
     DEVICE_CODE [[nodiscard]] Complex operator+(const Complex &aOther) const;
 
     /// <summary>
+    /// Complex addition SIMD
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Complex operator+(const Complex &aOther) const
+        requires IsShort<T> && CUDA_ONLY<T>;
+
+    /// <summary>
+    /// Complex addition SIMD
+    /// </summary>
+    DEVICE_CODE [[nodiscard]] Complex operator+(const Complex &aOther) const
+        requires Is16BitFloat<T> && CUDA_ONLY<T>;
+
+    /// <summary>
     /// Complex subtraction (only real part)
     /// </summary>
     DEVICE_CODE Complex &operator-=(T aOther);

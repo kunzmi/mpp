@@ -20,10 +20,11 @@ void InvokeAlphaPremulInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const Size2
 
 template <typename SrcT, typename ComputeT = default_floating_compute_type_for_t<SrcT>, typename DstT>
 void InvokeAlphaPremulACSrc(const SrcT *aSrc, size_t aPitchSrc, DstT *aDst, size_t aPitchDst,
-                            remove_vector_t<SrcT> aAlpha, const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
+                            const remove_vector_t<SrcT> &aAlpha, const Size2D &aSize,
+                            const mpp::cuda::StreamCtx &aStreamCtx);
 
 template <typename SrcDstT, typename ComputeT = default_floating_compute_type_for_t<SrcDstT>>
-void InvokeAlphaPremulACInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, remove_vector_t<SrcDstT> aAlpha,
+void InvokeAlphaPremulACInplace(SrcDstT *aSrcDst, size_t aPitchSrcDst, const remove_vector_t<SrcDstT> &aAlpha,
                                 const Size2D &aSize, const mpp::cuda::StreamCtx &aStreamCtx);
 
 } // namespace mpp::image::cuda
